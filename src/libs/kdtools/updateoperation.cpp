@@ -649,13 +649,8 @@ bool UpdateOperation::fromXml(const QDomDocument &doc)
         const QString value = v.text();
 
         int variantType;
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         const QMetaType t = QMetaType::fromName(type.toLatin1().data());
         variantType = t.id();
-#else
-        const QVariant::Type t = QVariant::nameToType(type.toLatin1().data());
-        variantType = t;
-#endif
         QVariant var = QVariant::fromValue(value);
         if (variantType == QMetaType::QStringList || !var.canConvert(t)) {
             QDataStream stream(QByteArray::fromBase64(value.toLatin1()));

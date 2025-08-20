@@ -148,16 +148,10 @@ bool BinaryFormatEngine::close()
 /*!
     \internal
 */
-#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
-bool BinaryFormatEngine::open(QIODevice::OpenMode mode)
-#else
 bool BinaryFormatEngine::open(QIODevice::OpenMode mode, std::optional<QFile::Permissions> permissions)
-#endif
 {
     Q_UNUSED(mode)
-#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
     Q_UNUSED(permissions)
-#endif
     return m_resource.isNull() ? false : m_resource->open();
 }
 

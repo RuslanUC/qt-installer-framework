@@ -40,10 +40,6 @@
 #  define INSTALLER_EXPORT
 #endif
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-typedef uint hashValue;
-#else
 typedef size_t hashValue;
-#endif
 
 #endif //INSTALLER_GLOBAL_H

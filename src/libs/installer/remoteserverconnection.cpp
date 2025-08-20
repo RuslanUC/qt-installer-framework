@@ -498,20 +498,12 @@ void RemoteServerConnection::handleQFSFileEngine(RemoteServerReply *reply, const
         bool createParentDirectories;
         data >>dirName;
         data >>createParentDirectories;
-#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
-        reply->send(m_engine->mkdir(dirName, createParentDirectories));
-#else
         reply->send(m_engine->mkdir(dirName, createParentDirectories, std::nullopt));
-#endif
 
     } else if (command == QLatin1String(Protocol::QAbstractFileEngineOpen)) {
         qint32 openMode;
         data >>openMode;
-#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
-        reply->send(m_engine->open(static_cast<QIODevice::OpenMode> (openMode)));
-#else
         reply->send(m_engine->open(static_cast<QIODevice::OpenMode> (openMode), std::nullopt));
-#endif
     } else if (command == QLatin1String(Protocol::QAbstractFileEngineOwner)) {
         qint32 owner;
         data >>owner;
@@ -580,11 +572,7 @@ void RemoteServerConnection::handleQFSFileEngine(RemoteServerReply *reply, const
     } else if (command == QLatin1String(Protocol::QAbstractFileEngineFileTime)) {
         qint32 filetime;
         data >> filetime;
-#if QT_VERSION < QT_VERSION_CHECK(6, 7, 0)
-        reply->send(m_engine->fileTime(static_cast<QAbstractFileEngine::FileTime> (filetime)));
-#else
         reply->send(m_engine->fileTime(static_cast<QFile::FileTime> (filetime)));
-#endif
     } else if (!command.isEmpty()) {
         qCDebug(QInstaller::lcServer) << "Unknown QAbstractFileEngine command:" << command;
     }

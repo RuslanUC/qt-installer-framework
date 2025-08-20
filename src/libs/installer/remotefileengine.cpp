@@ -383,17 +383,6 @@ bool RemoteFileEngine::link(const QString &newName)
 /*!
     \reimp
 */
-#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
-bool RemoteFileEngine::mkdir(const QString &dirName, bool createParentDirectories) const
-{
-    if ((const_cast<RemoteFileEngine *>(this))->connectToServer()) {
-        return callRemoteMethod<bool>(QString::fromLatin1(Protocol::QAbstractFileEngineMkdir),
-            dirName, createParentDirectories);
-    }
-    return m_fileEngine.mkdir(dirName, createParentDirectories);
-
-}
-#else
 bool RemoteFileEngine::mkdir(const QString &dirName, bool createParentDirectories,
            std::optional<QFile::Permissions> permissions) const
 {
@@ -403,26 +392,17 @@ bool RemoteFileEngine::mkdir(const QString &dirName, bool createParentDirectorie
     }
     return m_fileEngine.mkdir(dirName, createParentDirectories, permissions);
 }
-#endif
 
 /*!
     \reimp
 */
-#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
-bool RemoteFileEngine::open(QIODevice::OpenMode mode)
-#else
 bool RemoteFileEngine::open(QIODevice::OpenMode mode, std::optional<QFile::Permissions> permissions)
-#endif
 {
     if (connectToServer()) {
         return callRemoteMethod<bool>(QString::fromLatin1(Protocol::QAbstractFileEngineOpen),
             static_cast<qint32>(mode | QIODevice::Unbuffered));
     }
-#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
-    return m_fileEngine.open(mode | QIODevice::Unbuffered);
-#else
     return m_fileEngine.open(mode | QIODevice::Unbuffered, permissions);
-#endif
 }
 
 /*!
@@ -624,11 +604,7 @@ bool RemoteFileEngine::renameOverwrite(const QString &newName)
     return m_fileEngine.renameOverwrite(newName);
 }
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 7, 0)
-QDateTime RemoteFileEngine::fileTime(FileTime time) const
-#else
 QDateTime RemoteFileEngine::fileTime(QFile::FileTime time) const
-#endif
 {
     if ((const_cast<RemoteFileEngine *>(this))->connectToServer()) {
         return callRemoteMethod<QDateTime>

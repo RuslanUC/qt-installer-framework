@@ -87,10 +87,6 @@
 
 #ifdef Q_OS_WIN
 # include <qt_windows.h>
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-# include <QWinTaskbarButton>
-# include <QWinTaskbarProgress>
-#endif
 #endif
 
 using namespace KDUpdater;
@@ -1650,18 +1646,6 @@ IntroductionPage::IntroductionPage(PackageManagerCore *core)
             this, &IntroductionPage::onCoreNetworkSettingsChanged);
 
     m_updateComponents->setEnabled(!m_offlineMaintenanceTool && ProductKeyCheck::instance()->hasValidKey());
-
-#ifdef Q_OS_WIN
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) {
-        m_taskButton = new QWinTaskbarButton(this);
-        connect(core, &PackageManagerCore::metaJobProgress,
-                m_taskButton->progress(), &QWinTaskbarProgress::setValue);
-    } else {
-        m_taskButton = nullptr;
-    }
-#endif
-#endif
 }
 
 /*!
@@ -1705,21 +1689,6 @@ bool IntroductionPage::validatePage()
     } else {
         showMetaInfoUpdate();
     }
-
-#ifdef Q_OS_WIN
-#if QT_VERSION < QT_VERSION_CHECK(6, 0 ,0)
-    if (m_taskButton) {
-        if (!m_taskButton->window()) {
-            if (QWidget *widget = QApplication::activeWindow())
-                m_taskButton->setWindow(widget->windowHandle());
-        }
-
-        m_taskButton->progress()->reset();
-        m_taskButton->progress()->resume();
-        m_taskButton->progress()->setVisible(true);
-    }
-#endif
-#endif
 
     // fetch updater packages
     if (core->isUpdater()) {
@@ -1774,12 +1743,6 @@ bool IntroductionPage::validatePage()
     }
     gui()->setSettingsButtonEnabled(true);
 
-#ifdef Q_OS_WIN
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    if (m_taskButton)
-        m_taskButton->progress()->setVisible(!isComplete());
-#endif
-#endif
     return isComplete();
 }
 
@@ -1898,15 +1861,6 @@ void IntroductionPage::setErrorMessage(const QString &error)
 
     m_errorLabel->setText(error);
     m_errorLabel->setPalette(palette);
-
-#ifdef Q_OS_WIN
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    if (m_taskButton) {
-        m_taskButton->progress()->stop();
-        m_taskButton->progress()->setValue(100);
-    }
-#endif
-#endif
 }
 
 

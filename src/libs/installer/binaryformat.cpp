@@ -153,19 +153,11 @@ void Resource::setName(const QByteArray &name)
     Opens a resource in QIODevice::ReadOnly mode. The function returns \c true
     if successful. Optionally, \a permissions can be given.
 */
-#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
-bool Resource::open()
-#else
 bool Resource::open(std::optional<QFile::Permissions> permissions)
-#endif
 {
     if (isOpen())
         return false;
-#if QT_VERSION < QT_VERSION_CHECK(6, 3, 0)
-    if (!m_file.open(QIODevice::ReadOnly | QIODevice::Unbuffered)) {
-#else
     if (!m_file.open(QIODevice::ReadOnly | QIODevice::Unbuffered, permissions)) {
-#endif
         setErrorString(m_file.errorString());
         return false;
     }

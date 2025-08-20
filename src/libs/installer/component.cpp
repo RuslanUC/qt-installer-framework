@@ -46,29 +46,18 @@
 #include <QtCore/QDirIterator>
 #include <QtCore/QTranslator>
 #include <QtCore/QRegularExpression>
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#include <QtCore/QTextCodec>
-#endif
 
 #include <QApplication>
 #include <QtConcurrentFilter>
 
 #include <QtUiTools/QUiLoader>
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <private/qv4engine_p.h>
-#else
-#include <private/qv8engine_p.h>
-#endif
 #include <private/qv4scopedvalue_p.h>
 #include <private/qv4object_p.h>
 
 #include <algorithm>
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
 #include <QJSEngine>
-#else
-#include <QQmlEngine>
-#endif
 
 using namespace QInstaller;
 
@@ -252,11 +241,7 @@ Component::Component(PackageManagerCore *core)
     : d(new ComponentPrivate(core, this))
     , m_defaultArchivePath(scTargetDirPlaceholder)
 {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     QJSEngine::setObjectOwnership(this, QJSEngine::CppOwnership);
-#else
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-#endif
     setPrivate(d);
 
     connect(this, &Component::valueChanged, this, &Component::updateModelData);
@@ -777,9 +762,6 @@ void Component::loadLicenses(const QString &directory, const QHash<QString, QVar
                             file.fileName(), file.errorString(), tr(scClearCacheHint), packageManagerCore()->settings().localCachePath()));
         }
         QTextStream stream(&file);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        stream.setCodec("UTF-8");
-#endif
         license.insert(scContent, stream.readAll());
         d->m_licenses.insert(it.key(), license);
     }

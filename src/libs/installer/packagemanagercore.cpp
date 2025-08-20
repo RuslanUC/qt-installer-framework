@@ -57,15 +57,9 @@
 #include <QtCore/QMutex>
 #include <QtCore/QSettings>
 #include <QtCore/QTemporaryFile>
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QtCore5Compat/QTextCodec>
 #include <QtCore5Compat/QTextDecoder>
 #include <QtCore5Compat/QTextEncoder>
-#else
-#include <QtCore/QTextCodec>
-#include <QtCore/QTextDecoder>
-#include <QtCore/QTextEncoder>
-#endif
 #include <QtCore/QTextStream>
 
 #include <QDesktopServices>

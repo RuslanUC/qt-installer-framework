@@ -111,7 +111,7 @@ void RemoteServer::init(const QString &socketName, const QString &key, Protocol:
     // Otherwise the new canonical implementation of QDir::tempPath()
     // presents unintended usage of RemoteFileEngine.
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,12,0) && defined(Q_OS_UNIX)
+#if defined(Q_OS_UNIX)
     d->m_socketName = socketPathName(socketName);
 #else
     d->m_socketName = socketName;
