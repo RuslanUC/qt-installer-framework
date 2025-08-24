@@ -1,3 +1,5 @@
+include(${PROJECT_SOURCE_DIR}/cmake/definitions.cmake)
+
 find_package(Qt6 REQUIRED COMPONENTS Core)
 
 add_executable(installerbase
@@ -21,5 +23,6 @@ add_executable(installerbase
 target_link_libraries(installerbase PUBLIC
     Qt6::Core
     installer)
+target_compile_definitions(installerbase PUBLIC ${IFW_COMPILE_DEFINITIONS})
 
 # TODO: installerbase.rc if windows

@@ -1,3 +1,5 @@
+include(${PROJECT_SOURCE_DIR}/cmake/definitions.cmake)
+
 set(SOURCES
         archive_acl.c
         archive_check_magic.c
@@ -148,7 +150,7 @@ find_package(LibLZMA REQUIRED)
 
 add_library(archive STATIC ${SOURCES})
 target_include_directories(archive PUBLIC ${INCLUDE_DIRS})
-target_compile_definitions(archive PRIVATE HAVE_CONFIG_H)
+target_compile_definitions(archive PRIVATE HAVE_CONFIG_H IFW_LIBARCHIVE ${IFW_COMPILE_DEFINITIONS})
 target_link_libraries(archive PUBLIC
         ZLIB::ZLIB
         BZip2::BZip2

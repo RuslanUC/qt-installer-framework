@@ -1,3 +1,5 @@
+include(${PROJECT_SOURCE_DIR}/cmake/definitions.cmake)
+
 set(PLATFORM_SOURCES)
 
 # TODO:
@@ -168,7 +170,7 @@ add_library(installer STATIC
         ../kdtools/updatefinder.cpp
         ../kdtools/updatesinfo.cpp
         ../kdtools/environment.cpp)
-target_compile_definitions(installer PRIVATE BUILD_SHARED_IFWTOOLS BUILD_SHARED_KDTOOLS)
+target_compile_definitions(installer PRIVATE BUILD_SHARED_IFWTOOLS BUILD_SHARED_KDTOOLS ${IFW_COMPILE_DEFINITIONS})
 target_include_directories(installer PUBLIC
         .
         ../ifwtools
