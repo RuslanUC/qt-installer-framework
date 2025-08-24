@@ -1,0 +1,6 @@
+add_subdirectory(archivegen)
+add_subdirectory(binarycreator)
+add_subdirectory(repogen)
+add_subdirectory(devtool)
+add_subdirectory(repocompare)
+add_subdirectory(checksumgenerator)

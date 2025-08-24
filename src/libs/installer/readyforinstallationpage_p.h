@@ -82,7 +82,7 @@ private:
     void showSpaceWidget(bool show);
 
 private:
-    Ui::ComponentSummaryForm *m_ui;
+    ::Ui::ComponentSummaryForm *m_ui;
     ReadyForInstallationPage *q;
     PackageManagerCore *m_core;
     SpaceWidget *m_spaceWidget;

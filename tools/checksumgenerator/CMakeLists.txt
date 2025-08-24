@@ -1,0 +1,2 @@
+add_executable(checksumgenerator main.cpp)
+target_link_libraries(checksumgenerator PRIVATE installer)
