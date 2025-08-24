@@ -9,6 +9,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Gui Network Qml Test UiTools Widgets Xml Core5Compat)
+
 if(CMAKE_CROSSCOMPILING)
     return()
 endif()
