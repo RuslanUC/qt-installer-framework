@@ -2315,7 +2315,6 @@ bool ComponentSelectionPage::validatePage()
         // As component script loading failed, there is error in the script and component is
         // marked as unselected. Recalculate so that unselected component is removed from install.
         // User is then able to select other components for install.
-        core->clearComponentsToInstallCalculated();
         core->calculateComponentsToInstall();
         MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("Error"),
                                     tr("Error"), error.message());
@@ -3063,9 +3062,16 @@ void FinishedPage::entering()
         connect(m_commitButton, &QAbstractButton::clicked, this, &FinishedPage::handleFinishClicked);
     }
 
-    const QString disableCommitBtn = packageManagerCore()->value(QLatin1String("DisableCommitButtonOnFinishPage"));
-    if(m_commitButton && packageManagerCore()->isMaintainer() && QVariant(disableCommitBtn).toBool())
-        m_commitButton->hide();
+    const QString disableCommitBtn = packageManagerCore()->value(QLatin1String("DisableCommitButtonOnFinishPage"), QLatin1String("false"));
+    const QString disableFinishBtn = packageManagerCore()->value(QLatin1String("DisableFinishButtonOnFinishPage"), QLatin1String("false"));
+    if(m_commitButton && packageManagerCore()->isMaintainer() && QVariant(disableCommitBtn).toBool()) {
+        m_commitButton->setDisabled(true);
+        m_commitButton->setVisible(true);
+    }
+    if(wizard()->button(QWizard::CancelButton) && packageManagerCore()->isMaintainer() && QVariant(disableFinishBtn).toBool()) {
+        wizard()->button(QWizard::CancelButton)->setDisabled(true);
+        wizard()->button(QWizard::CancelButton)->setVisible(true);
+    }
 
     m_clickFinishLabel->setText(QLatin1String("\n") + tr("Select %1 to close the %2 Setup.")
                             .arg(gui()->defaultButtonText(QWizard::FinishButton).remove(QLatin1Char('&')), productName()));
@@ -3102,10 +3108,12 @@ void FinishedPage::entering()
 
     m_msgLabel->setText(finishedText);
 
+    const QString disableRunProgram = packageManagerCore()->value(QLatin1String("DisableRunProgramOnFinishPage"), QLatin1String("false"));
     if (!packageManagerCore()->isUninstaller()
             && !packageManagerCore()->isOfflineGenerator()
             && !packageManagerCore()->value(scRunProgram).isEmpty()
-            && installationSucceeded) {
+            && installationSucceeded
+            && !QVariant(disableRunProgram).toBool()) {
         m_runItCheckBox->show();
         m_runItCheckBox->setText(packageManagerCore()->value(scRunProgramDescription,
                 tr("Run %1 now.")).arg(productName()));

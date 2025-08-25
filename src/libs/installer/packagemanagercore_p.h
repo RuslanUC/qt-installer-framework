@@ -232,7 +232,6 @@ public:
     OperationList m_performedOperationsCurrentSession;
 
     bool m_dependsOnLocalInstallerBinary;
-    QStringList m_allowedRunningProcesses;
     bool m_autoAcceptLicenses;
     bool m_disableWriteMaintenanceTool;
     bool m_autoConfirmCommand;

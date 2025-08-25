@@ -353,8 +353,6 @@ public:
 
     Q_INVOKABLE bool isProcessRunning(const QString &name) const;
     Q_INVOKABLE bool killProcess(const QString &absoluteFilePath, int timeout = 30000) const;
-    Q_INVOKABLE void setAllowedRunningProcesses(const QStringList &processes);
-    Q_INVOKABLE QStringList allowedRunningProcesses() const;
 
     Settings &settings() const;
 
@@ -417,8 +415,6 @@ public Q_SLOTS:
     void languageChanged();
     void setCompleteUninstallation(bool complete);
     void cancelMetaInfoJob();
-    void componentsToInstallNeedsRecalculation(); // TODO: deprecated, remove
-    void clearComponentsToInstallCalculated() {} // TODO: deprecated, remove
 
 Q_SIGNALS:
     void aboutCalculateComponentsToInstall();

@@ -637,26 +637,6 @@ bool PackageManagerCore::isHybridInstaller() const
 {
     return d->isHybridInstaller();
 }
-/*!
-    \deprecated [4.5] Use recalculateAllComponents() instead.
-
-    \sa {installer::componentsToInstallNeedsRecalculation}{installer.componentsToInstallNeedsRecalculation}
- */
-void PackageManagerCore::componentsToInstallNeedsRecalculation()
-{
-    recalculateAllComponents();
-}
-
-/*!
-    \fn QInstaller::PackageManagerCore::clearComponentsToInstallCalculated()
-
-    \deprecated [4.5] Installer framework recalculates components each time the calculation
-    of components to install is requested, so there is no need to call this anymore, and the
-    method does nothing. On previous versions calling this forced a recalculation of
-    components to install.
-
-    \sa {installer::clearComponentsToInstallCalculated}{installer.clearComponentsToInstallCalculated}
- */
 
 /*!
     Recalculates all components to install and uninstall. Returns \c true
@@ -1670,7 +1650,7 @@ void PackageManagerCore::networkSettingsChanged()
             dropAdminRights();
     }
 
-    KDUpdater::FileDownloaderFactory::instance().setProxyFactory(proxyFactory());
+    KDUpdater::FileDownloaderFactory::setProxyFactory(proxyFactory());
 
     emit coreNetworkSettingsChanged();
 }
@@ -1696,7 +1676,7 @@ void PackageManagerCore::setProxyFactory(PackageManagerProxyFactory *factory)
 {
     delete d->m_proxyFactory;
     d->m_proxyFactory = factory;
-    KDUpdater::FileDownloaderFactory::instance().setProxyFactory(proxyFactory());
+    KDUpdater::FileDownloaderFactory::setProxyFactory(proxyFactory());
 }
 
 /*!
@@ -3577,36 +3557,6 @@ bool PackageManagerCore::killProcess(const QString &absoluteFilePath, int timeou
         }
     }
     return true;
-}
-
-/*!
-    \deprecated [4.6] Maintenance tool no longer automatically checks for all running processes
-    in the installation directory for CLI runs. To manually check for a process to stop, use
-    \l {component::addStopProcessForUpdateRequest}{component.addStopProcessForUpdateRequest} instead.
-
-    Sets additional \a processes that can run when
-    updating with the maintenance tool.
-
-    \sa {installer::setAllowedRunningProcesses}{installer.setAllowedRunningProcesses}
-*/
-void PackageManagerCore::setAllowedRunningProcesses(const QStringList &processes)
-{
-    d->m_allowedRunningProcesses = processes;
-}
-
-/*!
-    \deprecated [4.6] Maintenance tool no longer automatically checks for all running processes
-    in the installation directory for CLI runs. To manually check for a process to stop, use
-    \l {component::addStopProcessForUpdateRequest}{component.addStopProcessForUpdateRequest} instead.
-
-    Returns processes that are allowed to run when
-    updating with the maintenance tool.
-
-    \sa {installer::allowedRunningProcesses}{installer.allowedRunningProcesses}
-*/
-QStringList PackageManagerCore::allowedRunningProcesses() const
-{
-    return d->m_allowedRunningProcesses;
 }
 
 /*!
