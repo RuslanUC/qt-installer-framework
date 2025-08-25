@@ -3064,13 +3064,11 @@ void FinishedPage::entering()
 
     const QString disableCommitBtn = packageManagerCore()->value(QLatin1String("DisableCommitButtonOnFinishPage"), QLatin1String("false"));
     const QString disableFinishBtn = packageManagerCore()->value(QLatin1String("DisableFinishButtonOnFinishPage"), QLatin1String("false"));
-    if(m_commitButton && packageManagerCore()->isMaintainer() && QVariant(disableCommitBtn).toBool()) {
-        m_commitButton->setDisabled(true);
-        m_commitButton->setVisible(true);
+    if(wizard()->button(QWizard::CommitButton) && packageManagerCore()->isMaintainer() && QVariant(disableCommitBtn).toBool()) {
+        wizard()->button(QWizard::CommitButton)->setDisabled(true);
     }
     if(wizard()->button(QWizard::CancelButton) && packageManagerCore()->isMaintainer() && QVariant(disableFinishBtn).toBool()) {
         wizard()->button(QWizard::CancelButton)->setDisabled(true);
-        wizard()->button(QWizard::CancelButton)->setVisible(true);
     }
 
     m_clickFinishLabel->setText(QLatin1String("\n") + tr("Select %1 to close the %2 Setup.")
