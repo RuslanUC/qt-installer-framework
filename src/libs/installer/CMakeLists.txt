@@ -1,4 +1,5 @@
 include(${PROJECT_SOURCE_DIR}/cmake/definitions.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/lto.cmake)
 
 set(PLATFORM_SOURCES)
 
@@ -188,3 +189,4 @@ target_link_libraries(installer PUBLIC
         Qt6::Xml
         Qt6::Widgets
         archive)
+target_enable_lto(installer)

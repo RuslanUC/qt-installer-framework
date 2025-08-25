@@ -1,4 +1,5 @@
 include(${PROJECT_SOURCE_DIR}/cmake/definitions.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/lto.cmake)
 
 set(SOURCES
         archive_acl.c
@@ -155,3 +156,4 @@ target_link_libraries(archive PUBLIC
         ZLIB::ZLIB
         BZip2::BZip2
         LibLZMA::LibLZMA)
+target_enable_lto(archive)
