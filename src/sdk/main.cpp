@@ -103,6 +103,9 @@ static void cleanupUpdate(const CommandLineParser &parser, bool *exit)
 
 int main(int argc, char *argv[])
 {
+#if defined(Q_OS_WIN)
+    qputenv("QT_QPA_PLATFORM", "windows:darkmode=0");
+#endif
     // increase maximum numbers of file descriptors
 #if defined(Q_OS_MACOS)
     QCoreApplication::setSetuidAllowed(true);
