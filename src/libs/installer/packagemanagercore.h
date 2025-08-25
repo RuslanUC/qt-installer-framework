@@ -249,6 +249,7 @@ public:
 
     bool installationAllowedToDirectory(const QString &targetDirectory);
     QString targetDirWarning(const QString &targetDirectory) const;
+    bool directoryContainsInstallation(const QString &directory) const;
 
 public:
     ScriptEngine *componentScriptEngine() const;

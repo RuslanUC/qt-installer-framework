@@ -1281,7 +1281,32 @@ QString PackageManagerCore::targetDirWarning(const QString &targetDirectory) con
             "please specify a valid directory.").arg(match.captured(0));
     }
 
-    return QString();
+    if(directoryContainsInstallation(targetDirectory)) {
+        return tr("Seems like specified directory already contains installation. You can either update existing installation or remove it.");
+    }
+
+    return {};
+}
+
+bool PackageManagerCore::directoryContainsInstallation(const QString& directory) const {
+    const QString checkFiles[] = {
+        QString::fromUtf8("components.xml"),
+        QString::fromUtf8("installerResources"),
+        QString::fromUtf8("installer.dat"),
+        QString::fromUtf8("maintenancetool.dat"),
+        QString::fromUtf8("maintenancetool.ini"),
+        QString::fromUtf8("maintenancetool"),
+        QString::fromUtf8("maintenancetool.exe"),
+        maintenanceToolName(),
+        maintenanceToolName() + QString::fromUtf8(".exe"),
+    };
+
+    const QDir dir(directory);
+    for(const auto& fileName : checkFiles)
+        if(QFile(dir.filePath(fileName)).exists())
+            return true;
+
+    return false;
 }
 
 // -- QInstaller

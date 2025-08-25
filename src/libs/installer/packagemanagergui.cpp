@@ -2567,10 +2567,13 @@ void TargetDirectoryPage::leaving()
 
 void TargetDirectoryPage::dirRequested()
 {
-    const QString newDirName = QFileDialog::getExistingDirectory(this,
+    QString newDirName = QFileDialog::getExistingDirectory(this,
         tr("Select Installation Folder"), targetDir());
     if (newDirName.isEmpty() || newDirName == targetDir())
         return;
+    const QDir newDir(newDirName);
+    if(!newDir.isEmpty() && !packageManagerCore()->directoryContainsInstallation(newDirName))
+        newDirName = QDir::cleanPath(newDir.filePath(productName()));
     m_lineEdit->setText(QDir::toNativeSeparators(newDirName));
 }
 
@@ -3059,6 +3062,10 @@ void FinishedPage::entering()
         disconnect(m_commitButton, &QAbstractButton::clicked, this, &FinishedPage::handleFinishClicked);
         connect(m_commitButton, &QAbstractButton::clicked, this, &FinishedPage::handleFinishClicked);
     }
+
+    const QString disableCommitBtn = packageManagerCore()->value(QLatin1String("DisableCommitButtonOnFinishPage"));
+    if(m_commitButton && packageManagerCore()->isMaintainer() && QVariant(disableCommitBtn).toBool())
+        m_commitButton->hide();
 
     m_clickFinishLabel->setText(QLatin1String("\n") + tr("Select %1 to close the %2 Setup.")
                             .arg(gui()->defaultButtonText(QWizard::FinishButton).remove(QLatin1Char('&')), productName()));

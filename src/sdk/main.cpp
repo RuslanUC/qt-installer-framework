@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
             : QInstaller::Protocol::Mode::Debug));
 
         server->start();
-        return app.exec();
+        return SDKApp<QCoreApplication>::exec();
     }
 
     try {
