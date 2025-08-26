@@ -54,5 +54,7 @@ qt_add_translations(installerbase
         translations/ifw_ru.ts
         translations/ifw_pt_BR.ts)
 target_enable_lto(installerbase)
+if (WIN32)
+    target_link_options(installerbase PRIVATE "/MANIFEST:NO")
+endif()
 
-# TODO: installerbase.rc if windows
