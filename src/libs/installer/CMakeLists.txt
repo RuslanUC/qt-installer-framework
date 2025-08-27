@@ -148,6 +148,7 @@ add_library(installer STATIC
 
         ${PLATFORM_SOURCES}
 
+        ../ifwtools/resources/ifwtools.qrc
         ../ifwtools/rcc/rcc.cpp
         ../ifwtools/rcc/rccmain.cpp
         ../ifwtools/repositorygen.cpp

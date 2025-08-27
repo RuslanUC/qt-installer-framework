@@ -1265,26 +1265,31 @@ QString PackageManagerCore::targetDirWarning(const QString &targetDirectory) con
         return tr("Seems like specified directory already contains installation. You can either update existing installation or remove it.");
     }
 
-    return {};
+    return QString();
 }
 
 bool PackageManagerCore::directoryContainsInstallation(const QString& directory) const {
+    const auto mtName = maintenanceToolName();
+    const auto mtName2 = mtName.isEmpty() || mtName.isNull() ? QLatin1String("maintenancetool") : mtName;
+
     const QString checkFiles[] = {
-        QString::fromUtf8("components.xml"),
-        QString::fromUtf8("installerResources"),
-        QString::fromUtf8("installer.dat"),
-        QString::fromUtf8("maintenancetool.dat"),
-        QString::fromUtf8("maintenancetool.ini"),
-        QString::fromUtf8("maintenancetool"),
-        QString::fromUtf8("maintenancetool.exe"),
-        maintenanceToolName(),
-        maintenanceToolName() + QString::fromUtf8(".exe"),
+        QLatin1String("components.xml"),
+        QLatin1String("installerResources"),
+        QLatin1String("installer.dat"),
+        QLatin1String("maintenancetool.dat"),
+        QLatin1String("maintenancetool.ini"),
+        QLatin1String("maintenancetool"),
+        QLatin1String("maintenancetool.exe"),
+        mtName2,
+        mtName2 + QString::fromUtf8(".exe"),
     };
 
     const QDir dir(directory);
     for(const auto& fileName : checkFiles)
-        if(QFile(dir.filePath(fileName)).exists())
+        if (QFile(dir.filePath(fileName)).exists()) {
+            qInfo("File %s exists!", dir.filePath(fileName).toUtf8().data());
             return true;
+        }
 
     return false;
 }

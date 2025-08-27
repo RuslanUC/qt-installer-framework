@@ -1,6 +1,6 @@
 include_guard(GLOBAL)
 
-option(IFW_ENABLE_LTO "Enable link-time optimization" ON)
+option(IFW_ENABLE_LTO "Enable link-time optimization" OFF)
 
 if(IFW_ENABLE_LTO)
     include(CheckIPOSupported)
@@ -16,4 +16,7 @@ if(IFW_ENABLE_LTO)
         endfunction()
         message(STATUS "LTO not supported: <${error}>")
     endif()
+else()
+    function(target_enable_lto target)
+    endfunction()
 endif()
