@@ -32,7 +32,6 @@
 #include <init.h>
 #include <packagemanagercore.h>
 #include <globals.h>
-#include <productkeycheck.h>
 #include <errors.h>
 #include <loggingutils.h>
 
@@ -271,11 +270,6 @@ int CommandLineInterface::clearLocalCache()
 
 bool CommandLineInterface::checkLicense()
 {
-    const ProductKeyCheck *const productKeyCheck = ProductKeyCheck::instance();
-    if (!productKeyCheck->hasValidLicense()) {
-        qCWarning(QInstaller::lcInstallerInstallLog) << "No valid license found.";
-        return false;
-    }
     return true;
 }
 

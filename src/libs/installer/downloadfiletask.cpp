@@ -30,7 +30,6 @@
 
 #include "downloadfiletask_p.h"
 #include "globals.h"
-#include "productkeycheck.h"
 
 #include <QCoreApplication>
 #include <QDir>
@@ -323,7 +322,6 @@ void Downloader::errorOccurred(QNetworkReply::NetworkError error)
             stopDownloadDeadlineTimer();
             if (data.taskItem.source().contains(QLatin1String("_meta"), Qt::CaseInsensitive)) {
                 QString errorString = tr("Network error while downloading '%1': %2.").arg(data.taskItem.source(), reply->errorString());
-                errorString.append(ProductKeyCheck::instance()->additionalMetaDownloadWarning());
                 m_futureInterface->reportException(MetaDownloadException(errorString));
                 emit finished();
             } else {

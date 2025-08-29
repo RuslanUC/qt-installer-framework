@@ -41,8 +41,6 @@
 
 #include "updateoperationfactory.h"
 
-#include <productkeycheck.h>
-
 #include <QtCore/QDirIterator>
 #include <QtCore/QTranslator>
 #include <QtCore/QRegularExpression>
@@ -707,16 +705,19 @@ void Component::loadUserInterfaces(const QDir &directory, const QStringList &uis
                             it.fileName(), file.errorString(), tr(scClearCacheHint), packageManagerCore()->settings().localCachePath()));
         }
 
-        QUiLoader *const loader = ProductKeyCheck::instance()->uiLoader();
+        auto *const loader = new QUiLoader();
         loader->setTranslationEnabled(true);
         loader->setLanguageChangeEnabled(true);
         QWidget *const widget = loader->load(&file, 0);
         if (!widget) {
+            const auto errorString = loader->errorString();
+            delete loader;
             throw Error(tr("Cannot load the requested UI file \"%1\": %2.\n\n%3 \"%4\"").arg(
-                it.fileName(), loader->errorString(), tr(scClearCacheHint), packageManagerCore()->settings().localCachePath()));
+                it.fileName(), errorString, tr(scClearCacheHint), packageManagerCore()->settings().localCachePath()));
         }
         d->scriptEngine()->newQObject(widget);
         d->m_userInterfaces.insert(widget->objectName(), widget);
+        delete loader;
     }
 }
 
@@ -730,9 +731,6 @@ void Component::loadLicenses(const QString &directory, const QHash<QString, QVar
     for (it = licenseHash.begin(); it != licenseHash.end(); ++it) {
         QVariantMap license = it.value().toMap();
         const QString &fileName = license.value(scFile).toString();
-
-        if (!ProductKeyCheck::instance()->isValidLicenseTextFile(fileName))
-            continue;
 
         QFileInfo fileInfo(directory, fileName);
         foreach (const QString &lang, QLocale().uiLanguages()) {

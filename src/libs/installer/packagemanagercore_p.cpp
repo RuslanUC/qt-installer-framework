@@ -59,8 +59,6 @@
 #include "updateoperationfactory.h"
 #include "constants.h"
 
-#include <productkeycheck.h>
-
 #include <QSettings>
 #include <QtConcurrentRun>
 #include <QtConcurrent>
@@ -2761,9 +2759,6 @@ PackageManagerCore::Status PackageManagerCorePrivate::fetchComponentsAndInstall(
         qCDebug(QInstaller::lcInstallerInstallLog).noquote()
             << "Components not found with the current selection."
             << "Searching from additional repositories";
-        if (!ProductKeyCheck::instance()->securityWarning().isEmpty()) {
-            qCWarning(QInstaller::lcInstallerInstallLog) << ProductKeyCheck::instance()->securityWarning();
-        }
         enableAllCategories();
         fetchComponents();
     }
@@ -3164,8 +3159,6 @@ bool PackageManagerCorePrivate::addUpdateResourcesFromRepositories(bool compress
             m_compressedPackageSources.insert(PackageSource(QUrl::fromLocalFile(data->path()), 2, data->repository().postLoadComponentScript()));
         else
             m_packageSources.insert(PackageSource(QUrl::fromLocalFile(data->path()), 0, data->repository().postLoadComponentScript()));
-
-        ProductKeyCheck::instance()->addPackagesFromXml(data->path() + QLatin1String("/Updates.xml"));
     }
     if ((compressedRepository && m_compressedPackageSources.count() == 0 ) ||
          (!compressedRepository && m_packageSources.count() == 0)) {
@@ -3476,13 +3469,6 @@ bool PackageManagerCorePrivate::acceptLicenseAgreements() const
         if (m_core->isMaintainer() && component->isInstalled())
             continue;
         m_core->addLicenseItem(component->licenses());
-    }
-
-    const QString acceptanceText = ProductKeyCheck::instance()->licenseAcceptanceText();
-    if (!acceptanceText.isEmpty()) {
-        qCDebug(QInstaller::lcInstallerInstallLog).noquote() << acceptanceText;
-        if (!m_autoAcceptLicenses && !acceptRejectCliQuery())
-            return false;
     }
 
     QHash<QString, QMap<QString, QString>> priorityHash = m_core->sortedLicenses();

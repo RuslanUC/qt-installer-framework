@@ -38,7 +38,6 @@
 #include <constants.h>
 #include <packagemanagercore.h>
 #include <settings.h>
-#include <productkeycheck.h>
 #include <binaryformatenginehandler.h>
 #include <filedownloaderfactory.h>
 #include <packagemanagerproxyfactory.h>
@@ -391,16 +390,8 @@ public:
             }
         }
 
-        try {
-            ProductKeyCheck::instance()->init(m_core);
-        } catch (const QInstaller::Error &e) {
-            errorMessage = e.message();
-            return false;
-        }
-
         m_core->setValue(QInstaller::scUILanguage, lang.name());
         emit m_core->defaultTranslationsLoadedForLanguage(lang);
-        ProductKeyCheck::instance()->addPackagesFromXml(QLatin1String(":/metadata/Updates.xml"));
 
         return true;
     }

@@ -30,7 +30,6 @@
 #include "ui_settingsdialog.h"
 
 #include <packagemanagercore.h>
-#include <productkeycheck.h>
 #include <testrepository.h>
 
 #include <QtCore/QFile>
@@ -500,6 +499,6 @@ void SettingsDialog::insertRepositories(const QSet<Repository> repos, QTreeWidge
     foreach (const Repository &repo, repos) {
         RepositoryItem *item = new RepositoryItem(repo);
         rootItem->addChild(item);
-        item->setHidden(!ProductKeyCheck::instance()->isValidRepository(repo));
+        item->setHidden(false);
     }
 }

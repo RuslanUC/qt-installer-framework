@@ -30,7 +30,6 @@
 #include <packagemanagercore.h>
 #include <scriptengine.h>
 #include <packagemanagerpagefactory.h>
-#include <productkeycheck.h>
 #include <settings.h>
 
 using namespace QInstaller;
@@ -41,14 +40,6 @@ using namespace QInstaller;
 InstallerGui::InstallerGui(PackageManagerCore *core)
     : PackageManagerGui(core, nullptr)
 {
-    ProductKeyCheck *checker = ProductKeyCheck::instance();
-    foreach (const int id, checker->registeredPages()) {
-        PackageManagerPage *page = PackageManagerPageFactory::instance().create(id, core);
-        Q_ASSERT_X(page, Q_FUNC_INFO, qPrintable(QString::fromLatin1("Page with %1 couldn't be "
-            "constructed.").arg(id)));
-        setPage(id, page);
-    }
-
     setPage(PackageManagerCore::Introduction, new IntroductionPage(core));
     setPage(PackageManagerCore::TargetDirectory, new TargetDirectoryPage(core));
     setPage(PackageManagerCore::ComponentSelection, new ComponentSelectionPage(core));
@@ -73,14 +64,6 @@ InstallerGui::InstallerGui(PackageManagerCore *core)
 MaintenanceGui::MaintenanceGui(PackageManagerCore *core)
     : PackageManagerGui(core, nullptr)
 {
-    ProductKeyCheck *checker = ProductKeyCheck::instance();
-    foreach (const int id, checker->registeredPages()) {
-        PackageManagerPage *page = PackageManagerPageFactory::instance().create(id, core);
-        Q_ASSERT_X(page, Q_FUNC_INFO, qPrintable(QString::fromLatin1("Page with %1 couldn't be "
-            "constructed.").arg(id)));
-        setPage(id, page);
-    }
-
     connect(core, &PackageManagerCore::installerBinaryMarkerChanged,
             this, &MaintenanceGui::updateRestartPage);
 

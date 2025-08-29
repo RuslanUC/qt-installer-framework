@@ -30,7 +30,6 @@
 #include "metadatajob_p.h"
 #include "packagemanagercore.h"
 #include "packagemanagerproxyfactory.h"
-#include "productkeycheck.h"
 #include "proxycredentialsdialog.h"
 #include "serverauthenticationdialog.h"
 #include "settings.h"
@@ -233,7 +232,6 @@ void MetadataJob::doStart()
         return;
     }
 
-    const ProductKeyCheck *const productKeyCheck = ProductKeyCheck::instance();
     if (m_downloadType != DownloadType::CompressedPackage) {
         emit infoMessage(this, tr("Fetching latest update information..."));
         const bool onlineInstaller = m_core->isInstaller() && !m_core->isOfflineOnly();
@@ -250,8 +248,7 @@ void MetadataJob::doStart()
                 // For not blocking the UI
                 qApp->processEvents();
 
-                if (repo.isEnabled() &&
-                        productKeyCheck->isValidRepository(repo)) {
+                if (repo.isEnabled()) {
                     QAuthenticator authenticator;
                     authenticator.setUser(repo.username());
                     authenticator.setPassword(repo.password());
@@ -317,8 +314,7 @@ void MetadataJob::doStart()
 
         bool repositoriesFound = false;
         foreach (const Repository &repo, m_core->settings().temporaryRepositories()) {
-            if (repo.isCompressed() && repo.isEnabled() &&
-                    productKeyCheck->isValidRepository(repo)) {
+            if (repo.isCompressed() && repo.isEnabled()) {
                 repositoriesFound = true;
                 startUnzipRepositoryTask(repo);
 
@@ -349,7 +345,7 @@ bool MetadataJob::startXMLTask()
     int chunkSize = qMin(m_updatesXmlItems.length(), m_downloadableChunkSize);
     QList<FileTaskItem> tempPackages = m_updatesXmlItems.mid(0, chunkSize);
     m_updatesXmlItems = m_updatesXmlItems.mid(chunkSize, m_updatesXmlItems.length());
-    if (tempPackages.length() > 0) {
+    if (!tempPackages.empty()) {
         DownloadFileTask *const xmlTask = new DownloadFileTask(tempPackages);
         xmlTask->setProxyFactory(m_core->proxyFactory());
         connect(&m_xmlTask, &QFutureWatcher<FileTaskResult>::progressValueChanged, this,
@@ -1080,10 +1076,8 @@ QMultiHash<QString, QPair<Repository, Repository> > MetadataJob::searchAdditiona
                 repository.setUsername(el.attribute(QLatin1String("username")));
                 repository.setPassword(el.attribute(QLatin1String("password")));
                 repository.setDisplayName(el.attribute(QLatin1String("displayname")));
-                if (ProductKeyCheck::instance()->isValidRepository(repository)) {
-                    repositoryUpdates.insert(action, qMakePair(repository, Repository()));
-                    qDebug() << "Repository to add:" << repository.displayname();
-                }
+                repositoryUpdates.insert(action, qMakePair(repository, Repository()));
+                qDebug() << "Repository to add:" << repository.displayname();
             } else if (action == QLatin1String("remove")) {
                 // remove possible default repositories using the given server url
                 Repository repository(resolveUrl(result, el.attribute(QLatin1String("url"))), true);
@@ -1099,12 +1093,10 @@ QMultiHash<QString, QPair<Repository, Repository> > MetadataJob::searchAdditiona
                 newRepository.setPassword(el.attribute(QLatin1String("password")));
                 newRepository.setDisplayName(el.attribute(QLatin1String("displayname")));
 
-                if (ProductKeyCheck::instance()->isValidRepository(newRepository)) {
-                    // store the new repository and the one old it replaces
-                    repositoryUpdates.insert(action, qMakePair(newRepository, oldRepository));
-                    qDebug() << "Replace repository" << oldRepository.displayname() << "with"
-                        << newRepository.displayname();
-                }
+                // store the new repository and the one old it replaces
+                repositoryUpdates.insert(action, qMakePair(newRepository, oldRepository));
+                qDebug() << "Replace repository" << oldRepository.displayname() << "with"
+                    << newRepository.displayname();
             } else {
                 qDebug() << "Invalid additional repositories action set in Updates.xml fetched "
                     "from" << metadata.repository().displayname() << "line:" << el.lineNumber();

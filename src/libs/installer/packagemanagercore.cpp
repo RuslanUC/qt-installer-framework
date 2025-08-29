@@ -48,8 +48,6 @@
 #include "loggingutils.h"
 #include "componentsortfilterproxymodel.h"
 
-#include <productkeycheck.h>
-
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QtConcurrentRun>
@@ -1737,9 +1735,6 @@ bool PackageManagerCore::fetchPackagesWithFallbackRepositories(const QStringList
         qCDebug(QInstaller::lcInstallerInstallLog).noquote()
             << "Components not found with the current selection."
             << "Searching from additional repositories";
-        if (!ProductKeyCheck::instance()->securityWarning().isEmpty()) {
-            qCWarning(QInstaller::lcInstallerInstallLog) << ProductKeyCheck::instance()->securityWarning();
-        }
         if (!checkComponents()) {
             return false;
         }
@@ -1758,11 +1753,6 @@ bool PackageManagerCore::fetchRemotePackagesTree(const QStringList& components)
 
     if (isUninstaller()) {
         d->setStatus(Failure, tr("Application running in Uninstaller mode."));
-        return false;
-    }
-
-    if (!ProductKeyCheck::instance()->hasValidKey()) {
-        d->setStatus(Failure, ProductKeyCheck::instance()->lastErrorString());
         return false;
     }
 
@@ -4517,9 +4507,6 @@ bool PackageManagerCore::fetchAllPackages(const PackagesList &remotes, const Loc
                 if (d->statusCanceledOrFailed())
                     return false;
 
-                if (!ProductKeyCheck::instance()->isValidPackage(package->data(scName).toString()))
-                    continue;
-
                 if (firstRun && !package->data(scTreeName)
                         .value<QPair<QString, bool>>().first.isEmpty()) {
                     // Package has a tree name, leave for later
@@ -4666,9 +4653,6 @@ bool PackageManagerCore::fetchUpdaterPackages(const PackagesList &remotes, const
         foreach (Package *const update, remotes) {
             if (d->statusCanceledOrFailed())
                 return false;
-
-            if (!ProductKeyCheck::instance()->isValidPackage(update->data(scName).toString()))
-                continue;
 
             std::unique_ptr<QInstaller::Component> component(new QInstaller::Component(this));
             data.package = update;

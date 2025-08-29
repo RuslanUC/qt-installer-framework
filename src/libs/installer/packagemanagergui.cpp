@@ -38,7 +38,6 @@
 #include "settings.h"
 #include "utils.h"
 #include "scriptengine.h"
-#include "productkeycheck.h"
 #include "repositorycategory.h"
 #include "componentselectionpage_p.h"
 #include "loggingutils.h"
@@ -1645,7 +1644,7 @@ IntroductionPage::IntroductionPage(PackageManagerCore *core)
     connect(core, &PackageManagerCore::coreNetworkSettingsChanged,
             this, &IntroductionPage::onCoreNetworkSettingsChanged);
 
-    m_updateComponents->setEnabled(!m_offlineMaintenanceTool && ProductKeyCheck::instance()->hasValidKey());
+    m_updateComponents->setEnabled(!m_offlineMaintenanceTool);
 }
 
 /*!
@@ -1791,8 +1790,7 @@ void IntroductionPage::showMaintenanceTools()
 void IntroductionPage::setMaintenanceToolsEnabled(bool enable)
 {
     m_packageManager->setEnabled(enable && !m_offlineMaintenanceTool);
-    m_updateComponents->setEnabled(enable && !m_offlineMaintenanceTool
-        && ProductKeyCheck::instance()->hasValidKey());
+    m_updateComponents->setEnabled(enable && !m_offlineMaintenanceTool);
     m_removeAllComponents->setEnabled(enable);
 }
 
@@ -1804,8 +1802,7 @@ void IntroductionPage::setMaintenanceToolsEnabled(bool enable)
 void IntroductionPage::setMaintainerToolsEnabled(bool enable)
 {
     m_packageManager->setEnabled(enable && !m_offlineMaintenanceTool);
-    m_updateComponents->setEnabled(enable && !m_offlineMaintenanceTool
-        && ProductKeyCheck::instance()->hasValidKey());
+    m_updateComponents->setEnabled(enable && !m_offlineMaintenanceTool);
 }
 
 /*!
@@ -2140,7 +2137,7 @@ void LicenseAgreementPage::entering()
 */
 bool LicenseAgreementPage::isComplete() const
 {
-    return m_acceptCheckBox->isChecked() && ProductKeyCheck::instance()->hasAcceptedAllLicenses();
+    return m_acceptCheckBox->isChecked();
 }
 
 /*!

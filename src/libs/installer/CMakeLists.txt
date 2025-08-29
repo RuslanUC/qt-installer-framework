@@ -143,7 +143,6 @@ add_library(installer STATIC
         libarchivearchive.cpp
         libarchivewrapper.cpp
         libarchivewrapper_p.cpp
-        productkeycheck.cpp
         commandlineparser_p.cpp
 
         ${PLATFORM_SOURCES}

@@ -27,7 +27,6 @@
 **************************************************************************/
 
 #include "checkablecombobox.h"
-#include "productkeycheck.h"
 #include "messageboxhandler.h"
 
 #include <QStandardItem>

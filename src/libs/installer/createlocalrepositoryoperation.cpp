@@ -36,7 +36,6 @@
 #include "copydirectoryoperation.h"
 #include "archivefactory.h"
 #include "packagemanagercore.h"
-#include "productkeycheck.h"
 #include "constants.h"
 #include "remoteclient.h"
 
@@ -293,8 +292,7 @@ bool CreateLocalRepositoryOperation::performOperation()
                     else if (e.tagName() == QLatin1String("Version"))
                         version = e.text();
                 }
-                if (ProductKeyCheck::instance()->isValidPackage(name))
-                    nameVersionHash.insert(name, version);
+                nameVersionHash.insert(name, version);
             }
         }
 

@@ -34,8 +34,6 @@
 
 #include <packagemanagercore.h>
 
-#include <productkeycheck.h>
-
 #include <QtCore/QTimer>
 #include <QtWidgets/QMessageBox>
 #include <QtConcurrent>
