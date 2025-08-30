@@ -57,24 +57,6 @@
 #include "archive_read_private.h"
 #include "filter_fork.h"
 
-
-#if ARCHIVE_VERSION_NUMBER < 4000000
-/* Deprecated; remove in libarchive 4.0 */
-int
-archive_read_support_compression_program(struct archive *a, const char *cmd)
-{
-	return archive_read_support_filter_program(a, cmd);
-}
-
-int
-archive_read_support_compression_program_signature(struct archive *a,
-    const char *cmd, const void *signature, size_t signature_len)
-{
-	return archive_read_support_filter_program_signature(a,
-	    cmd, signature, signature_len);
-}
-#endif
-
 int
 archive_read_support_filter_program(struct archive *a, const char *cmd)
 {

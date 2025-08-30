@@ -97,15 +97,6 @@ static int	lzip_bidder_bid(struct archive_read_filter_bidder *,
 		    struct archive_read_filter *);
 static int	lzip_bidder_init(struct archive_read_filter *);
 
-#if ARCHIVE_VERSION_NUMBER < 4000000
-/* Deprecated; remove in libarchive 4.0 */
-int
-archive_read_support_compression_xz(struct archive *a)
-{
-	return archive_read_support_filter_xz(a);
-}
-#endif
-
 static const struct archive_read_filter_bidder_vtable
 xz_bidder_vtable = {
 	.bid = xz_bidder_bid,
@@ -130,14 +121,6 @@ archive_read_support_filter_xz(struct archive *_a)
 #endif
 }
 
-#if ARCHIVE_VERSION_NUMBER < 4000000
-int
-archive_read_support_compression_lzma(struct archive *a)
-{
-	return archive_read_support_filter_lzma(a);
-}
-#endif
-
 static const struct archive_read_filter_bidder_vtable
 lzma_bidder_vtable = {
 	.bid = lzma_bidder_bid,
@@ -161,15 +144,6 @@ archive_read_support_filter_lzma(struct archive *_a)
 	return (ARCHIVE_WARN);
 #endif
 }
-
-
-#if ARCHIVE_VERSION_NUMBER < 4000000
-int
-archive_read_support_compression_lzip(struct archive *a)
-{
-	return archive_read_support_filter_lzip(a);
-}
-#endif
 
 static const struct archive_read_filter_bidder_vtable
 lzip_bidder_vtable = {

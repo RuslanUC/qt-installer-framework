@@ -66,15 +66,6 @@ static int	rpm_filter_close(struct archive_read_filter *);
 
 static inline size_t rpm_limit_bytes(uint64_t, size_t);
 
-#if ARCHIVE_VERSION_NUMBER < 4000000
-/* Deprecated; remove in libarchive 4.0 */
-int
-archive_read_support_compression_rpm(struct archive *a)
-{
-	return archive_read_support_filter_rpm(a);
-}
-#endif
-
 static const struct archive_read_filter_bidder_vtable
 rpm_bidder_vtable = {
 	.bid = rpm_bidder_bid,

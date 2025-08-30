@@ -45,30 +45,6 @@
 #include "archive_private.h"
 #include "archive_write_private.h"
 
-#if ARCHIVE_VERSION_NUMBER < 4000000
-int
-archive_write_set_compression_lzip(struct archive *a)
-{
-	__archive_write_filters_free(a);
-	return (archive_write_add_filter_lzip(a));
-}
-
-int
-archive_write_set_compression_lzma(struct archive *a)
-{
-	__archive_write_filters_free(a);
-	return (archive_write_add_filter_lzma(a));
-}
-
-int
-archive_write_set_compression_xz(struct archive *a)
-{
-	__archive_write_filters_free(a);
-	return (archive_write_add_filter_xz(a));
-}
-
-#endif
-
 #ifndef HAVE_LZMA_H
 int
 archive_write_add_filter_xz(struct archive *a)

@@ -139,15 +139,6 @@ static int	compress_filter_close(struct archive_read_filter *);
 static int	getbits(struct archive_read_filter *, int n);
 static int	next_code(struct archive_read_filter *);
 
-#if ARCHIVE_VERSION_NUMBER < 4000000
-/* Deprecated; remove in libarchive 4.0 */
-int
-archive_read_support_compression_compress(struct archive *a)
-{
-	return archive_read_support_filter_compress(a);
-}
-#endif
-
 static const struct archive_read_filter_bidder_vtable
 compress_bidder_vtable = {
 	.bid = compress_bidder_bid,

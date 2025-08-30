@@ -135,8 +135,7 @@ int main(int argc, char *argv[])
     mutually = QInstaller::checkMutualOptions(parser, QStringList()
         << CommandLineOptions::scStartUpdaterLong
         << CommandLineOptions::scStartPackageManagerLong
-        << CommandLineOptions::scStartUninstallerLong
-        << CommandLineOptions::scDeprecatedUpdater);
+        << CommandLineOptions::scStartUninstallerLong);
 
     if (mutually.isEmpty()) {
         mutually = QInstaller::checkMutualOptions(parser, QStringList()
@@ -302,10 +301,7 @@ int main(int argc, char *argv[])
 
         const SelfRestarter restarter(argc, argv);
         if (parser.positionalArguments().contains(CommandLineOptions::scCheckUpdatesShort)
-                || parser.positionalArguments().contains(CommandLineOptions::scCheckUpdatesLong)
-                || parser.isSet(CommandLineOptions::scDeprecatedCheckUpdates)) {
-            // Also check for deprecated --checkupdates option, which is superseded by check-updates
-            // command in IFW 4.x.x. Should not be used for normal interactive usage.
+                || parser.positionalArguments().contains(CommandLineOptions::scCheckUpdatesLong)) {
             return CommandLineInterface(argc, argv).checkUpdates();
         } else if (parser.positionalArguments().contains(CommandLineOptions::scListShort)
                 || parser.positionalArguments().contains(CommandLineOptions::scListLong)) {

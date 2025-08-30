@@ -48,15 +48,6 @@
 #include "archive_write_private.h"
 #include "filter_fork.h"
 
-#if ARCHIVE_VERSION_NUMBER < 4000000
-int
-archive_write_set_compression_program(struct archive *a, const char *cmd)
-{
-	__archive_write_filters_free(a);
-	return (archive_write_add_filter_program(a, cmd));
-}
-#endif
-
 struct archive_write_program_data {
 #if defined(_WIN32) && !defined(__CYGWIN__)
 	HANDLE		 child;

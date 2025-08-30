@@ -601,15 +601,6 @@ archive_write_open2(struct archive *_a, void *client_data,
 	return (ret);
 }
 
-int
-archive_write_open(struct archive *_a, void *client_data,
-    archive_open_callback *opener, archive_write_callback *writer,
-    archive_close_callback *closer)
-{
-	return archive_write_open2(_a, client_data, opener, writer,
-	    closer, NULL);
-}
-
 /*
  * Close out the archive.
  */

@@ -303,10 +303,6 @@ static const QLatin1String scCleanupUpdate("cleanup-update");
 static const QLatin1String scCleanupUpdateOnly("cleanup-update-only");
 static const QLatin1String scLanguage("lang");
 
-// Deprecated options, provided only for backward compatibility
-static const QLatin1String scDeprecatedUpdater("updater");
-static const QLatin1String scDeprecatedCheckUpdates("checkupdates");
-
 // Options supposed to be used without graphical interface
 static const QStringList scCommandLineInterfaceOptions = {
     scInstallShort,

@@ -67,12 +67,6 @@ static ssize_t	file_write(struct archive *, void *, const void *buff, size_t);
 static int	open_filename(struct archive *, int, const void *);
 
 int
-archive_write_open_file(struct archive *a, const char *filename)
-{
-	return (archive_write_open_filename(a, filename));
-}
-
-int
 archive_write_open_filename(struct archive *a, const char *filename)
 {
 

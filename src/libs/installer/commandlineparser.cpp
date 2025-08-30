@@ -264,16 +264,6 @@ CommandLineParser::CommandLineParser()
     cleanupUpdateOnly.setValueName(QLatin1String("path"));
     cleanupUpdateOnly.setFlags(QCommandLineOption::HiddenFromHelp);
     addOption(cleanupUpdateOnly);
-
-    // Deprecated options
-    QCommandLineOption deprecatedUpdater(CommandLineOptions::scDeprecatedUpdater);
-    deprecatedUpdater.setFlags(QCommandLineOption::HiddenFromHelp);
-    addOption(deprecatedUpdater);
-
-    QCommandLineOption deprecatedCheckUpdates(CommandLineOptions::scDeprecatedCheckUpdates);
-    deprecatedCheckUpdates.setFlags(QCommandLineOption::HiddenFromHelp);
-    addOption(deprecatedCheckUpdates); // Behaves like check-updates but does not default to verbose output
-
     // Custom extension options
     d->addExtensionsOptions();
 

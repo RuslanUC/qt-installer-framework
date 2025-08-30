@@ -92,13 +92,6 @@ static int64_t	file_skip(struct archive *, void *, int64_t request);
 static int64_t	file_skip_lseek(struct archive *, void *, int64_t request);
 
 int
-archive_read_open_file(struct archive *a, const char *filename,
-    size_t block_size)
-{
-	return (archive_read_open_filename(a, filename, block_size));
-}
-
-int
 archive_read_open_filename(struct archive *a, const char *filename,
     size_t block_size)
 {

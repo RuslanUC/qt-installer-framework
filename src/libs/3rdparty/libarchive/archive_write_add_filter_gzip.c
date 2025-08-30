@@ -44,15 +44,6 @@
 #include "archive_string.h"
 #include "archive_write_private.h"
 
-#if ARCHIVE_VERSION_NUMBER < 4000000
-int
-archive_write_set_compression_gzip(struct archive *a)
-{
-	__archive_write_filters_free(a);
-	return (archive_write_add_filter_gzip(a));
-}
-#endif
-
 /* Don't compile this if we don't have zlib. */
 
 struct private_data {

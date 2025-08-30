@@ -134,37 +134,6 @@ archive_format_name(struct archive *a)
 }
 
 
-int
-archive_compression(struct archive *a)
-{
-	return archive_filter_code(a, 0);
-}
-
-const char *
-archive_compression_name(struct archive *a)
-{
-	return archive_filter_name(a, 0);
-}
-
-
-/*
- * Return a count of the number of compressed bytes processed.
- */
-la_int64_t
-archive_position_compressed(struct archive *a)
-{
-	return archive_filter_bytes(a, -1);
-}
-
-/*
- * Return a count of the number of uncompressed bytes processed.
- */
-la_int64_t
-archive_position_uncompressed(struct archive *a)
-{
-	return archive_filter_bytes(a, 0);
-}
-
 void
 archive_clear_error(struct archive *a)
 {

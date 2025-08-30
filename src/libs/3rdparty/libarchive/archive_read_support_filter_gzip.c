@@ -82,15 +82,6 @@ static int	gzip_bidder_bid(struct archive_read_filter_bidder *,
 		    struct archive_read_filter *);
 static int	gzip_bidder_init(struct archive_read_filter *);
 
-#if ARCHIVE_VERSION_NUMBER < 4000000
-/* Deprecated; remove in libarchive 4.0 */
-int
-archive_read_support_compression_gzip(struct archive *a)
-{
-	return archive_read_support_filter_gzip(a);
-}
-#endif
-
 static const struct archive_read_filter_bidder_vtable
 gzip_bidder_vtable = {
 	.bid = gzip_bidder_bid,

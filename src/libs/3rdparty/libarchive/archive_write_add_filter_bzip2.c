@@ -44,15 +44,6 @@
 #include "archive_private.h"
 #include "archive_write_private.h"
 
-#if ARCHIVE_VERSION_NUMBER < 4000000
-int
-archive_write_set_compression_bzip2(struct archive *a)
-{
-	__archive_write_filters_free(a);
-	return (archive_write_add_filter_bzip2(a));
-}
-#endif
-
 struct private_data {
 	int		 compression_level;
 #if defined(HAVE_BZLIB_H) && defined(BZ_CONFIG_ERROR)

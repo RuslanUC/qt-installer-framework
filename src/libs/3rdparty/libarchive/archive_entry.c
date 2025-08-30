@@ -1764,68 +1764,6 @@ _archive_entry_acl_from_text_l(struct archive_entry *entry, const char *text,
 	return (archive_acl_from_text_l(&entry->acl, text, type, sc));
 }
 
-/* Deprecated */
-static int
-archive_entry_acl_text_compat(int *flags)
-{
-	if ((*flags & ARCHIVE_ENTRY_ACL_TYPE_POSIX1E) == 0)
-		return (1);
-
-	/* ABI compat with old ARCHIVE_ENTRY_ACL_STYLE_EXTRA_ID */
-	if ((*flags & OLD_ARCHIVE_ENTRY_ACL_STYLE_EXTRA_ID) != 0)
-		*flags |= ARCHIVE_ENTRY_ACL_STYLE_EXTRA_ID;
-
-	/* ABI compat with old ARCHIVE_ENTRY_ACL_STYLE_MARK_DEFAULT */
-	if ((*flags & OLD_ARCHIVE_ENTRY_ACL_STYLE_MARK_DEFAULT) != 0)
-		*flags |=  ARCHIVE_ENTRY_ACL_STYLE_MARK_DEFAULT;
-
-	*flags |= ARCHIVE_ENTRY_ACL_STYLE_SEPARATOR_COMMA;
-
-	return (0);
-}
-
-/* Deprecated */
-const wchar_t *
-archive_entry_acl_text_w(struct archive_entry *entry, int flags)
-{
-	free(entry->acl.acl_text_w);
-	entry->acl.acl_text_w = NULL;
-	if (archive_entry_acl_text_compat(&flags) == 0)
-		entry->acl.acl_text_w = archive_acl_to_text_w(&entry->acl,
-		    NULL, flags, entry->archive);
-	return (entry->acl.acl_text_w);
-}
-
-/* Deprecated */
-const char *
-archive_entry_acl_text(struct archive_entry *entry, int flags)
-{
-	free(entry->acl.acl_text);
-	entry->acl.acl_text = NULL;
-	if (archive_entry_acl_text_compat(&flags) == 0)
-		entry->acl.acl_text = archive_acl_to_text_l(&entry->acl, NULL,
-		    flags, NULL);
-
-	return (entry->acl.acl_text);
-}
-
-/* Deprecated */
-int
-_archive_entry_acl_text_l(struct archive_entry *entry, int flags,
-    const char **acl_text, size_t *len, struct archive_string_conv *sc)
-{
-	free(entry->acl.acl_text);
-	entry->acl.acl_text = NULL;
-
-	if (archive_entry_acl_text_compat(&flags) == 0)
-		entry->acl.acl_text = archive_acl_to_text_l(&entry->acl,
-		    (ssize_t *)len, flags, sc);
-
-	*acl_text = entry->acl.acl_text;
-
-	return (0);
-}
-
 /*
  * Following code is modified from UC Berkeley sources, and
  * is subject to the following copyright notice.

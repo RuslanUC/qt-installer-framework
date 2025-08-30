@@ -74,15 +74,6 @@ static ssize_t	uudecode_filter_read(struct archive_read_filter *,
 		    const void **);
 static int	uudecode_filter_close(struct archive_read_filter *);
 
-#if ARCHIVE_VERSION_NUMBER < 4000000
-/* Deprecated; remove in libarchive 4.0 */
-int
-archive_read_support_compression_uu(struct archive *a)
-{
-	return archive_read_support_filter_uu(a);
-}
-#endif
-
 static const struct archive_read_filter_bidder_vtable
 uudecode_bidder_vtable = {
 	.bid = uudecode_bidder_bid,
