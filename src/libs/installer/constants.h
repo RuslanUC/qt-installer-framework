@@ -294,8 +294,6 @@ static const QLatin1String scStartServerShort("ss");
 static const QLatin1String scStartServerLong("start-server");
 static const QLatin1String scStartClientShort("sc");
 static const QLatin1String scStartClientLong("start-client");
-static const QLatin1String scSquishPortShort("q");
-static const QLatin1String scSquishPortLong("squish-port");
 static const QLatin1String scMaxConcurrentOperationsShort("mco");
 static const QLatin1String scMaxConcurrentOperationsLong("max-concurrent-operations");
 static const QLatin1String scCleanupUpdate("cleanup-update");

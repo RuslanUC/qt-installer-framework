@@ -238,13 +238,6 @@ CommandLineParser::CommandLineParser()
                       "started by the client application in that case, you need to start it on your own."),
         QLatin1String("socketname, key")));
     addOption(QCommandLineOption(QStringList()
-        << CommandLineOptions::scSquishPortShort << CommandLineOptions::scSquishPortLong,
-        QLatin1String("Give a port where Squish can connect to. If no port is given, attach to squish "
-                      "not done. Note: To enable Squish support you first need to build IFW with SQUISH_PATH "
-                      "parameter where SQUISH_PATH is pointing to your Squish installation folder: "
-                      "<path_to_qt>/bin/qmake -r SQUISH_PATH=<pat_to_squish>"),
-        QLatin1String("port number")));
-    addOption(QCommandLineOption(QStringList()
         << CommandLineOptions::scMaxConcurrentOperationsShort << CommandLineOptions::scMaxConcurrentOperationsLong,
         QLatin1String("Specifies the maximum number of threads used to perform concurrent operations "
                       "in the unpacking phase of components. Set to a positive number, or 0 (default) "

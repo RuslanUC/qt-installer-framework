@@ -35,15 +35,10 @@
 #include <messageboxhandler.h>
 #include <packagemanagercore.h>
 #include <globals.h>
-#include <runoncechecker.h>
 
-#include <QDir>
 #include <QDirIterator>
 #include <QFontDatabase>
 
-#ifdef ENABLE_SQUISH
-#include <qtbuiltinhook.h>
-#endif
 
 InstallerBase::InstallerBase(int &argc, char *argv[])
     : SDKApp<QApplication>(argc, argv)
@@ -93,26 +88,13 @@ int InstallerBase::run()
         controller.setGui(new MaintenanceGui(m_core));
     emit m_core->guiElementsReady();
 
-    QInstaller::PackageManagerCore::Status status =
-        QInstaller::PackageManagerCore::Status(controller.init());
+    auto status = QInstaller::PackageManagerCore::Status(controller.init());
     if (status != QInstaller::PackageManagerCore::Success)
         return status;
 
     m_core->saveGivenArguments(m_parser.optionNames());
 
-#ifdef ENABLE_SQUISH
-    if (m_parser.isSet(CommandLineOptions::scSquishPortLong)) {
-        const int maxSquishPortNumber = 65535;
-        int squishPort = m_parser.value(CommandLineOptions::scSquishPortLong).toInt();
-        if (squishPort <= 0 || squishPort > maxSquishPortNumber) {
-            qWarning().noquote() << "Invalid Squish port:" << squishPort;
-        } else {
-            bool attachSucceeded = Squish::allowAttaching(squishPort);
-            qCDebug(QInstaller::lcDeveloperBuild)  << "Attach to squish port" << squishPort << "succeeded: "<<attachSucceeded;
-        }
-    }
-#endif
-    const int result = QCoreApplication::instance()->exec();
+    const int result = QCoreApplication::exec();
     if (result != 0)
         return result;
 
@@ -122,8 +104,6 @@ int InstallerBase::run()
     status = m_core->status();
     switch (status) {
         case QInstaller::PackageManagerCore::Success:
-            return status;
-
         case QInstaller::PackageManagerCore::Canceled:
             return status;
 
