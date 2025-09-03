@@ -54,7 +54,6 @@ class INSTALLER_EXPORT Component : public QObject, public ComponentModelHelper
     Q_PROPERTY(QString displayName READ displayName)
     Q_PROPERTY(bool autoCreateOperations READ autoCreateOperations WRITE setAutoCreateOperations)
     Q_PROPERTY(QStringList archives READ archives)
-    Q_PROPERTY(QStringList userInterfaces READ userInterfaces)
     Q_PROPERTY(QStringList dependencies READ dependencies)
     Q_PROPERTY(QStringList autoDependencies READ autoDependencies)
     Q_PROPERTY(bool fromOnlineRepository READ isFromOnlineRepository)
@@ -123,15 +122,12 @@ public:
     void evaluateComponentScript(const QString &fileName, const bool postScriptContext = false);
 
     void loadTranslations(const QDir &directory, const QStringList &qms);
-    void loadUserInterfaces(const QDir &directory, const QStringList &uis);
     void loadLicenses(const QString &directory, const QHash<QString, QVariant> &hash);
     void loadXMLOperations();
     void loadXMLExtractOperations();
     void markAsPerformedInstallation();
 
-    QStringList userInterfaces() const;
     QHash<QString, QVariantMap> licenses() const;
-    Q_INVOKABLE QWidget *userInterface(const QString &name) const;
     Q_INVOKABLE virtual void beginInstallation();
     Q_INVOKABLE virtual void createOperations();
     Q_INVOKABLE virtual void createOperationsForArchive(const QString &archive);

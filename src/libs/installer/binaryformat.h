@@ -36,6 +36,7 @@
 #include <QtCore/private/qfsfileengine_p.h>
 #include <QList>
 #include <QSharedPointer>
+#include <QFile>
 
 namespace QInstaller {
 

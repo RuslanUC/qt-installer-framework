@@ -356,11 +356,6 @@ public:
 
     Settings &settings() const;
 
-    Q_INVOKABLE bool addWizardPage(QInstaller::Component *component, const QString &name, int page);
-    Q_INVOKABLE bool removeWizardPage(QInstaller::Component *component, const QString &name);
-    Q_INVOKABLE bool addWizardPageItem(QInstaller::Component *component, const QString &name,
-                                       int page, int position = 100);
-    Q_INVOKABLE bool removeWizardPageItem(QInstaller::Component *component, const QString &name);
     Q_INVOKABLE bool addWizardPageWarning(const QString &message, PackageManagerCore::WizardPage page, const QString &id, int position = 100);
     Q_INVOKABLE bool removeWizardPageWarning(const QString &id);
     Q_INVOKABLE bool setDefaultPageVisible(int page, bool visible);

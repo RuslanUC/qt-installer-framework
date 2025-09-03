@@ -100,7 +100,6 @@ static const QLatin1String scTargetDirPlaceholder("@TargetDir@");
 static const QLatin1String scTargetDirPlaceholderWithArg("@TargetDir@%1");
 static const QLatin1String scLastUpdateDate("LastUpdateDate");
 static const QLatin1String scInstallDate("InstallDate");
-static const QLatin1String scUserInterfaces("UserInterfaces");
 static const QLatin1String scTranslations("Translations");
 static const QLatin1String scLicenses("Licenses");
 static const QLatin1String scLicensesValue("licenses");

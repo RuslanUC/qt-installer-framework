@@ -180,11 +180,8 @@ target_include_directories(installer PUBLIC
         ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(installer PUBLIC
         Qt6::Core
-        Qt6::CorePrivate
-        Qt6::Core5Compat
         Qt6::Qml
         Qt6::QmlPrivate
-        Qt6::UiTools
         Qt6::Concurrent
         Qt6::Xml
         Qt6::Widgets

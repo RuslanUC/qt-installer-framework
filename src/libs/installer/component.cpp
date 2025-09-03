@@ -351,10 +351,6 @@ void Component::loadDataFromPackage(const Package &package)
 
     setLocalTempPath(QInstaller::pathFromUrl(package.packageSource().url));
 
-    const QStringList uiList = QInstaller::splitStringWithComma(package.data(scUserInterfaces).toString());
-    if (!uiList.isEmpty())
-        loadUserInterfaces(QDir(scTwoArgs.arg(localTempPath(), name())), uiList);
-
 #ifndef IFW_DISABLE_TRANSLATIONS
     const QStringList qms = QInstaller::splitStringWithComma(package.data(scTranslations).toString());
     if (!qms.isEmpty())
@@ -689,39 +685,6 @@ void Component::loadTranslations(const QDir &directory, const QStringList &qms)
 }
 
 /*!
-    Loads the user interface files matching the name filters \a uis inside \a directory. The loaded
-    interface can be accessed via userInterfaces() by using the class name set in the UI file.
-*/
-void Component::loadUserInterfaces(const QDir &directory, const QStringList &uis)
-{
-    if (qobject_cast<QApplication*> (qApp) == 0)
-        return;
-
-    QDirIterator it(directory.path(), uis, QDir::Files);
-    while (it.hasNext()) {
-        QFile file(it.next());
-        if (!file.open(QIODevice::ReadOnly)) {
-            throw Error(tr("Cannot open the requested UI file \"%1\": %2.\n\n%3 \"%4\"").arg(
-                            it.fileName(), file.errorString(), tr(scClearCacheHint), packageManagerCore()->settings().localCachePath()));
-        }
-
-        auto *const loader = new QUiLoader();
-        loader->setTranslationEnabled(true);
-        loader->setLanguageChangeEnabled(true);
-        QWidget *const widget = loader->load(&file, 0);
-        if (!widget) {
-            const auto errorString = loader->errorString();
-            delete loader;
-            throw Error(tr("Cannot load the requested UI file \"%1\": %2.\n\n%3 \"%4\"").arg(
-                it.fileName(), errorString, tr(scClearCacheHint), packageManagerCore()->settings().localCachePath()));
-        }
-        d->scriptEngine()->newQObject(widget);
-        d->m_userInterfaces.insert(widget->objectName(), widget);
-        delete loader;
-    }
-}
-
-/*!
   Loads the text of the licenses contained in \a licenseHash from \a directory.
   This is saved into a new hash containing the filename, the text and the priority of that file.
 */
@@ -800,32 +763,11 @@ void Component::loadXMLExtractOperations()
 }
 
 /*!
-    \property QInstaller::Component::userInterfaces
-
-    \brief A list of all user interface class names known to this component.
-*/
-QStringList Component::userInterfaces() const
-{
-    return d->m_userInterfaces.keys();
-}
-
-/*!
     Returns a hash that contains the file names, text and priorities of license files for the component.
 */
 QHash<QString, QVariantMap> Component::licenses() const
 {
     return d->m_licenses;
-}
-
-/*!
-    Returns the QWidget created for \a name or \c 0 if the widget has been deleted or cannot
-    be found.
-
-    \sa {component::userInterface}{component.userInterface}
-*/
-QWidget *Component::userInterface(const QString &name) const
-{
-    return d->m_userInterfaces.value(name).data();
 }
 
 /*!

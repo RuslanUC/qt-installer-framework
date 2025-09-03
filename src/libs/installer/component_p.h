@@ -83,7 +83,6 @@ public:
     QStringList m_downloadableArchives;
     QString m_downloadableArchivesVariable;
     QStringList m_stopProcessForUpdateRequests;
-    QHash<QString, QPointer<QWidget> > m_userInterfaces;
     QHash<QString, QVariant> m_scriptHash;
 
     // < display name, < file name, file content > >

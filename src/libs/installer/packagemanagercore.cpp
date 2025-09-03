@@ -55,9 +55,6 @@
 #include <QtCore/QMutex>
 #include <QtCore/QSettings>
 #include <QtCore/QTemporaryFile>
-#include <QtCore5Compat/QTextCodec>
-#include <QtCore5Compat/QTextDecoder>
-#include <QtCore5Compat/QTextEncoder>
 #include <QtCore/QTextStream>
 
 #include <QDesktopServices>
@@ -1042,12 +1039,14 @@ QString PackageManagerCore::readFile(const QString &filePath, const QString &cod
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
         return QString();
 
-    QTextCodec *codec = QTextCodec::codecForName(qPrintable(codecName));
-    if (!codec)
+    std::optional<QStringConverter::Encoding> encoding = QStringConverter::encodingForName(qPrintable(codecName));
+    if(!encoding)
         return QString();
 
     QTextStream stream(&f);
-    return QString::fromUtf8(codec->fromUnicode(stream.readAll()));
+    stream.setEncoding(encoding.value());
+
+    return stream.readAll();
 }
 
 /*!
@@ -1837,55 +1836,6 @@ bool PackageManagerCore::fetchPackagesTree(const PackagesList &packages, const L
 }
 
 /*!
-    \fn QInstaller::PackageManagerCore::addWizardPage(QInstaller::Component * component, const QString & name, int page)
-
-    Adds the widget with object name \a name registered by \a component as a new page
-    into the installer's GUI wizard. The widget is added before \a page.
-
-    See \l{Controller Scripting} for the possible values of \a page.
-
-    Returns \c true if the operation succeeded.
-
-    \sa {installer::addWizardPage}{installer.addWizardPage}
-*/
-bool PackageManagerCore::addWizardPage(Component *component, const QString &name, int page)
-{
-    if (!isCommandLineInstance()) {
-        if (QWidget* const widget = component->userInterface(name)) {
-            emit wizardPageInsertionRequested(widget, static_cast<WizardPage>(page));
-            return true;
-        }
-    } else {
-        qCDebug(QInstaller::lcDeveloperBuild) << "Headless installation: skip wizard page addition: " << name;
-    }
-    return false;
-}
-
-/*!
-    \fn QInstaller::PackageManagerCore::removeWizardPage(QInstaller::Component * component, const QString & name)
-
-    Removes the widget with the object name \a name previously added to the installer's wizard
-    by \a component.
-
-    Returns \c true if the operation succeeded.
-
-    \sa {installer::removeWizardPage}{installer.removeWizardPage}
-    \sa addWizardPage(), setDefaultPageVisible(), wizardPageRemovalRequested()
-*/
-bool PackageManagerCore::removeWizardPage(Component *component, const QString &name)
-{
-    if (!isCommandLineInstance()) {
-        if (QWidget* const widget = component->userInterface(name)) {
-            emit wizardPageRemovalRequested(widget);
-            return true;
-        }
-    } else {
-        qCDebug(QInstaller::lcDeveloperBuild) << "Headless installation: skip wizard page removal: " << name;
-    }
-    return false;
-}
-
-/*!
     Sets the visibility of the default page with the ID \a page to \a visible. That is,
     removes it from or adds it to the wizard. This works only for pages that were
     in the installer when it was started.
@@ -1940,59 +1890,6 @@ void PackageManagerCore::selectComponent(const QString &id)
 void PackageManagerCore::deselectComponent(const QString &id)
 {
     d->setComponentSelection(id, Qt::Unchecked);
-}
-
-/*!
-    \fn QInstaller::PackageManagerCore::addWizardPageItem(QInstaller::Component * component, const QString & name,
-        int page, int position)
-
-    Adds the widget with the object name \a name registered by \a component as a GUI element
-    into the installer's GUI wizard. The widget is added on \a page ordered by
-    \a position number. If several widgets are added to the same page, the widget
-    with lower \a position number will be inserted on top.
-
-    See \l{Controller Scripting} for the possible values of \a page.
-
-    If the widget can be found in an UI file for the component, returns \c true and emits the
-    wizardWidgetInsertionRequested() signal.
-
-    \sa {installer::addWizardPageItem}{installer.addWizardPageItem}
-    \sa removeWizardPageItem(), wizardWidgetInsertionRequested()
-*/
-bool PackageManagerCore::addWizardPageItem(Component *component, const QString &name, int page, int position)
-{
-    if (!isCommandLineInstance()) {
-        if (QWidget* const widget = component->userInterface(name)) {
-            emit wizardWidgetInsertionRequested(widget, static_cast<WizardPage>(page), position);
-            return true;
-        }
-    } else {
-        qCDebug(QInstaller::lcDeveloperBuild) << "Headless installation: skip wizard page item addition: " << name;
-    }
-    return false;
-}
-
-/*!
-    \fn QInstaller::PackageManagerCore::removeWizardPageItem(QInstaller::Component * component, const QString & name)
-
-    Removes the widget with the object name \a name previously added to the installer's wizard
-    by \a component.
-
-    If the widget can be found in an UI file for the component, returns \c true and emits the
-    wizardWidgetRemovalRequested() signal.
-
-    \sa {installer::removeWizardPageItem}{installer.removeWizardPageItem}
-    \sa addWizardPageItem()
-*/
-bool PackageManagerCore::removeWizardPageItem(Component *component, const QString &name)
-{
-    if (!isCommandLineInstance()) {
-        if (QWidget* const widget = component->userInterface(name)) {
-            emit wizardWidgetRemovalRequested(widget);
-            return true;
-        }
-    }
-    return false;
 }
 
 /*!
@@ -3622,22 +3519,26 @@ QList<QVariant> PackageManagerCore::execute(const QString &program, const QStrin
         return QList< QVariant >();
 
     if (!adjustedStdIn.isNull()) {
-        QTextCodec *codec = QTextCodec::codecForName(qPrintable(stdInCodec));
-        if (!codec)
+        const auto encoding = QStringConverter::encodingForName(qPrintable(stdInCodec));
+        if(!encoding)
             return QList<QVariant>();
 
-        QTextEncoder encoder(codec);
-        process.write(encoder.fromUnicode(adjustedStdIn));
+        QStringEncoder encoder(encoding.value());
+
+        process.write(encoder.encode(adjustedStdIn));
         process.closeWriteChannel();
     }
 
     process.waitForFinished(-1);
 
-    QTextCodec *codec = QTextCodec::codecForName(qPrintable(stdOutCodec));
-    if (!codec)
+    const auto encoding = QStringConverter::encodingForName(qPrintable(stdOutCodec));
+    if(!encoding)
         return QList<QVariant>();
+
+    QStringDecoder decoder(encoding.value());
+
     return QList<QVariant>()
-            << QTextDecoder(codec).toUnicode(process.readAllStandardOutput())
+            << QString(decoder.decode(process.readAllStandardOutput()))
             << process.exitCode();
 }
 
