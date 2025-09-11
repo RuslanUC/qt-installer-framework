@@ -34,7 +34,7 @@ elseif (UNIX)
             ../kdtools/sysinfo_x11.cpp)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Core Core5Compat UiTools Concurrent Qml Widgets Xml Widgets Network)
+find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Qml Widgets Xml Widgets Network)
 
 add_library(installer STATIC
         proxycredentialsdialog.ui
