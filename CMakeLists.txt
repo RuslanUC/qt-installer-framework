@@ -21,8 +21,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Gui Network Qml Test UiTool
 add_subdirectory(src)
 add_subdirectory(tools)
 
-# TODO: install headers
-install(TARGETS installer ARCHIVE LIBRARY RUNTIME PUBLIC_HEADER)
+install(TARGETS installer ARCHIVE LIBRARY RUNTIME PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/ifw")
 install(TARGETS installerbase RUNTIME)
 install(TARGETS binarycreator RUNTIME)
 install(TARGETS archivegen RUNTIME)
