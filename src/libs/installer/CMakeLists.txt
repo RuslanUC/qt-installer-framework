@@ -26,10 +26,6 @@ endif()
 
 find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Widgets Xml Network)
 
-if(NOT DEFINED IFW_LINK_TYPE)
-    set(IFW_LINK_TYPE STATIC)
-endif()
-
 add_library(installer ${IFW_LINK_TYPE}
         proxycredentialsdialog.ui
         serverauthenticationdialog.ui

@@ -21,12 +21,12 @@ find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Gui Network Qml Test UiTool
 add_subdirectory(src)
 add_subdirectory(tools)
 
-if(BUILD_TESTS)
-    add_subdirectory(tests)
-endif()
-
-if(BUILD_EXAMPLES)
-    add_subdirectory(examples)
-endif()
-
-
+# TODO: install headers
+install(TARGETS installer ARCHIVE LIBRARY RUNTIME PUBLIC_HEADER)
+install(TARGETS installerbase RUNTIME)
+install(TARGETS binarycreator RUNTIME)
+install(TARGETS archivegen RUNTIME)
+install(TARGETS checksumgenerator RUNTIME)
+install(TARGETS devtool RUNTIME)
+install(TARGETS repocompare RUNTIME)
+install(TARGETS repogen RUNTIME)
