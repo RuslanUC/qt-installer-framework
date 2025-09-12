@@ -26,7 +26,7 @@
 **
 **************************************************************************/
 #include "component.h"
-#include "scriptengine.h"
+#include "pluginengine.h"
 
 #include "errors.h"
 #include "fileutils.h"
@@ -47,15 +47,9 @@
 
 #include <QApplication>
 #include <QtConcurrentFilter>
-
-#include <QtUiTools/QUiLoader>
-
-#include <private/qv4engine_p.h>
-#include <private/qv4scopedvalue_p.h>
-#include <private/qv4object_p.h>
+#include <QMetaEnum>
 
 #include <algorithm>
-#include <QJSEngine>
 
 using namespace QInstaller;
 
@@ -239,7 +233,6 @@ Component::Component(PackageManagerCore *core)
     : d(new ComponentPrivate(core, this))
     , m_defaultArchivePath(scTargetDirPlaceholder)
 {
-    QJSEngine::setObjectOwnership(this, QJSEngine::CppOwnership);
     setPrivate(d);
 
     connect(this, &Component::valueChanged, this, &Component::updateModelData);
@@ -619,22 +612,15 @@ void Component::evaluateComponentScript(const QString &fileName, const bool post
 {
     // introduce the component object as javascript value and call the name to check that it
     // was successful
-    try {
-        if (postScriptContent) {
-            d->m_postScriptContext = d->scriptEngine()->loadInContext(scComponent, fileName,
-                scComponentScriptTest.arg(name()));
-        } else {
-            d->m_scriptContext = d->scriptEngine()->loadInContext(scComponent, fileName,
-                scComponentScriptTest.arg(name()));
-        }
-    } catch (const Error &error) {
-        qCWarning(QInstaller::lcDeveloperBuild) << error.message();
-        setUnstable(Component::UnstableError::ScriptLoadingFailed, error.message());
+    if (!d->pluginEngine()->init()) {
+        const QString failedMessage = QLatin1String("Failed to load component plugin!");
+        qCWarning(QInstaller::lcDeveloperBuild) << failedMessage;
+        setUnstable(Component::UnstableError::ScriptLoadingFailed, failedMessage);
         // evaluateComponentScript is called with postScriptContent after we have selected components
         // and are about to install. Do not allow install if unstable components are allowed
         // as we then end up installing a component which has invalid script.
         if (!packageManagerCore()->settings().allowUnstableComponents() || postScriptContent)
-            throw error;
+            throw new std::runtime_error(failedMessage.toStdString());
     }
 
     emit loaded();
@@ -648,7 +634,6 @@ void Component::evaluateComponentScript(const QString &fileName, const bool post
 */
 void Component::languageChanged()
 {
-    callScriptMethod(scRetranslateUi);
 }
 
 /*!
@@ -794,7 +779,7 @@ void Component::createOperationsForPath(const QString &path)
         return;
 
     // the script can override this method
-    if (!callScriptMethod(scCreateOperationsForPath, QJSValueList() << path).isUndefined())
+    if(d->pluginEngine()->callCreateOperationsForPath(path))
         return;
 
     QString target;
@@ -838,7 +823,7 @@ void Component::createOperationsForArchive(const QString &archive)
         return;
 
     // the script can override this method
-    if (!callScriptMethod(scCreateOperationsForArchive, QJSValueList() << archive).isUndefined())
+    if(d->pluginEngine()->callCreateOperationsForArchive(archive))
         return;
 
     QScopedPointer<AbstractArchive> archiveFile(ArchiveFactory::instance().create(archive));
@@ -861,7 +846,7 @@ void Component::createOperationsForArchive(const QString &archive)
 void Component::beginInstallation()
 {
     // the script can override this method
-    callScriptMethod(scBeginInstallation);
+    d->pluginEngine()->callBeginInstallation();
 }
 
 /*!
@@ -871,7 +856,7 @@ void Component::beginInstallation()
 void Component::createOperations()
 {
     // the script can override this method
-    if (!callScriptMethod(scCreateOperations).isUndefined()) {
+    if (d->pluginEngine()->callCreateOperations()) {
         d->m_operationsCreated = true;
         return;
     }
@@ -1169,58 +1154,6 @@ void Component::markComponentUnstable(Component::UnstableError error, const QStr
     updateModelData(scDescription, QString());
 }
 
-QJSValue Component::callScriptMethod(const QString &methodName, const QJSValueList &arguments) const
-{
-    QJSValue scriptContext;
-    if (!d->m_postScriptContext.isUndefined() && d->m_postScriptContext.property(methodName).isCallable())
-        scriptContext = d->m_postScriptContext;
-    else
-        scriptContext = d->m_scriptContext;
-    return d->scriptEngine()->callScriptMethod(scriptContext,
-            methodName, arguments);
-}
-
-namespace {
-
-inline bool convert(QQmlV4Function *func, QStringList *toArgs)
-{
-    if (func->length() < 2)
-        return false;
-
-    QV4::Scope scope(func->v4engine());
-    QV4::ScopedValue val(scope);
-    val = (*func)[0];
-
-    *toArgs << val->toQString();
-    for (int i = 1; i < func->length(); i++) {
-        val = (*func)[i];
-        if (val->isObject() && val->as<QV4::Object>()->isArrayObject()) {
-            QV4::ScopedValue valtmp(scope);
-            QV4::Object *array = val->as<QV4::Object>();
-            uint length = array->getLength();
-            for (uint ii = 0; ii < length; ++ii) {
-                valtmp = array->get(ii);
-                *toArgs << valtmp->toQStringNoThrow();
-            }
-        } else {
-            *toArgs << val->toQString();
-        }
-    }
-    return true;
-}
-
-}
-/*!
-    \internal
-*/
-bool Component::addOperation(QQmlV4Function *func)
-{
-    QStringList args;
-    if (convert(func, &args))
-        return addOperation(args[0], args.mid(1));
-    return false;
-}
-
 /*!
     Creates and adds an installation operation for \a operation. Add any number of \a parameters.
     The variables that the parameters contain, such as \c @TargetDir@, are replaced with their
@@ -1237,17 +1170,6 @@ bool Component::addOperation(const QString &operation, const QStringList &parame
             return true;
     }
 
-    return false;
-}
-
-/*!
-    \internal
-*/
-bool Component::addElevatedOperation(QQmlV4Function *func)
-{
-    QStringList args;
-    if (convert(func, &args))
-        return addElevatedOperation(args[0], args.mid(1));
     return false;
 }
 
@@ -1336,8 +1258,9 @@ void Component::setValidatorCallbackName(const QString &name)
 */
 bool Component::validatePage()
 {
-    if (!validatorCallbackName.isEmpty())
-        return callScriptMethod(validatorCallbackName).toBool();
+    // TODO
+    /*if (!validatorCallbackName.isEmpty())
+        return callScriptMethod(validatorCallbackName).toBool();*/
     return true;
 }
 
@@ -1433,7 +1356,7 @@ void Component::setInstalled()
 */
 bool Component::isAutoDependOn(const QSet<QString> &componentsToInstall) const
 {
-    // If there is no auto depend on value or the value is empty, we have nothing todo. The component does
+    // If there is no auto depend on value or the value is empty, we have nothing to do. The component does
     // not need to be installed as an auto dependency.
     QStringList autoDependOnList = autoDependencies();
     if (autoDependOnList.isEmpty())
@@ -1480,21 +1403,7 @@ bool Component::isDefault() const
 
     // the script can override this method
     if (d->m_vars.value(scDefault).compare(scScript, Qt::CaseInsensitive) == 0) {
-        QJSValue valueFromScript;
-        try {
-            valueFromScript = callScriptMethod(scIsDefault);
-        } catch (const Error &error) {
-            MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(),
-                QLatin1String("isDefaultError"), tr("Cannot resolve isDefault in %1").arg(name()),
-                    error.message());
-            return false;
-        }
-        if (!valueFromScript.isError())
-            return valueFromScript.toBool();
-        qCWarning(QInstaller::lcDeveloperBuild) << "Value from script is not valid."
-            << (valueFromScript.toString().isEmpty()
-            ? QString::fromLatin1("Unknown error.") : valueFromScript.toString());
-        return false;
+        return d->pluginEngine()->isDefault();
     }
 
     return d->m_vars.value(scDefault).compare(scTrue, Qt::CaseInsensitive) == 0;

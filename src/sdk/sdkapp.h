@@ -46,7 +46,7 @@
 #include <globals.h>
 #include <errors.h>
 #include <loggingutils.h>
-#include <scriptengine.h>
+#include <pluginengine.h>
 
 #include <QApplication>
 #include <QDir>

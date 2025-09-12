@@ -37,7 +37,7 @@
 #include "performinstallationform.h"
 #include "settings.h"
 #include "utils.h"
-#include "scriptengine.h"
+#include "pluginengine.h"
 #include "repositorycategory.h"
 #include "componentselectionpage_p.h"
 #include "loggingutils.h"
@@ -120,8 +120,8 @@ public:
         layout()->addWidget(widget);
         layout()->setContentsMargins(0, 0, 0, 0);
 
-        addPageAndProperties(packageManagerCore()->controlScriptEngine());
-        addPageAndProperties(packageManagerCore()->componentScriptEngine());
+        /*addPageAndProperties(packageManagerCore()->controlScriptEngine());
+        addPageAndProperties(packageManagerCore()->componentScriptEngine());*/
     }
 
     QWidget *widget() const
@@ -182,7 +182,7 @@ protected:
         return PackageManagerPage::eventFilter(obj, event);
     }
 
-    void addPageAndProperties(ScriptEngine *engine)
+    /*void addPageAndProperties(ScriptEngine *engine)
     {
         engine->addToGlobalObject(this);
         engine->addToGlobalObject(widget());
@@ -197,7 +197,7 @@ protected:
                 "});"
             ).arg(m_widget->objectName(), property));
         }
-    }
+    }*/
 
 private:
     QWidget *const m_widget;
@@ -277,7 +277,6 @@ public:
     QHash<int, QWizardPage*> m_defaultPages;
     QHash<int, QString> m_defaultButtonText;
 
-    QJSValue m_controlScriptContext;
     QHash<QWizard::WizardButton, QString> m_wizardButtonTypes;
 };
 
@@ -763,29 +762,11 @@ void PackageManagerGui::setValidatorForCustomPageRequested(Component *component,
 */
 void PackageManagerGui::loadControlScript(const QString &scriptPath)
 {
-    d->m_controlScriptContext = m_core->controlScriptEngine()->loadInContext(
-        QLatin1String("Controller"), scriptPath);
+    if(!m_core->controlPluginEngine()->load(scriptPath))
+        throw new QInstaller::Error(QLatin1String("Failed to load control plugin"));
+    if(!m_core->controlPluginEngine()->init())
+        throw new QInstaller::Error(QLatin1String("Failed to initialize control plugin"));
     qCDebug(QInstaller::lcInstallerInstallLog) << "Loaded control script" << scriptPath;
-}
-
-/*!
-    Calls the control script method specified by \a methodName.
-*/
-void PackageManagerGui::callControlScriptMethod(const QString &methodName)
-{
-    if (d->m_controlScriptContext.isUndefined())
-        return;
-    try {
-        const QJSValue returnValue = m_core->controlScriptEngine()->callScriptMethod(
-            d->m_controlScriptContext, methodName);
-        if (returnValue.isUndefined()) {
-            qCDebug(QInstaller::lcDeveloperBuild) << "Control script callback" << methodName
-                << "does not exist.";
-            return;
-        }
-    } catch (const QInstaller::Error &e) {
-        qCritical() << qPrintable(e.message());
-    }
 }
 
 /*!
@@ -794,7 +775,7 @@ void PackageManagerGui::callControlScriptMethod(const QString &methodName)
 void PackageManagerGui::executeControlScript(int pageId)
 {
     if (PackageManagerPage *const p = qobject_cast<PackageManagerPage*> (page(pageId)))
-        callControlScriptMethod(p->objectName() + QLatin1String("Callback"));
+        m_core->controlPluginEngine()->callPageCallback(p->objectName());
 }
 
 /*!
@@ -891,8 +872,8 @@ void PackageManagerGui::wizardPageRemovalRequested(QWidget *widget)
             continue;
         removePage(pageId);
         d->m_defaultPages.remove(pageId);
-        packageManagerCore()->controlScriptEngine()->removeFromGlobalObject(dynamicPage);
-        packageManagerCore()->componentScriptEngine()->removeFromGlobalObject(dynamicPage);
+        /*packageManagerCore()->controlScriptEngine()->removeFromGlobalObject(dynamicPage);
+        packageManagerCore()->componentScriptEngine()->removeFromGlobalObject(dynamicPage);*/
     }
     updatePageListWidget();
 }
@@ -909,8 +890,8 @@ void PackageManagerGui::wizardWidgetInsertionRequested(QWidget *widget,
     if (PackageManagerPage *p = qobject_cast<PackageManagerPage *>(QWizard::page(page))) {
         p->m_customWidgets.insert(position, widget);
         d->addAndOrderCustomWidgets(p, widget);
-        packageManagerCore()->controlScriptEngine()->addToGlobalObject(p);
-        packageManagerCore()->componentScriptEngine()->addToGlobalObject(p);
+        /*packageManagerCore()->controlScriptEngine()->addToGlobalObject(p);
+        packageManagerCore()->componentScriptEngine()->addToGlobalObject(p);*/
     }
 }
 
@@ -927,8 +908,8 @@ void PackageManagerGui::wizardWidgetRemovalRequested(QWidget *widget)
         managerPage->removeCustomWidget(widget);
     }
     widget->setParent(nullptr);
-    packageManagerCore()->controlScriptEngine()->removeFromGlobalObject(widget);
-    packageManagerCore()->componentScriptEngine()->removeFromGlobalObject(widget);
+    /*packageManagerCore()->controlScriptEngine()->removeFromGlobalObject(widget);
+    packageManagerCore()->componentScriptEngine()->removeFromGlobalObject(widget);*/
 }
 
 /*!
@@ -949,8 +930,8 @@ void PackageManagerGui::wizardPageWarningInsertionRequested(const QString &messa
         warningLabel->setObjectName(QLatin1String("LabelWithPixmap_") + id);
         p->m_customWidgets.insert(position, warningLabel);
         d->addAndOrderCustomWidgets(p, warningLabel);
-        packageManagerCore()->controlScriptEngine()->addToGlobalObject(warningLabel);
-        packageManagerCore()->componentScriptEngine()->addToGlobalObject(warningLabel);
+        /*packageManagerCore()->controlScriptEngine()->addToGlobalObject(warningLabel);
+        packageManagerCore()->componentScriptEngine()->addToGlobalObject(warningLabel);*/
     }
 }
 
@@ -968,8 +949,8 @@ void PackageManagerGui::wizardPageWarningRemovalRequested(const QString &id)
         managerPage->removeCustomWidget(warningLabel);
     }
     warningLabel->setParent(nullptr);
-    packageManagerCore()->controlScriptEngine()->removeFromGlobalObject(warningLabel);
-    packageManagerCore()->componentScriptEngine()->removeFromGlobalObject(warningLabel);
+    /*packageManagerCore()->controlScriptEngine()->removeFromGlobalObject(warningLabel);
+    packageManagerCore()->componentScriptEngine()->removeFromGlobalObject(warningLabel);*/
 }
 
 /*!

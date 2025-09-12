@@ -31,7 +31,6 @@
 
 #include "qinstallerglobal.h"
 
-#include <QJSValue>
 #include <QPointer>
 #include <QStringList>
 #include <QUrl>
@@ -40,7 +39,7 @@ namespace QInstaller {
 
 class Component;
 class PackageManagerCore;
-class ScriptEngine;
+class PluginEngine;
 
 class ComponentPrivate
 {
@@ -55,7 +54,7 @@ public:
     explicit ComponentPrivate(PackageManagerCore *core, Component *qq);
     ~ComponentPrivate();
 
-    ScriptEngine *scriptEngine() const;
+    PluginEngine *pluginEngine() const;
 
     PackageManagerCore *m_core;
     Component *m_parentComponent;
@@ -75,8 +74,6 @@ public:
     QString m_componentName;
     QUrl m_repositoryUrl;
     QString m_localTempPath;
-    QJSValue m_scriptContext;
-    QJSValue m_postScriptContext;
     QHash<QString, QString> m_vars;
     QList<Component*> m_childComponents;
     QList<Component*> m_allChildComponents;

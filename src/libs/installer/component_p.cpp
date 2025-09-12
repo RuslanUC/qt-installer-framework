@@ -57,8 +57,6 @@ ComponentPrivate::ComponentPrivate(PackageManagerCore *core, Component *qq)
     , m_updateIsAvailable(false)
     , m_treeNameMoveChildren(false)
     , m_postLoadScript(false)
-    , m_scriptContext(QJSValue::UndefinedValue)
-    , m_postScriptContext(QJSValue::UndefinedValue)
 {
 }
 
@@ -66,9 +64,9 @@ ComponentPrivate::~ComponentPrivate()
 {
 }
 
-ScriptEngine *ComponentPrivate::scriptEngine() const
+PluginEngine *ComponentPrivate::pluginEngine() const
 {
-    return m_core->componentScriptEngine();
+    return m_core->componentPluginEngine();
 }
 
 // -- ComponentModelHelper

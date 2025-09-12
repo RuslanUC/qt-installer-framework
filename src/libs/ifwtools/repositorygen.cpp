@@ -38,7 +38,6 @@
 #include "settings.h"
 #include "qinstallerglobal.h"
 #include "utils.h"
-#include "scriptengine.h"
 
 #include "updater.h"
 
@@ -971,16 +970,6 @@ void QInstallerTools::copyScriptFiles(const QDomNodeList &childNodes, const Pack
         // if the user isn't aware of the downloadable archives value we will add it automatically later
         foundDownloadableArchives |= scriptContent.contains(QLatin1String("addDownloadableArchive"))
                                      || scriptContent.contains(QLatin1String("removeDownloadableArchive"));
-
-        static QInstaller::ScriptEngine testScriptEngine;
-        const QJSValue value = testScriptEngine.evaluate(scriptContent, scriptFile.fileName());
-        if (value.isError()) {
-            throw QInstaller::Error(QString::fromLatin1("Exception while loading component "
-                        "script at \"%1\": %2").arg(QDir::toNativeSeparators(scriptFile.fileName()),
-                        value.toString().isEmpty() ? QString::fromLatin1("Unknown error.") :
-                        value.toString() + QStringLiteral(" on line number: ") +
-                        value.property(QStringLiteral("lineNumber")).toString()));
-        }
 
         const QString toLocation(QString::fromLatin1("%1/%2/%3").arg(targetDir, info.name, script));
         copyWithException(scriptFile.fileName(), toLocation, QInstaller::scScript);

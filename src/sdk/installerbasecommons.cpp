@@ -28,7 +28,7 @@
 #include "installerbasecommons.h"
 
 #include <packagemanagercore.h>
-#include <scriptengine.h>
+#include <pluginengine.h>
 #include <packagemanagerpagefactory.h>
 #include <settings.h>
 
@@ -51,11 +51,11 @@ InstallerGui::InstallerGui(PackageManagerCore *core)
     setPage(PackageManagerCore::PerformInstallation, new PerformInstallationPage(core));
     setPage(PackageManagerCore::InstallationFinished, new FinishedPage(core));
 
-    foreach (const int id, pageIds()) {
+    /*foreach (const int id, pageIds()) {
         QWizardPage *wizardPage = page(id);
         packageManagerCore()->controlScriptEngine()->addToGlobalObject(wizardPage);
         packageManagerCore()->componentScriptEngine()->addToGlobalObject(wizardPage);
-    }
+    }*/
 }
 
 
@@ -87,16 +87,16 @@ MaintenanceGui::MaintenanceGui(PackageManagerCore *core)
     if (core->isUninstaller())
         wizardPageVisibilityChangeRequested(false, PackageManagerCore::InstallationFinished + 1);
 
-    foreach (const int id, pageIds()) {
+    /*foreach (const int id, pageIds()) {
         QWizardPage *wizardPage = page(id);
         packageManagerCore()->controlScriptEngine()->addToGlobalObject(wizardPage);
         packageManagerCore()->componentScriptEngine()->addToGlobalObject(wizardPage);
-    }
+    }*/
 }
 
 void MaintenanceGui::updateRestartPage()
 {
-    wizardPageVisibilityChangeRequested((packageManagerCore()->isUninstaller() ? false : true),
+    wizardPageVisibilityChangeRequested(!packageManagerCore()->isUninstaller(),
         PackageManagerCore::InstallationFinished + 1);
 }
 

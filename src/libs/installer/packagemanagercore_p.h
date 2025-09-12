@@ -56,7 +56,7 @@ namespace QInstaller {
 struct BinaryLayout;
 struct AliasSource;
 class AliasFinder;
-class ScriptEngine;
+class PluginEngine;
 class ComponentModel;
 class ComponentAlias;
 class InstallerCalculator;
@@ -118,8 +118,8 @@ public:
     bool loadComponentScripts(const T &components, const bool postScript = false);
 
     void cleanUpComponentEnvironment();
-    ScriptEngine *componentScriptEngine() const;
-    ScriptEngine *controlScriptEngine() const;
+    PluginEngine *componentPluginEngine() const;
+    PluginEngine *controlPluginEngine() const;
 
     void clearAllComponentLists();
     void clearUpdaterComponentLists();
@@ -311,8 +311,8 @@ private:
 
     bool m_foundEssentialUpdate;
 
-    mutable ScriptEngine *m_componentScriptEngine;
-    mutable ScriptEngine *m_controlScriptEngine;
+    mutable PluginEngine *m_componentScriptEngine;
+    mutable PluginEngine *m_controlScriptEngine;
     // < name (component to replace), < replacement component, component to replace > >
     QHash<QString, QPair<Component*, Component*> > m_componentsToReplaceAllMode;
     QHash<QString, QPair<Component*, Component*> > m_componentsToReplaceUpdaterMode;

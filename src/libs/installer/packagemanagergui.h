@@ -72,7 +72,6 @@ public:
     virtual ~PackageManagerGui() = 0;
 
     void loadControlScript(const QString& scriptPath);
-    void callControlScriptMethod(const QString& methodName);
 
     QWidget *pageById(int id) const;
     QWidget *pageByObjectName(const QString &name) const;

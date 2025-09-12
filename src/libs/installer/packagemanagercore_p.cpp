@@ -31,7 +31,7 @@
 #include "binarycontent.h"
 #include "binaryformatenginehandler.h"
 #include "binarylayout.h"
-#include "scriptengine.h"
+#include "pluginengine.h"
 #include "componentmodel.h"
 #include "errors.h"
 #include "fileio.h"
@@ -614,17 +614,17 @@ void PackageManagerCorePrivate::cleanUpComponentEnvironment()
     clearUninstallerCalculator();
 }
 
-ScriptEngine *PackageManagerCorePrivate::componentScriptEngine() const
+PluginEngine *PackageManagerCorePrivate::componentPluginEngine() const
 {
     if (!m_componentScriptEngine)
-        m_componentScriptEngine = new ScriptEngine(m_core);
+        m_componentScriptEngine = new PluginEngine(m_core);
     return m_componentScriptEngine;
 }
 
-ScriptEngine *PackageManagerCorePrivate::controlScriptEngine() const
+PluginEngine *PackageManagerCorePrivate::controlPluginEngine() const
 {
     if (!m_controlScriptEngine)
-        m_controlScriptEngine = new ScriptEngine(m_core);
+        m_controlScriptEngine = new PluginEngine(m_core);
     return m_controlScriptEngine;
 }
 

@@ -45,7 +45,6 @@ namespace QInstaller {
 struct AliasSource;
 class ComponentModel;
 class ComponentAlias;
-class ScriptEngine;
 class PackageManagerCorePrivate;
 class PackageManagerProxyFactory;
 class Settings;
@@ -252,8 +251,8 @@ public:
     bool directoryContainsInstallation(const QString &directory) const;
 
 public:
-    ScriptEngine *componentScriptEngine() const;
-    ScriptEngine *controlScriptEngine() const;
+    PluginEngine *componentPluginEngine() const;
+    PluginEngine *controlPluginEngine() const;
 
     // component handling
 

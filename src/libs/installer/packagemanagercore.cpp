@@ -2055,9 +2055,9 @@ void PackageManagerCore::runProgram()
 
     \sa {Component Scripting}
 */
-ScriptEngine *PackageManagerCore::componentScriptEngine() const
+PluginEngine *PackageManagerCore::componentPluginEngine() const
 {
-    return d->componentScriptEngine();
+    return d->componentPluginEngine();
 }
 
 /*!
@@ -2065,9 +2065,9 @@ ScriptEngine *PackageManagerCore::componentScriptEngine() const
 
     \sa {Controller Scripting}
 */
-ScriptEngine *PackageManagerCore::controlScriptEngine() const
+PluginEngine *PackageManagerCore::controlPluginEngine() const
 {
-    return d->controlScriptEngine();
+    return d->controlPluginEngine();
 }
 
 /*!

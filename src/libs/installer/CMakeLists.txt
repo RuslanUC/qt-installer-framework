@@ -3,16 +3,6 @@ include(${PROJECT_SOURCE_DIR}/cmake/lto.cmake)
 
 set(PLATFORM_SOURCES)
 
-# TODO:
-#win32 {
-#
-#LIBS += -ladvapi32 -lpsapi      # kdtools
-#LIBS += -lole32 -lshell32       # createshortcutoperation
-#
-#win32-g++*:LIBS += -lmpr -luuid
-#win32-g++*:QMAKE_CXXFLAGS += -Wno-missing-field-initializers
-#}
-
 set(INCLUDE_DIRS .)
 
 if (WIN32 AND MSVC)
@@ -34,9 +24,13 @@ elseif (UNIX)
             ../kdtools/sysinfo_x11.cpp)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Qml Widgets Xml Widgets Network)
+find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Widgets Xml Network)
 
-add_library(installer STATIC
+if(NOT DEFINED IFW_LINK_TYPE)
+    set(IFW_LINK_TYPE STATIC)
+endif()
+
+add_library(installer ${IFW_LINK_TYPE}
         proxycredentialsdialog.ui
         serverauthenticationdialog.ui
         componentsummary.ui
@@ -69,7 +63,6 @@ add_library(installer STATIC
         stopprocessforupdateoperation.cpp
         utils.cpp
         component.cpp
-        scriptengine.cpp
         componentmodel.cpp
         qtpatch.cpp
         consumeoutputoperation.cpp
@@ -144,6 +137,9 @@ add_library(installer STATIC
         libarchivewrapper.cpp
         libarchivewrapper_p.cpp
         commandlineparser_p.cpp
+        plugin.h
+        pluginengine.cpp
+        plugin_proxy.cpp
 
         ${PLATFORM_SOURCES}
 
@@ -180,8 +176,7 @@ target_include_directories(installer PUBLIC
         ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(installer PUBLIC
         Qt6::Core
-        Qt6::Qml
-        Qt6::QmlPrivate
+        Qt6::CorePrivate
         Qt6::Concurrent
         Qt6::Xml
         Qt6::Widgets

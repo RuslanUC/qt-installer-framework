@@ -139,11 +139,9 @@ public:
     OperationList operations(const Operation::OperationGroups &mask = Operation::All) const;
 
     void addOperation(Operation *operation);
-    Q_INVOKABLE bool addOperation(QQmlV4Function *args);
     bool addOperation(const QString &operation, const QStringList &parameters);
 
     void addElevatedOperation(Operation *operation);
-    Q_INVOKABLE bool addElevatedOperation(QQmlV4Function *args);
     bool addElevatedOperation(const QString &operation, const QStringList &parameters);
 
     QStringList downloadableArchives();
@@ -234,8 +232,6 @@ private:
         const QString &parameter10 = QString());
     Operation *createOperation(const QString &operationName, const QStringList &parameters);
     void markComponentUnstable(const Component::UnstableError error, const QString &errorMessage);
-
-    QJSValue callScriptMethod(const QString &methodName, const QJSValueList &arguments = QJSValueList()) const;
 
 private:
     QString validatorCallbackName;

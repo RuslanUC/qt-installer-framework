@@ -157,3 +157,4 @@ target_link_libraries(archive PUBLIC
         BZip2::BZip2
         LibLZMA::LibLZMA)
 target_enable_lto(archive)
+target_compile_options(archive PRIVATE -fPIC)

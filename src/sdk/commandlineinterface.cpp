@@ -82,8 +82,8 @@ bool CommandLineInterface::initialize()
     m_core->saveGivenArguments(QStringList() << command << m_parser.optionNames());
     QString ctrlScript = controlScript();
     if (!ctrlScript.isEmpty()) {
-        m_core->controlScriptEngine()->loadInContext(
-                QLatin1String("Controller"), ctrlScript);
+        m_core->controlPluginEngine()->load(ctrlScript);
+        m_core->controlPluginEngine()->init();
         qCDebug(QInstaller::lcInstallerInstallLog) << "Loaded control script" << ctrlScript;
     }
     return true;
