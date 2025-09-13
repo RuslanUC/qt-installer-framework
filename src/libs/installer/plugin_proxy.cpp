@@ -116,8 +116,8 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core) : QObject(c
     connect(core, &QInstaller::PackageManagerCore::valueChanged, [this](const QString &key, const QString &value) {
         emit valueChanged(key, value);
     });
-    connect(core, &QInstaller::PackageManagerCore::statusChanged, [this](const Status status) {
-        emit statusChanged(status);
+    connect(core, &QInstaller::PackageManagerCore::statusChanged, [this](const QInstaller::PackageManagerCore::Status status) {
+        emit statusChanged((QInstaller::Plugin::Status)status);
     });
     connect(core, &QInstaller::PackageManagerCore::defaultTranslationsLoadedForLanguage, [this](const QLocale lang) {
         emit defaultTranslationsLoadedForLanguage(lang);
@@ -179,20 +179,20 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core) : QObject(c
     connect(core, &QInstaller::PackageManagerCore::downloadArchivesFinished, [this] {
         emit downloadArchivesFinished();
     });
-    connect(core, &QInstaller::PackageManagerCore::wizardPageInsertionRequested, [this](QWidget *widget, const WizardPage page) {
-        emit wizardPageInsertionRequested(widget, page);
+    connect(core, &QInstaller::PackageManagerCore::wizardPageInsertionRequested, [this](QWidget *widget, const QInstaller::PackageManagerCore::WizardPage page) {
+        emit wizardPageInsertionRequested(widget, (QInstaller::Plugin::WizardPage)page);
     });
     connect(core, &QInstaller::PackageManagerCore::wizardPageRemovalRequested, [this](QWidget *widget) {
         emit wizardPageRemovalRequested(widget);
     });
-    connect(core, &QInstaller::PackageManagerCore::wizardWidgetInsertionRequested, [this](QWidget *widget, const WizardPage page, const int position) {
-        emit wizardWidgetInsertionRequested(widget, page, position);
+    connect(core, &QInstaller::PackageManagerCore::wizardWidgetInsertionRequested, [this](QWidget *widget, const QInstaller::PackageManagerCore::WizardPage page, const int position) {
+        emit wizardWidgetInsertionRequested(widget, (QInstaller::Plugin::WizardPage)page, position);
     });
     connect(core, &QInstaller::PackageManagerCore::wizardWidgetRemovalRequested, [this](QWidget *widget) {
         emit wizardWidgetRemovalRequested(widget);
     });
-    connect(core, &QInstaller::PackageManagerCore::wizardPageWarningInsertionRequested, [this](const QString &message, const WizardPage page, const QString &id, int position) {
-        emit wizardPageWarningInsertionRequested(message, page, id, position);
+    connect(core, &QInstaller::PackageManagerCore::wizardPageWarningInsertionRequested, [this](const QString &message, const QInstaller::PackageManagerCore::WizardPage page, const QString &id, int position) {
+        emit wizardPageWarningInsertionRequested(message, (QInstaller::Plugin::WizardPage)page, id, position);
     });
     connect(core, &QInstaller::PackageManagerCore::wizardPageWarningRemovalRequested, [this](const QString &id) {
         emit wizardPageWarningRemovalRequested(id);
@@ -227,8 +227,8 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core) : QObject(c
     connect(core, &QInstaller::PackageManagerCore::installDirectoryChanged, [this](const QString &newDirectory) {
         emit installDirectoryChanged(newDirectory);
     });
-    connect(core, &QInstaller::PackageManagerCore::availableSpaceChanged, [this](const SpaceInfo spaceInfo) {
-        emit availableSpaceChanged(spaceInfo);
+    connect(core, &QInstaller::PackageManagerCore::availableSpaceChanged, [this](const QInstaller::PackageManagerCore::SpaceInfo spaceInfo) {
+        emit availableSpaceChanged((QInstaller::Plugin::SpaceInfo)spaceInfo);
     });
     connect(core, &QInstaller::PackageManagerCore::metadataDownloadFailed, [this] {
         emit metadataDownloadFailed();
@@ -484,7 +484,7 @@ bool InstallerProxy::killProcess(const QString& absoluteFilePath, int timeout) c
 }
 
 bool InstallerProxy::addWizardPageWarning(const QString& message, WizardPage page, const QString& id, int position) {
-    return m_core->addWizardPageWarning(message, page, id, position);
+    return m_core->addWizardPageWarning(message, (QInstaller::PackageManagerCore::WizardPage)page, id, position);
 }
 
 bool InstallerProxy::removeWizardPageWarning(const QString& id) {

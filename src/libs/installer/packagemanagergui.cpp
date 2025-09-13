@@ -763,9 +763,9 @@ void PackageManagerGui::setValidatorForCustomPageRequested(Component *component,
 void PackageManagerGui::loadControlScript(const QString &scriptPath)
 {
     if(!m_core->controlPluginEngine()->load(scriptPath))
-        throw new QInstaller::Error(QLatin1String("Failed to load control plugin"));
+        throw QInstaller::Error(QLatin1String("Failed to load control plugin"));
     if(!m_core->controlPluginEngine()->init())
-        throw new QInstaller::Error(QLatin1String("Failed to initialize control plugin"));
+        throw QInstaller::Error(QLatin1String("Failed to initialize control plugin"));
     qCDebug(QInstaller::lcInstallerInstallLog) << "Loaded control script" << scriptPath;
 }
 

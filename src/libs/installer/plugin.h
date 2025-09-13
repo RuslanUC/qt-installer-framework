@@ -2,11 +2,46 @@
 
 #include <QObject>
 #include <QWizard>
+#include <QSettings>
 #include "systeminfo.h"
-#include "packagemanagercore.h"
 
 namespace QInstaller {
     class PackageManagerGui;
+    class PackageManagerCore;
+    class Component;
+
+    namespace Plugin {
+        enum Status {
+            Success = EXIT_SUCCESS,
+            Failure = EXIT_FAILURE,
+            Running = 2,
+            Canceled = 3,
+            Unfinished = 4,
+            ForceUpdate = 5,
+            EssentialUpdated = 6,
+            NoPackagesFound = 7,
+            MetaDownloadFailure = 8
+        };
+
+        enum WizardPage {
+            Introduction = 0x1000,
+            TargetDirectory = 0x2000,
+            ComponentSelection = 0x3000,
+            LicenseCheck = 0x4000,
+            StartMenuSelection = 0x5000,
+            ReadyForInstallation = 0x6000,
+            PerformInstallation = 0x7000,
+            InstallationFinished = 0x8000,
+            End = 0xffff
+        };
+
+        enum SpaceInfo {
+            SpaceAvailable,
+            SpaceExceeded,
+            ExecutableSizeExceeded,
+            RecommendedSizeExceeded
+        };
+    }
 }
 
 class GuiProxy final : public QObject {
@@ -58,9 +93,9 @@ class InstallerProxy final : public QObject {
     Q_DISABLE_COPY(InstallerProxy)
 
 public:
-    using Status = QInstaller::PackageManagerCore::Status;
-    using WizardPage = QInstaller::PackageManagerCore::WizardPage;
-    using SpaceInfo = QInstaller::PackageManagerCore::SpaceInfo;
+    using Status = QInstaller::Plugin::Status;
+    using WizardPage = QInstaller::Plugin::WizardPage;
+    using SpaceInfo = QInstaller::Plugin::SpaceInfo;
 
     explicit InstallerProxy(QInstaller::PackageManagerCore *core);
 
@@ -327,9 +362,61 @@ private:
     ComponentProxy* component_proxy;
 };
 
-typedef bool(*IfwPluginControlInit)(ControlPluginContext*); // ifw_control_init
-typedef bool(*IfwPluginComponentInit)(ComponentPluginContext*); // ifw_component_init
+#ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
+#include "packagemanagercore.h"
 
-typedef bool(*IfwPluginComponentIsDefault)(); // ifw_component_is_default
+// TODO: msvc
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wenum-compare"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wenum-compare"
+#endif
 
-//
+static_assert(QInstaller::PackageManagerCore::Status::Success == QInstaller::Plugin::Status::Success);
+static_assert(QInstaller::PackageManagerCore::Status::Failure == QInstaller::Plugin::Status::Failure);
+static_assert(QInstaller::PackageManagerCore::Status::Running == QInstaller::Plugin::Status::Running);
+static_assert(QInstaller::PackageManagerCore::Status::Canceled == QInstaller::Plugin::Status::Canceled);
+static_assert(QInstaller::PackageManagerCore::Status::Unfinished == QInstaller::Plugin::Status::Unfinished);
+static_assert(QInstaller::PackageManagerCore::Status::ForceUpdate == QInstaller::Plugin::Status::ForceUpdate);
+static_assert(QInstaller::PackageManagerCore::Status::EssentialUpdated == QInstaller::Plugin::Status::EssentialUpdated);
+static_assert(QInstaller::PackageManagerCore::Status::NoPackagesFound == QInstaller::Plugin::Status::NoPackagesFound);
+static_assert(QInstaller::PackageManagerCore::Status::MetaDownloadFailure == QInstaller::Plugin::Status::MetaDownloadFailure);
+
+static_assert(QInstaller::PackageManagerCore::WizardPage::Introduction == QInstaller::Plugin::WizardPage::Introduction);
+static_assert(QInstaller::PackageManagerCore::WizardPage::TargetDirectory == QInstaller::Plugin::WizardPage::TargetDirectory);
+static_assert(QInstaller::PackageManagerCore::WizardPage::ComponentSelection == QInstaller::Plugin::WizardPage::ComponentSelection);
+static_assert(QInstaller::PackageManagerCore::WizardPage::LicenseCheck == QInstaller::Plugin::WizardPage::LicenseCheck);
+static_assert(QInstaller::PackageManagerCore::WizardPage::StartMenuSelection == QInstaller::Plugin::WizardPage::StartMenuSelection);
+static_assert(QInstaller::PackageManagerCore::WizardPage::ReadyForInstallation == QInstaller::Plugin::WizardPage::ReadyForInstallation);
+static_assert(QInstaller::PackageManagerCore::WizardPage::PerformInstallation == QInstaller::Plugin::WizardPage::PerformInstallation);
+static_assert(QInstaller::PackageManagerCore::WizardPage::InstallationFinished == QInstaller::Plugin::WizardPage::InstallationFinished);
+static_assert(QInstaller::PackageManagerCore::WizardPage::End == QInstaller::Plugin::WizardPage::End);
+
+static_assert(QInstaller::PackageManagerCore::SpaceInfo::SpaceAvailable == QInstaller::Plugin::SpaceInfo::SpaceAvailable);
+static_assert(QInstaller::PackageManagerCore::SpaceInfo::SpaceExceeded == QInstaller::Plugin::SpaceInfo::SpaceExceeded);
+static_assert(QInstaller::PackageManagerCore::SpaceInfo::ExecutableSizeExceeded == QInstaller::Plugin::SpaceInfo::ExecutableSizeExceeded);
+static_assert(QInstaller::PackageManagerCore::SpaceInfo::RecommendedSizeExceeded == QInstaller::Plugin::SpaceInfo::RecommendedSizeExceeded);
+
+// TODO: msvc
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
+
+#else
+
+#   ifdef __cplusplus
+extern "C" {
+#   endif
+
+    bool ifw_control_init(ControlPluginContext*);
+    bool ifw_component_init(ComponentPluginContext*);
+
+#   ifdef __cplusplus
+}
+#   endif
+
+#endif

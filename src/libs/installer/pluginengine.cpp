@@ -34,7 +34,7 @@ namespace QInstaller {
 
         control_init_func = reinterpret_cast<IfwPluginControlInit>(library.resolve("ifw_control_init"));
         component_init_func = reinterpret_cast<IfwPluginComponentInit>(library.resolve("ifw_component_init"));
-        if(!control_init_func ^ !component_init_func) {
+        if(!(!control_init_func ^ !component_init_func)) {
             library.unload();
             return false;
         }
