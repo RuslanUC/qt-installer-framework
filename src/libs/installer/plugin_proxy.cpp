@@ -653,6 +653,10 @@ bool ComponentProxy::isForcedUpdate() {
     return m_component->isForcedUpdate();
 }
 
+bool ComponentProxy::addOperation(const QString &operation, const QStringList &parameters) {
+    return m_component->addOperation(operation, parameters);
+}
+
 void ComponentProxy::setAutoCreateOperations(bool autoCreateOperations) {
     m_component->setAutoCreateOperations(autoCreateOperations);
 }

@@ -163,7 +163,7 @@ add_library(installer ${IFW_LINK_TYPE}
         ../kdtools/updatefinder.cpp
         ../kdtools/updatesinfo.cpp
         ../kdtools/environment.cpp)
-target_compile_definitions(installer PRIVATE BUILD_SHARED_IFWTOOLS BUILD_SHARED_KDTOOLS ${IFW_COMPILE_DEFINITIONS})
+target_compile_definitions(installer PRIVATE BUILD_SHARED_IFWTOOLS BUILD_SHARED_KDTOOLS ${IFW_COMPILE_DEFINITIONS} BUILD_LIB_INSTALLER)
 target_include_directories(installer PUBLIC
         .
         ../ifwtools

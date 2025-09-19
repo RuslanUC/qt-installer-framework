@@ -33,7 +33,7 @@
 
 namespace QInstallerTools {
 
-class BinaryDump
+class INSTALLER_EXPORT BinaryDump
 {
     Q_DISABLE_COPY(BinaryDump)
 

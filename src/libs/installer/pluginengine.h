@@ -10,11 +10,11 @@ class ComponentPluginContext;
 
 typedef bool(*IfwPluginControlInit)(ControlPluginContext*); // ifw_control_init
 typedef bool(*IfwPluginComponentInit)(ComponentPluginContext*); // ifw_component_init
-typedef bool(*IfwPluginComponentIsDefault)(); // ifw_component_is_default
-typedef bool(*IfwPluginComponentCreateOperations)(); // ifw_component_create_operations
-typedef bool(*IfwPluginComponentCreateOperationsForPath)(); // ifw_component_create_operations_for_path
-typedef bool(*IfwPluginComponentCreateOperationsForArchive)(); // ifw_component_create_operations_for_archive
-typedef void(*IfwPluginComponentBeginInstallation)(); // ifw_component_begin_installation
+typedef bool(*IfwPluginComponentIsDefault)(ComponentPluginContext*); // ifw_component_is_default
+typedef bool(*IfwPluginComponentCreateOperations)(ComponentPluginContext*); // ifw_component_create_operations
+typedef bool(*IfwPluginComponentCreateOperationsForPath)(ComponentPluginContext*, const QString& path); // ifw_component_create_operations_for_path
+typedef bool(*IfwPluginComponentCreateOperationsForArchive)(ComponentPluginContext*, const QString& archive); // ifw_component_create_operations_for_archive
+typedef void(*IfwPluginComponentBeginInstallation)(ComponentPluginContext*); // ifw_component_begin_installation
 
 namespace QInstaller {
     class PackageManagerCore;
@@ -32,14 +32,14 @@ namespace QInstaller {
         bool load(const QString& path);
         bool init();
 
-        bool isDefault() const;
+        bool isDefault();
 
         void callPageCallback(const QString& page_name);
-        bool callCreateOperations() const;
-        bool callCreateOperationsForPath(const QString& path) const;
-        bool callCreateOperationsForArchive(const QString& archive) const;
+        bool callCreateOperations();
+        bool callCreateOperationsForPath(const QString& path);
+        bool callCreateOperationsForArchive(const QString& archive);
 
-        void callBeginInstallation() const;
+        void callBeginInstallation();
 
     private:
         PackageManagerCore* core;

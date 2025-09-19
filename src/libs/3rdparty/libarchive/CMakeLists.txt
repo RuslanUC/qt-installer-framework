@@ -149,12 +149,19 @@ find_package(ZLIB REQUIRED)
 find_package(BZip2 REQUIRED)
 find_package(LibLZMA REQUIRED)
 
+if(WIN32)
+    set(_WIN32_BCRYPT bcrypt)
+else()
+    set(_WIN32_BCRYPT)
+endif()
+
 add_library(archive STATIC ${SOURCES})
 target_include_directories(archive PUBLIC ${INCLUDE_DIRS})
 target_compile_definitions(archive PRIVATE HAVE_CONFIG_H IFW_LIBARCHIVE ${IFW_COMPILE_DEFINITIONS})
 target_link_libraries(archive PUBLIC
         ZLIB::ZLIB
         BZip2::BZip2
-        LibLZMA::LibLZMA)
+        LibLZMA::LibLZMA
+        ${_WIN32_BCRYPT})
 target_enable_lto(archive)
 target_compile_options(archive PRIVATE -fPIC)

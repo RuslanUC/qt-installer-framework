@@ -84,9 +84,9 @@ namespace QInstaller {
         return false;
     }
 
-    bool PluginEngine::isDefault() const {
+    bool PluginEngine::isDefault() {
         if(initialized && is_default_func)
-            return is_default_func();
+            return is_default_func(componentPluginContext());
         return false;
     }
 
@@ -96,27 +96,27 @@ namespace QInstaller {
             callback_func();
     }
 
-    bool PluginEngine::callCreateOperations() const {
+    bool PluginEngine::callCreateOperations() {
         if(initialized && component_create_operations_func)
-            return component_create_operations_func();
+            return component_create_operations_func(componentPluginContext());
         return false;
     }
 
-    bool PluginEngine::callCreateOperationsForPath(const QString& path) const {
+    bool PluginEngine::callCreateOperationsForPath(const QString& path) {
         if(initialized && component_create_operations_for_path_func)
-            return component_create_operations_for_path_func();
+            return component_create_operations_for_path_func(componentPluginContext(), path);
         return false;
     }
 
-    bool PluginEngine::callCreateOperationsForArchive(const QString& archive) const {
+    bool PluginEngine::callCreateOperationsForArchive(const QString& archive) {
         if(initialized && component_create_operations_for_archive_func)
-            return component_create_operations_for_archive_func();
+            return component_create_operations_for_archive_func(componentPluginContext(), archive);
         return false;
     }
 
-    void PluginEngine::callBeginInstallation() const {
+    void PluginEngine::callBeginInstallation() {
         if(initialized && component_begin_installation_func)
-            return component_begin_installation_func();
+            return component_begin_installation_func(componentPluginContext());
     }
 }
 

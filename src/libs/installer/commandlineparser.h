@@ -31,10 +31,11 @@
 
 #include <QCommandLineParser>
 #include <QHash>
+#include "installer_global.h"
 
 class CommandLineParserPrivate;
 
-class CommandLineParser
+class INSTALLER_EXPORT CommandLineParser
 {
 public:
     enum OptionContextFlag {

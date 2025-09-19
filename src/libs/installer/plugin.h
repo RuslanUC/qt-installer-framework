@@ -318,6 +318,8 @@ public:
     bool componentChangeRequested();
     bool isForcedUpdate();
 
+    bool addOperation(const QString &operation, const QStringList &parameters);
+
 public Q_SLOTS:
     void setAutoCreateOperations(bool autoCreateOperations);
 
@@ -414,6 +416,11 @@ extern "C" {
 
     bool ifw_control_init(ControlPluginContext*);
     bool ifw_component_init(ComponentPluginContext*);
+    bool ifw_component_is_default(ComponentPluginContext*);
+    bool ifw_component_create_operations(ComponentPluginContext*);
+    bool ifw_component_create_operations_for_path(ComponentPluginContext*, const QString&);
+    bool ifw_component_create_operations_for_archive(ComponentPluginContext*, const QString&);
+    void ifw_component_begin_installation(ComponentPluginContext*);
 
 #   ifdef __cplusplus
 }
