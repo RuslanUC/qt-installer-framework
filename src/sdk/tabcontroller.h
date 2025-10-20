@@ -29,7 +29,6 @@
 #ifndef TABCONTROLLER_H
 #define TABCONTROLLER_H
 
-#include <QtCore/QHash>
 #include <QtCore/QObject>
 
 namespace QInstaller {

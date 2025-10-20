@@ -28,10 +28,12 @@
 #ifndef REPOSITORYMANAGER_H
 #define REPOSITORYMANAGER_H
 
+#include <QDate>
 #include <QObject>
 #include <QMap>
-#include <QDate>
-#include <QNetworkAccessManager>
+
+class QNetworkAccessManager;
+class QNetworkReply;
 
 struct ComponentDescription {
     QString version;

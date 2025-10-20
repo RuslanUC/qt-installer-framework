@@ -27,12 +27,9 @@
 **************************************************************************/
 #include "repositorymanager.h"
 
-#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QStringList>
-#include <QUrl>
-#include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QXmlStreamReader>
 #include <QMessageBox>

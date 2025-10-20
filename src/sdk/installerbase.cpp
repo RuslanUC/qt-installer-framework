@@ -40,8 +40,7 @@
 #include <QFontDatabase>
 
 
-InstallerBase::InstallerBase(int &argc, char *argv[])
-    : SDKApp<QApplication>(argc, argv)
+InstallerBase::InstallerBase(int &argc, char *argv[]) : SDKApp(argc, argv)
 {
     QInstaller::init(); // register custom operations
 }

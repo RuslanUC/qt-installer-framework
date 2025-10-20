@@ -38,7 +38,6 @@
 #include <abstractarchive.h>
 #include <globals.h>
 
-#include <QDomDocument>
 #include <QtCore/QDir>
 #include <QtCore/QDirIterator>
 #include <QtCore/QFileInfo>

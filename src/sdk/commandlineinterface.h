@@ -52,7 +52,7 @@ public:
     int installPackages();
     int uninstallPackages();
     int removeInstallation();
-    int createOfflineInstaller(const QInstaller::PackageManagerCore::HybridInstaller createHybrid);
+    int createOfflineInstaller(QInstaller::PackageManagerCore::HybridInstaller createHybrid);
     int clearLocalCache();
 
 private:

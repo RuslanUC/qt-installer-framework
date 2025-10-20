@@ -30,7 +30,6 @@
 #define INSTALLERBASE_H
 
 #include "sdkapp.h"
-#include "commandlineparser.h"
 
 namespace QInstaller {
     class PackageManagerCore;

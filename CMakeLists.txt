@@ -16,7 +16,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Gui Network Qml Test UiTools Widgets Xml Core5Compat)
+find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Gui Network Widgets Xml)
 
 add_subdirectory(src)
 add_subdirectory(tools)

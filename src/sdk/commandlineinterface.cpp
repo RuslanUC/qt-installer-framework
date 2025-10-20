@@ -35,10 +35,9 @@
 #include <errors.h>
 #include <loggingutils.h>
 
-#include <QDir>
 
 CommandLineInterface::CommandLineInterface(int &argc, char *argv[])
-    : SDKApp<QCoreApplication>(argc, argv)
+    : SDKApp(argc, argv)
 {
     QInstaller::init(); // register custom operations
     m_parser.parse(arguments());

@@ -34,11 +34,7 @@
 
 #include <QtCore/QBuffer>
 #include <QtCore/QCryptographicHash>
-#include <QtCore/QHash>
 #include <QtCore/QUrl>
-#include <QtCore/QTextStream>
-
-#include <ostream>
 
 QT_BEGIN_NAMESPACE
 class QIODevice;

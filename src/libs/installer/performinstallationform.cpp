@@ -134,11 +134,11 @@ void PerformInstallationForm::setupUi(QWidget *widget)
     bottomLayout->setObjectName(QLatin1String("BottomLayout"));
     bottomLayout->addStretch();
 
+    // TODO: remove?
     m_productImagesScrollArea = new QScrollArea(widget);
     m_productImagesScrollArea->setObjectName(QLatin1String("ProductImagesScrollArea"));
     m_productImagesScrollArea->setWidgetResizable(true);
     m_productImagesScrollArea->setFrameShape(QFrame::NoFrame);
-    m_productImagesScrollArea->setStyleSheet(QLatin1String("background-color:transparent;"));
 
     m_productImagesLabel = new AspectRatioLabel(widget);
     m_productImagesLabel->setObjectName(QLatin1String("ProductImagesLabel"));

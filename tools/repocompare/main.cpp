@@ -27,7 +27,6 @@
 **************************************************************************/
 #include <QApplication>
 #include <QTimer>
-#include <QtCore>
 #include "mainwindow.h"
 #include "repositorymanager.h"
 

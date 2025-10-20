@@ -31,8 +31,6 @@
 
 #include "genericfactory.h"
 
-#include "updater.h"
-
 namespace QInstaller {
 class PackageManagerCore;
 }

@@ -34,11 +34,10 @@
 
 #include <QtCore/QFile>
 
-#include <QItemSelectionModel>
 #include <QMessageBox>
 #include <QTreeWidget>
 
-#include <QtXml/QDomDocument>
+#include <QLineEdit>
 
 using namespace QInstaller;
 

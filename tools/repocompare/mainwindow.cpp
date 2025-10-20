@@ -27,17 +27,13 @@
 **************************************************************************/
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QFile>
-#include <QTemporaryFile>
 #include <QMapIterator>
-#include <QTextStream>
-#include <QUrl>
 #include <QXmlStreamReader>
 #include <QSettings>
 #include <QMessageBox>
+#include <QComboBox>
 #include <QFileDialog>
-#include <QNetworkReply>
-#include <QNetworkRequest>
+#include <QTreeWidgetItem>
 
 namespace {
 const QLatin1String productionIdentifier = QLatin1String("ProductionRepositories");

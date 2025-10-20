@@ -29,13 +29,10 @@
 #define MAINWINDOW_H
 
 #include "repositorymanager.h"
-#include <QTemporaryFile>
-#include <QUrl>
 #include <QDate>
 #include <QString>
 #include <QMap>
 #include <QMainWindow>
-#include <QNetworkAccessManager>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

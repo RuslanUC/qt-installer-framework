@@ -375,23 +375,6 @@ PackageManagerGui::PackageManagerGui(PackageManagerCore *core, QWidget *parent)
     if (!m_core->settings().wizardStyle().isEmpty())
         setWizardStyle(getStyle(m_core->settings().wizardStyle()));
 
-    // set custom stylesheet
-    const QString styleSheetFile = m_core->settings().styleSheet();
-    if (!styleSheetFile.isEmpty()) {
-        QFile sheet(styleSheetFile);
-        if (sheet.exists()) {
-            if (sheet.open(QIODevice::ReadOnly)) {
-                qApp->setStyleSheet(QString::fromLatin1(sheet.readAll()));
-            } else {
-                qCWarning(QInstaller::lcDeveloperBuild) << "The specified style sheet file "
-                    "can not be opened.";
-            }
-        } else {
-            qCWarning(QInstaller::lcDeveloperBuild) << "A style sheet file is specified, "
-                "but it does not exist.";
-        }
-    }
-
     setOption(QWizard::NoBackButtonOnStartPage);
     setOption(QWizard::NoBackButtonOnLastPage);
 #ifdef Q_OS_MACOS
