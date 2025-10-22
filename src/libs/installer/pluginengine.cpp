@@ -1,6 +1,17 @@
 #include "pluginengine.h"
+
+#include <QLoggingCategory>
+#include <systeminfo.h>
+
+#include "globals.h"
 #include "plugin.h"
 #include "packagemanagergui.h"
+
+#if defined(Q_OS_LINUX)
+#   define SO_EXTENSION "so"
+#elif defined(Q_OS_WINDOWS)
+#   define SO_EXTENSION "dll"
+#endif
 
 namespace QInstaller {
     PluginEngine::PluginEngine(PackageManagerCore* parent) : QObject(reinterpret_cast<QObject*>(parent)) {
@@ -15,6 +26,7 @@ namespace QInstaller {
 
         delete context_control;
         delete context_component;
+        delete tempFile;
     }
 
     void PluginEngine::setComponent(Component* component) {
@@ -25,12 +37,56 @@ namespace QInstaller {
         if(initialized)
             return true;
 
-        if(!QLibrary::isLibrary(path))
-            return false;
+        if(path.startsWith(QLatin1String(":/"))) {
+            QFile resFile(path);
+            if(!resFile.open(QIODevice::ReadOnly)) {
+                qCCritical(QInstaller::lcInstallerPluginLog) << "Failed to open library: " << resFile.errorString();
+                return false;
+            }
 
-        library.setFileName(path);
-        if(!library.load())
+            const auto tempName = QString(QDir::tempPath() + QLatin1String("/XXXXXXXX_")+QFileInfo(path).fileName() + QLatin1String("." SO_EXTENSION));
+            tempFile = new QTemporaryFile(tempName);
+
+            if(!tempFile->open()) {
+                qCCritical(QInstaller::lcInstallerPluginLog) << "Failed to open tmp library: " << tempFile->errorString();
+                return false;
+            }
+
+            tempFile->write(resFile.readAll());
+            tempFile->flush();
+            tempFile->setPermissions(QFile::ExeOwner | QFile::ReadOwner | QFile::WriteOwner | QFile::ExeGroup | QFile::ReadGroup | QFile::ExeOther | QFile::ReadOther);
+            tempFile->setAutoRemove(true);
+
+            library.setFileName(tempFile->fileName());
+            if(!library.load()) {
+                qCCritical(QInstaller::lcInstallerPluginLog) << "Failed to load library: " << library.errorString();
+                return false;
+            }
+        } else {
+            if(!QLibrary::isLibrary(path)) {
+                qCCritical(QInstaller::lcInstallerPluginLog) << "Failed to load library: Not a library";
+                return false;
+            }
+
+            library.setFileName(path);
+            if(!library.load()) {
+                qCCritical(QInstaller::lcInstallerPluginLog) << "Failed to load library: " << library.errorString();
+                return false;
+            }
+        }
+
+        const auto api_version_func = reinterpret_cast<IfwPluginApiVersion>(library.resolve("__ifw_plugin_api_version"));
+        if(!api_version_func) {
+            qCWarning(QInstaller::lcInstallerPluginLog) << "Failed to load library: cannot resolve __ifw_plugin_api_version";
+            library.unload();
             return false;
+        }
+
+        if (const auto plugin_api_version = api_version_func(); plugin_api_version != IFW_PLUGIN_API_VERSION) {
+            qCWarning(QInstaller::lcInstallerPluginLog) << "Ifw plugin version mismatch: expected " << IFW_PLUGIN_API_VERSION << ", got " << plugin_api_version;
+            library.unload();
+            return false;
+        }
 
         control_init_func = reinterpret_cast<IfwPluginControlInit>(library.resolve("ifw_control_init"));
         component_init_func = reinterpret_cast<IfwPluginComponentInit>(library.resolve("ifw_component_init"));
@@ -58,7 +114,8 @@ namespace QInstaller {
         auto* guiObject = reinterpret_cast<PackageManagerGui*>(core->guiObject());
         context_control = new ControlPluginContext(
             guiObject ? new GuiProxy(guiObject) : nullptr,
-            new InstallerProxy(core));
+            new InstallerProxy(core),
+            new SystemInfoProxy());
 
         return context_control;
     }
@@ -71,7 +128,8 @@ namespace QInstaller {
         context_component = new ComponentPluginContext(
             guiObject ? new GuiProxy(guiObject) : nullptr,
             new InstallerProxy(core),
-            component ? new ComponentProxy(component) : nullptr);
+            component ? new ComponentProxy(component) : nullptr,
+            new SystemInfoProxy());
 
         return context_component;
     }
@@ -120,36 +178,21 @@ namespace QInstaller {
     }
 }
 
-PluginContext::PluginContext(GuiProxy* gui, InstallerProxy* installer) : gui_proxy(gui), installer_proxy(installer) {
+ControlPluginContext::ControlPluginContext(GuiProxy* gui, InstallerProxy* installer, SystemInfoProxy* systemInfo) : gui(gui), installer(installer), systemInfo(systemInfo) {
 }
 
-PluginContext::~PluginContext() {
-    delete gui_proxy;
-    delete installer_proxy;
+ControlPluginContext::~ControlPluginContext() {
+    delete gui;
+    delete installer;
+    delete systemInfo;
 }
 
-GuiProxy* PluginContext::gui() const {
-    return gui_proxy;
-}
-
-InstallerProxy* PluginContext::installer() const {
-    return installer_proxy;
-}
-
-QInstaller::SystemInfo PluginContext::systemInfo() const {
-    return QInstaller::SystemInfo();
-}
-
-ControlPluginContext::ControlPluginContext(GuiProxy* gui, InstallerProxy* installer) : PluginContext(gui, installer) {
-}
-
-ComponentPluginContext::ComponentPluginContext(GuiProxy* gui, InstallerProxy* installer, ComponentProxy* component) : PluginContext(gui, installer), component_proxy(component) {
+ComponentPluginContext::ComponentPluginContext(GuiProxy* gui, InstallerProxy* installer, ComponentProxy* component, SystemInfoProxy* systemInfo) : gui(gui), installer(installer), component(component), systemInfo(systemInfo) {
 }
 
 ComponentPluginContext::~ComponentPluginContext() {
-    delete component_proxy;
-}
-
-ComponentProxy* ComponentPluginContext::component() const {
-    return component_proxy;
+    delete gui;
+    delete installer;
+    delete component;
+    delete systemInfo;
 }

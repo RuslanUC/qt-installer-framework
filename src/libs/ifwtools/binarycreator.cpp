@@ -33,7 +33,6 @@
 #include "binarycontent.h"
 #include "errors.h"
 #include "fileio.h"
-#include "init.h"
 #include "repository.h"
 #include "settings.h"
 #include "utils.h"

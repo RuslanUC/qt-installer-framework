@@ -2,6 +2,8 @@
 
 #include <QObject>
 #include <QLibrary>
+#include <QTemporaryFile>
+
 #include "installer_global.h"
 
 class PluginContext;
@@ -15,6 +17,7 @@ typedef bool(*IfwPluginComponentCreateOperations)(ComponentPluginContext*); // i
 typedef bool(*IfwPluginComponentCreateOperationsForPath)(ComponentPluginContext*, const QString& path); // ifw_component_create_operations_for_path
 typedef bool(*IfwPluginComponentCreateOperationsForArchive)(ComponentPluginContext*, const QString& archive); // ifw_component_create_operations_for_archive
 typedef void(*IfwPluginComponentBeginInstallation)(ComponentPluginContext*); // ifw_component_begin_installation
+typedef int(*IfwPluginApiVersion)(); // ifw_component_begin_installation
 
 namespace QInstaller {
     class PackageManagerCore;
@@ -60,6 +63,8 @@ namespace QInstaller {
 
         bool is_control = false;
         bool initialized = false;
+
+        QTemporaryFile* tempFile = nullptr;
 
         ControlPluginContext* controlPluginContext();
         ComponentPluginContext* componentPluginContext();

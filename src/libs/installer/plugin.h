@@ -1,12 +1,20 @@
 #pragma once
 
-#include <QObject>
-#include <QWizard>
-#include <QSettings>
-#include "systeminfo.h"
+#include <cstdint>
+#include <cstdlib>
+#include <set>
+#include <string>
+#include <vector>
+#include <functional>
+
+#ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
+#include "packagemanagercore.h"
+#include "packagemanagergui.h"
+#endif
+
+#define IFW_PLUGIN_API_VERSION 2
 
 namespace QInstaller {
-    class PackageManagerGui;
     class PackageManagerCore;
     class Component;
 
@@ -44,329 +52,305 @@ namespace QInstaller {
     }
 }
 
-class GuiProxy final : public QObject {
-    Q_OBJECT
-    Q_DISABLE_COPY(GuiProxy)
+typedef struct SystemInfoProxy {
+#ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
+    SystemInfoProxy();
+#endif
 
-public:
-    explicit GuiProxy(QInstaller::PackageManagerGui *gui);
+    std::function<std::string()> currentCpuArchitecture;
+    std::function<std::string()> buildCpuArchitecture;
+    std::function<std::string()> kernelType;
+    std::function<std::string()> kernelVersion;
+    std::function<std::string()> productType;
+    std::function<std::string()> productVersion;
+    std::function<std::string()> prettyProductName;
+} SystemInfoProxy;
 
-    QWidget* pageById(int id) const;
-    QWidget* pageByObjectName(const QString &name) const;
+typedef struct GuiProxy {
+#ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
+    explicit GuiProxy(QInstaller::PackageManagerGui*);
+#endif
 
-    QWidget* currentPageWidget() const;
-    QWidget* pageWidgetByObjectName(const QString &name) const;
+    std::function<void*(int id)> pageById;
+    std::function<void*(const std::string& name)> pageByObjectName;
 
-    QString defaultButtonText(int wizardButton) const;
-    void clickButton(int wizardButton, int delayInMs = 0) const;
-    void clickButton(const QString &objectName, int delayInMs = 0) const;
-    bool isButtonEnabled(int wizardButton) const;
-    void setWizardPageButtonText(int pageId, int buttonId, const QString &buttonText) const;
+    std::function<void*()> currentPageWidget;
+    std::function<void*(const std::string& name)> pageWidgetByObjectName;
 
-    void showSettingsButton(bool show) const;
-    void setSettingsButtonEnabled(bool enable) const;
+    std::function<std::string(int wizardButton)> defaultButtonText;
+    std::function<void(int wizardButton, int delayInMs)> clickButtonById;
+    std::function<void(const std::string& objectName, int delayInMs)> clickButtonByName;
+    std::function<bool(int wizardButton)> isButtonEnabled;
+    std::function<void(int pageId, int buttonId, const std::string& buttonText)> setWizardPageButtonText;
 
-    void setSilent(bool silent) const;
+    std::function<void(bool show)> showSettingsButton;
+    std::function<void(bool enable)> setSettingsButtonEnabled;
 
-    void setTextItems(QObject *object, const QStringList &items) const;
+    std::function<void(bool silent)> setSilent;
 
-Q_SIGNALS:
-    void interrupted();
-    void languageChanged();
-    void finishButtonClicked();
-    void gotRestarted();
-    void settingsButtonClicked();
+    std::function<void()> cancelButtonClicked;
+    std::function<void()> reject;
+    std::function<void()> rejectWithoutPrompt;
+    std::function<void()> showFinishedPage;
+    std::function<void(bool value)> setModified;
 
-public slots:
-    void cancelButtonClicked() const;
-    void reject() const;
-    void rejectWithoutPrompt() const;
-    void showFinishedPage() const;
-    void setModified(bool value) const;
+    // Signals
 
-private:
-    QInstaller::PackageManagerGui *m_gui;
-};
+    std::function<void(std::function<void()> callback)> setInterruptedCallback;
+    std::function<void(std::function<void()> callback)> setLanguageChangedCallback;
+    std::function<void(std::function<void()> callback)> setFinishButtonClickedCallback;
+    std::function<void(std::function<void()> callback)> setGotRestartedCallback;
+    std::function<void(std::function<void()> callback)> setSettingsButtonClickedCallback;
+} GuiProxy;
 
-class InstallerProxy final : public QObject {
-    Q_OBJECT
-    Q_DISABLE_COPY(InstallerProxy)
-
-public:
+typedef struct InstallerProxy {
     using Status = QInstaller::Plugin::Status;
     using WizardPage = QInstaller::Plugin::WizardPage;
     using SpaceInfo = QInstaller::Plugin::SpaceInfo;
 
-    explicit InstallerProxy(QInstaller::PackageManagerCore *core);
+#ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
+    explicit InstallerProxy(QInstaller::PackageManagerCore*);
+#endif
 
-    static bool virtualComponentsVisible();
+    std::function<bool()> virtualComponentsVisible;
 
-    static bool noForceInstallation();
+    std::function<bool()> noForceInstallation;
 
-    static bool noDefaultInstallation();
+    std::function<bool()> noDefaultInstallation;
 
-    void setDependsOnLocalInstallerBinary();
-    bool localInstallerBinaryUsed();
+    std::function<void()> setDependsOnLocalInstallerBinary;
+    std::function<bool()> localInstallerBinaryUsed;
 
-    QList<QVariant> execute(const QString &program,
-        const QStringList &arguments = QStringList(), const QString &stdIn = QString(),
-        const QString &stdInCodec = QLatin1String("latin1"),
-        const QString &stdOutCodec = QLatin1String("latin1")) const;
-    bool executeDetached(const QString &program,
-        const QStringList &arguments = QStringList(),
-        const QString &workingDirectory = QString()) const;
-    QString environmentVariable(const QString &name) const;
+    std::function<std::tuple<std::string, int>(const std::string &program, const std::vector<std::string> &arguments, const std::string &stdIn, const std::string &stdInCodec, const std::string &stdOutCodec)> execute;
+    std::function<bool(const std::string &program, const std::vector<std::string> &arguments, const std::string &workingDirectory)> executeDetached;
+    std::function<std::string(const std::string &name)> environmentVariable;
 
-    bool operationExists(const QString &name);
-    bool performOperation(const QString &name, const QStringList &arguments);
+    std::function<bool(const std::string &name)> operationExists;
+    std::function<bool(const std::string &name, const std::vector<std::string> &arguments)> performOperation;
 
-    static bool versionMatches(const QString &version, const QString &requirement);
+    std::function<bool(const std::string &version, const std::string &requirement)> versionMatches;
 
-    static QString findLibrary(const QString &name, const QStringList &paths = QStringList());
-    static QString findPath(const QString &name, const QStringList &paths = QStringList());
+    std::function<std::string(const std::string &name, const std::vector<std::string> &paths)> findLibrary;
+    std::function<std::string(const std::string &name, const std::vector<std::string> &paths)> findPath;
 
-    void setInstallerBaseBinary(const QString &path);
+    std::function<void(const std::string &path)> setInstallerBaseBinary;
 
-    bool containsValue(const QString &key) const;
-    void setValue(const QString &key, const QString &value);
-    QString value(const QString &key, const QString &defaultValue = QString(), const int &format = QSettings::NativeFormat) const;
-    QStringList values(const QString &key, const QStringList &defaultValue = QStringList()) const;
-    QString key(const QString &value) const;
+    std::function<bool(const std::string &key)> containsValue;
+    std::function<void(const std::string &key, const std::string &value)> setValue;
+    std::function<std::string(const std::string &key, const std::string &defaultValue, const int &format)> value;
+    std::function<std::vector<std::string>(const std::string &key, const std::vector<std::string> &defaultValue)> values;
+    std::function<std::string(const std::string &value)> key;
 
-    void addUserRepositories(const QStringList &repositories);
-    void setTemporaryRepositories(const QStringList &repositories,
-                                              bool replace = false, bool compressed = false);
-    void setAllowCompressedRepositoryInstall(bool allow);
+    std::function<void(const std::vector<std::string> &repositories)> addUserRepositories;
+    std::function<void(const std::vector<std::string> &repositories, bool replace, bool compressed)> setTemporaryRepositories;
+    std::function<void(bool allow)> setAllowCompressedRepositoryInstall;
 
-    void autoAcceptMessageBoxes();
-    void autoRejectMessageBoxes();
-    void setMessageBoxAutomaticAnswer(const QString &identifier, int button);
-    void acceptMessageBoxDefaultButton();
+    std::function<void()> autoAcceptMessageBoxes;
+    std::function<void()> autoRejectMessageBoxes;
+    std::function<void(const std::string &identifier, int button)> setMessageBoxAutomaticAnswer;
+    std::function<void()> acceptMessageBoxDefaultButton;
 
-    void setAutoAcceptLicenses();
-    void setFileDialogAutomaticAnswer(const QString &identifier, const QString &value);
-    void removeFileDialogAutomaticAnswer(const QString &identifier);
-    bool containsFileDialogAutomaticAnswer(const QString &identifier) const;
-
-    bool isFileExtensionRegistered(const QString &extension) const;
-    bool fileExists(const QString &filePath) const;
-    QString readFile(const QString &filePath, const QString &codecName) const;
-    QString readConsoleLine(const QString &title = QString(), qint64 maxlen = 0) const;
-
-    QString toNativeSeparators(const QString &path);
-    QString fromNativeSeparators(const QString &path);
-
-    QInstaller::Component *componentByName(const QString &identifier) const;
-    QList<QInstaller::Component *> components(const QString &regexp = QString()) const;
-
-    bool calculateComponentsToInstall();
-
-    bool recalculateAllComponents();
-
-    bool calculateComponentsToUninstall();
-
-    void setInstaller();
-    bool isInstaller() const;
-    bool isOfflineOnly() const;
-
-    void setUninstaller();
-    bool isUninstaller() const;
-
-    void setUpdater();
-    bool isUpdater() const;
-
-    void setPackageManager();
-    bool isPackageManager() const;
-
-    bool isOfflineGenerator() const;
-
-    bool isPackageViewer() const;
-
-    bool isUserSetBinaryMarker() const;
-
-    bool isCommandLineInstance() const;
-    bool isCommandLineDefaultInstall() const;
-
-    bool gainAdminRights();
-    void dropAdminRights();
-    bool hasAdminRights() const;
-
-    qint64 requiredDiskSpace() const;
-    quint64 requiredTemporaryDiskSpace() const;
-
-    bool isProcessRunning(const QString &name) const;
-    bool killProcess(const QString &absoluteFilePath, int timeout = 30000) const;
-
-    bool addWizardPageWarning(const QString &message, WizardPage page, const QString &id, int position = 100);
-    bool removeWizardPageWarning(const QString &id);
-    bool setDefaultPageVisible(int page, bool visible);
-    void setValidatorForCustomPage(QInstaller::Component *component, const QString &name,
-                                               const QString &callbackName);
-    void selectComponent(const QString &id);
-    void deselectComponent(const QString &id);
-
-public Q_SLOTS:
-    bool runInstaller();
-    bool runUninstaller();
-    bool runPackageUpdater();
-    bool runOfflineGenerator();
-    void interrupt();
-    void setCanceled();
-    void languageChanged();
-    void setCompleteUninstallation(bool complete);
-    void cancelMetaInfoJob();
-
-Q_SIGNALS:
-    void aboutCalculateComponentsToInstall();
-    void finishedCalculateComponentsToInstall();
-    void aboutCalculateComponentsToUninstall();
-    void finishedCalculateComponentsToUninstall();
-    void componentAdded(QInstaller::Component *comp);
-    void valueChanged(const QString &key, const QString &value);
-    void statusChanged(Status);
-    void defaultTranslationsLoadedForLanguage(QLocale lang);
-    void currentPageChanged(int page);
-    void finishButtonClicked();
-
-    void metaJobProgress(int progress);
-    void metaJobTotalProgress(int progress);
-    void metaJobInfoMessage(const QString &message);
-
-    void startAllComponentsReset();
-    void finishAllComponentsReset(const QList<QInstaller::Component*> &rootComponents);
-
-    void startUpdaterComponentsReset();
-    void finishUpdaterComponentsReset(const QList<QInstaller::Component*> &componentsWithUpdates);
-
-    void installationStarted();
-    void installationInterrupted();
-    void installationFinished();
-    void updateFinished();
-    void uninstallationStarted();
-    void uninstallationFinished();
-    void offlineGenerationStarted();
-    void offlineGenerationFinished();
-    void titleMessageChanged(const QString &title);
-    void downloadArchivesFinished();
-
-    void wizardPageInsertionRequested(QWidget *widget, WizardPage page);
-    void wizardPageRemovalRequested(QWidget *widget);
-    void wizardWidgetInsertionRequested(QWidget *widget, WizardPage page,
-                                        int position);
-    void wizardWidgetRemovalRequested(QWidget *widget);
-    void wizardPageWarningInsertionRequested(const QString &message, WizardPage page, const QString &id, int position);
-    void wizardPageWarningRemovalRequested(const QString &id);
-    void wizardPageVisibilityChangeRequested(bool visible, int page);
-    void setValidatorForCustomPageRequested(QInstaller::Component *component, const QString &name,
-                                            const QString &callbackName);
-
-    void setAutomatedPageSwitchEnabled(bool request);
-    void coreNetworkSettingsChanged();
-
-    void guiObjectChanged(QObject *gui);
-    void unstableComponentFound(const QString &type, const QString &errorMessage, const QString &component);
-    void installerBinaryMarkerChanged(qint64 magicMarker);
-    void componentsRecalculated();
-    void guiElementsReady();
-    void installDirectoryChanged(const QString &newDirectory);
-    void availableSpaceChanged(SpaceInfo spaceInfo);
-    void metadataDownloadFailed();
-
-private:
-    QInstaller::PackageManagerCore* m_core;
-};
-
-class ComponentProxy final : public QObject {
-    Q_OBJECT
-    Q_DISABLE_COPY(ComponentProxy)
-
-public:
-    explicit ComponentProxy(QInstaller::Component *component);
-
-    void setValue(const QString &key, const QString &value);
-    QString value(const QString &key, const QString &defaultValue = QString()) const;
-
-    void registerPathForUninstallation(const QString &path, bool wipe = false);
-
-    void addDownloadableArchive(const QString &path);
-    void removeDownloadableArchive(const QString &path);
-
-    void addStopProcessForUpdateRequest(const QString &process);
-    void removeStopProcessForUpdateRequest(const QString &process);
-    void setStopProcessForUpdateRequest(const QString &process, bool requested);
-
-    void addDependency(const QString &newDependency);
-    void addAutoDependOn(const QString &newDependOn);
-
-    bool isDefault() const;
-    bool isAutoDependOn(const QSet<QString> &componentsToInstall) const;
-
-    void setInstalled();
-    bool isInstalled(const QString &version = QString()) const;
-    bool installationRequested() const;
-
-    void setUninstalled();
-    bool isUninstalled() const;
-    bool uninstallationRequested() const;
-
-    bool isFromOnlineRepository() const;
-
-    void setUpdateAvailable(bool isUpdateAvailable);
-    bool isUpdateAvailable() const;
-    bool updateRequested() const;
-
-    bool componentChangeRequested();
-    bool isForcedUpdate();
-
-    bool addOperation(const QString &operation, const QStringList &parameters);
-
-public Q_SLOTS:
-    void setAutoCreateOperations(bool autoCreateOperations);
-
-Q_SIGNALS:
-    void loaded();
-    void virtualStateChanged();
-    void valueChanged(const QString &key, const QString &value);
-
-private:
-    QInstaller::Component* m_component;
-};
-
-class PluginContext {
-public:
-    using buttons = QWizard::WizardButton;
-
-    PluginContext(GuiProxy* gui, InstallerProxy* installer);
-    ~PluginContext();
-
-    GuiProxy* gui() const;
-    InstallerProxy* installer() const;
-    QInstaller::SystemInfo systemInfo() const;
-
-private:
-    GuiProxy* gui_proxy;
-    InstallerProxy* installer_proxy;
-};
-
-class ControlPluginContext : public PluginContext {
-public:
-    ControlPluginContext(GuiProxy* gui, InstallerProxy* installer);
-};
-
-class ComponentPluginContext : public PluginContext {
-public:
-    ComponentPluginContext(GuiProxy* gui, InstallerProxy* installer, ComponentProxy* component);
+    std::function<void()> setAutoAcceptLicenses;
+    std::function<void(const std::string &identifier, const std::string &value)> setFileDialogAutomaticAnswer;
+    std::function<void(const std::string &identifier)> removeFileDialogAutomaticAnswer;
+    std::function<bool(const std::string &identifier)> containsFileDialogAutomaticAnswer;
+
+    std::function<bool(const std::string &extension)> isFileExtensionRegistered;
+    std::function<bool(const std::string &filePath)> fileExists;
+    std::function<std::string(const std::string &filePath, const std::string &codecName)> readFile;
+    std::function<std::string(const std::string &title, int64_t maxlen)> readConsoleLine;
+
+    std::function<std::string(const std::string &path)> toNativeSeparators;
+    std::function<std::string(const std::string &path)> fromNativeSeparators;
+
+    std::function<QInstaller::Component *(const std::string &identifier)> componentByName;
+    std::function<std::vector<QInstaller::Component *>(const std::string &regexp)> components;
+
+    std::function<bool()> calculateComponentsToInstall;
+
+    std::function<bool()> recalculateAllComponents;
+
+    std::function<bool()> calculateComponentsToUninstall;
+
+    std::function<void()> setInstaller;
+    std::function<bool()> isInstaller;
+    std::function<bool()> isOfflineOnly;
+
+    std::function<void()> setUninstaller;
+    std::function<bool()> isUninstaller;
+
+    std::function<void()> setUpdater;
+    std::function<bool()> isUpdater;
+
+    std::function<void()> setPackageManager;
+    std::function<bool()> isPackageManager;
+
+    std::function<bool()> isOfflineGenerator;
+
+    std::function<bool()> isPackageViewer;
+
+    std::function<bool()> isUserSetBinaryMarker;
+
+    std::function<bool()> isCommandLineInstance;
+    std::function<bool()> isCommandLineDefaultInstall;
+
+    std::function<bool()> gainAdminRights;
+    std::function<void()> dropAdminRights;
+    std::function<bool()> hasAdminRights;
+
+    std::function<int64_t()> requiredDiskSpace;
+    std::function<uint64_t()> requiredTemporaryDiskSpace;
+
+    std::function<bool(const std::string &name)> isProcessRunning;
+    std::function<bool(const std::string &absoluteFilePath, int timeout)> killProcess;
+
+    std::function<bool(const std::string &message, WizardPage page, const std::string &id, int position)> addWizardPageWarning;
+    std::function<bool(const std::string &id)> removeWizardPageWarning;
+    std::function<bool(int page, bool visible)> setDefaultPageVisible;
+    std::function<void(QInstaller::Component *component, const std::string &name, const std::string &callbackName)> setValidatorForCustomPage;
+    std::function<void(const std::string &id)> selectComponent;
+    std::function<void(const std::string &id)> deselectComponent;
+
+    std::function<bool()> runInstaller;
+    std::function<bool()> runUninstaller;
+    std::function<bool()> runPackageUpdater;
+    std::function<bool()> runOfflineGenerator;
+    std::function<void()> interrupt;
+    std::function<void()> setCanceled;
+    std::function<void()> languageChanged;
+    std::function<void(bool complete)> setCompleteUninstallation;
+    std::function<void()> cancelMetaInfoJob;
+
+    // Signals
+
+    std::function<void(std::function<void()> callback)> setAboutCalculateComponentsToInstallCallback;
+    std::function<void(std::function<void()> callback)> setFinishedCalculateComponentsToInstallCallback;
+    std::function<void(std::function<void()> callback)> setAboutCalculateComponentsToUninstallCallback;
+    std::function<void(std::function<void()> callback)> setFinishedCalculateComponentsToUninstallCallback;
+    std::function<void(std::function<void(QInstaller::Component *comp)> callback)> setComponentAddedCallback;
+    std::function<void(std::function<void(const std::string &key, const std::string &value)> callback)> setValueChangedCallback;
+    std::function<void(std::function<void(Status)> callback)> setStatusChangedCallback;
+    std::function<void(std::function<void(int page)> callback)> setCurrentPageChangedCallback;
+    std::function<void(std::function<void()> callback)> setFinishButtonClickedCallback;
+
+    std::function<void(std::function<void(int progress)> callback)> setMetaJobProgressCallback;
+    std::function<void(std::function<void(int progress)> callback)> setMetaJobTotalProgressCallback;
+    std::function<void(std::function<void(const std::string &message)> callback)> setMetaJobInfoMessageCallback;
+
+    std::function<void(std::function<void()> callback)> setStartAllComponentsResetCallback;
+    std::function<void(std::function<void(const std::vector<QInstaller::Component*> &rootComponents)> callback)> setFinishAllComponentsResetCallback;
+
+    std::function<void(std::function<void()> callback)> setStartUpdaterComponentsResetCallback;
+    std::function<void(std::function<void(const std::vector<QInstaller::Component*> &componentsWithUpdates)> callback)> setFinishUpdaterComponentsResetCallback;
+
+    std::function<void(std::function<void()> callback)> setInstallationStartedCallback;
+    std::function<void(std::function<void()> callback)> setInstallationInterruptedCallback;
+    std::function<void(std::function<void()> callback)> setInstallationFinishedCallback;
+    std::function<void(std::function<void()> callback)> setUpdateFinishedCallback;
+    std::function<void(std::function<void()> callback)> setUninstallationStartedCallback;
+    std::function<void(std::function<void()> callback)> setUninstallationFinishedCallback;
+    std::function<void(std::function<void()> callback)> setOfflineGenerationStartedCallback;
+    std::function<void(std::function<void()> callback)> setOfflineGenerationFinishedCallback;
+    std::function<void(std::function<void(const std::string &title)> callback)> setTitleMessageChangedCallback;
+    std::function<void(std::function<void()> callback)> setDownloadArchivesFinishedCallback;
+
+    std::function<void(std::function<void(void* /* QWidget */ widget, WizardPage page)> callback)> setWizardPageInsertionRequestedCallback;
+    std::function<void(std::function<void(void* /* QWidget */ widget)> callback)> setWizardPageRemovalRequestedCallback;
+    std::function<void(std::function<void(void* /* QWidget */ widget, WizardPage page, int position)> callback)> setWizardWidgetInsertionRequestedCallback;
+    std::function<void(std::function<void(void* /* QWidget */ widget)> callback)> setWizardWidgetRemovalRequestedCallback;
+    std::function<void(std::function<void(const std::string &message, WizardPage page, const std::string &id, int position)> callback)> setWizardPageWarningInsertionRequestedCallback;
+    std::function<void(std::function<void(const std::string &id)> callback)> setWizardPageWarningRemovalRequestedCallback;
+    std::function<void(std::function<void(bool visible, int page)> callback)> setWizardPageVisibilityChangeRequestedCallback;
+    std::function<void(std::function<void(QInstaller::Component *component, const std::string &name, const std::string &callbackName)> callback)> setSetValidatorForCustomPageRequestedCallback;
+
+    std::function<void(std::function<void(bool request)> callback)> setSetAutomatedPageSwitchEnabledCallback;
+    std::function<void(std::function<void()> callback)> setCoreNetworkSettingsChangedCallback;
+
+    std::function<void(std::function<void(void* /* QObject */ gui)> callback)> setGuiObjectChangedCallback;
+    std::function<void(std::function<void(const std::string &type, const std::string &errorMessage, const std::string &component)> callback)> setUnstableComponentFoundCallback;
+    std::function<void(std::function<void(int64_t magicMarker)> callback)> setInstallerBinaryMarkerChangedCallback;
+    std::function<void(std::function<void()> callback)> setComponentsRecalculatedCallback;
+    std::function<void(std::function<void()> callback)> setGuiElementsReadyCallback;
+    std::function<void(std::function<void(const std::string &newDirectory)> callback)> setInstallDirectoryChangedCallback;
+    std::function<void(std::function<void(SpaceInfo spaceInfo)> callback)> setAvailableSpaceChangedCallback;
+    std::function<void(std::function<void()> callback)> setMetadataDownloadFailedCallback;
+} InstallerProxy;
+
+typedef struct ComponentProxy {
+#ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
+    explicit ComponentProxy(QInstaller::Component*);
+#endif
+
+    std::function<void(const std::string &key, const std::string &value)> setValue;
+    std::function<std::string(const std::string &key, const std::string &defaultValue)> value;
+
+    std::function<void(const std::string &path, bool wipe)> registerPathForUninstallation;
+
+    std::function<void(const std::string &path)> addDownloadableArchive;
+    std::function<void(const std::string &path)> removeDownloadableArchive;
+
+    std::function<void(const std::string &process)> addStopProcessForUpdateRequest;
+    std::function<void(const std::string &process)> removeStopProcessForUpdateRequest;
+    std::function<void(const std::string &process, bool requested)> setStopProcessForUpdateRequest;
+
+    std::function<void(const std::string &newDependency)> addDependency;
+    std::function<void(const std::string &newDependOn)> addAutoDependOn;
+
+    std::function<bool()> isDefault;
+    std::function<bool(const std::set<std::string> &componentsToInstall)> isAutoDependOn;
+
+    std::function<void()> setInstalled;
+    std::function<bool(const std::string &version)> isInstalled;
+    std::function<bool()> installationRequested;
+
+    std::function<void()> setUninstalled;
+    std::function<bool()> isUninstalled;
+    std::function<bool()> uninstallationRequested;
+
+    std::function<bool()> isFromOnlineRepository;
+
+    std::function<void(bool isUpdateAvailable)> setUpdateAvailable;
+    std::function<bool()> isUpdateAvailable;
+    std::function<bool()> updateRequested;
+
+    std::function<bool()> componentChangeRequested;
+    std::function<bool()> isForcedUpdate;
+
+    std::function<bool(const std::string &operation, const std::vector<std::string> &parameters)> addOperation;
+
+    std::function<void(bool autoCreateOperations)> setAutoCreateOperations;
+
+    // Signals
+
+    std::function<void(std::function<void()> callback)> setLoadedCallback;
+    std::function<void(std::function<void()> callback)> setVirtualStateChangedCallback;
+    std::function<void(std::function<void(const std::string &key, const std::string &value)> callback)> setValueChangedCallback;
+} ComponentProxy;
+
+typedef struct ControlPluginContext {
+#ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
+    ControlPluginContext(GuiProxy* gui, InstallerProxy* installer, SystemInfoProxy* systemInfo);
+    ~ControlPluginContext();
+#endif
+
+    GuiProxy* gui;
+    InstallerProxy* installer;
+    SystemInfoProxy* systemInfo;
+} ControlPluginContext;
+
+typedef struct ComponentPluginContext {
+#ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
+    ComponentPluginContext(GuiProxy* gui, InstallerProxy* installer, ComponentProxy* component, SystemInfoProxy* systemInfo);
     ~ComponentPluginContext();
+#endif
 
-    ComponentProxy* component() const;
-
-private:
-    ComponentProxy* component_proxy;
-};
+    GuiProxy* gui;
+    InstallerProxy* installer;
+    ComponentProxy* component;
+    SystemInfoProxy* systemInfo;
+} ComponentPluginContext;
 
 #ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
-#include "packagemanagercore.h"
-
 // TODO: msvc
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -418,10 +402,13 @@ extern "C" {
     bool ifw_component_init(ComponentPluginContext*);
     bool ifw_component_is_default(ComponentPluginContext*);
     bool ifw_component_create_operations(ComponentPluginContext*);
-    bool ifw_component_create_operations_for_path(ComponentPluginContext*, const QString&);
-    bool ifw_component_create_operations_for_archive(ComponentPluginContext*, const QString&);
+    bool ifw_component_create_operations_for_path(ComponentPluginContext*, const std::string&);
+    bool ifw_component_create_operations_for_archive(ComponentPluginContext*, const std::string&);
     void ifw_component_begin_installation(ComponentPluginContext*);
 
+    int __ifw_plugin_api_version() {
+        return IFW_PLUGIN_API_VERSION;
+    }
 #   ifdef __cplusplus
 }
 #   endif

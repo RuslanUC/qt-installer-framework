@@ -40,6 +40,7 @@
 
 const char IFW_SERVER[] = "ifw.server";
 const char IFW_INSTALLER_INSTALLLOG[] = "ifw.installer.installlog";
+const char IFW_INSTALLER_PLUGINSLOG[] = "ifw.installer.pluginslog";
 const char IFW_DEVELOPER_BUILD[] = "ifw.developer.build";
 
 // Internal-only, hidden in --help text
@@ -78,6 +79,7 @@ namespace QInstaller
 
 Q_LOGGING_CATEGORY(lcServer, IFW_SERVER)
 Q_LOGGING_CATEGORY(lcInstallerInstallLog, IFW_INSTALLER_INSTALLLOG)
+Q_LOGGING_CATEGORY(lcInstallerPluginLog, IFW_INSTALLER_PLUGINSLOG)
 Q_LOGGING_CATEGORY(lcProgressIndicator, IFW_PROGRESS_INDICATOR)
 Q_LOGGING_CATEGORY(lcDeveloperBuild, IFW_DEVELOPER_BUILD)
 
@@ -88,6 +90,7 @@ QStringList loggingCategories()
 {
     static QStringList categories = QStringList()
             << QLatin1String(IFW_INSTALLER_INSTALLLOG)
+            << QLatin1String(IFW_INSTALLER_PLUGINSLOG)
             << QLatin1String(IFW_SERVER)
             << QLatin1String(IFW_DEVELOPER_BUILD)
             << QLatin1String("js");

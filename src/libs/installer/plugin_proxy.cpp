@@ -3,660 +3,787 @@
 #include "packagemanagercore.h"
 #include "component.h"
 
-GuiProxy::GuiProxy(QInstaller::PackageManagerGui* gui) : QObject(static_cast<QObject*>(gui)) {
-    m_gui = gui;
-
-    connect(gui, &QInstaller::PackageManagerGui::interrupted, [this] {
-        emit interrupted();
-    });
-    connect(gui, &QInstaller::PackageManagerGui::languageChanged, [this] {
-        emit languageChanged();
-    });
-    connect(gui, &QInstaller::PackageManagerGui::finishButtonClicked, [this] {
-        emit finishButtonClicked();
-    });
-    connect(gui, &QInstaller::PackageManagerGui::gotRestarted, [this] {
-        emit gotRestarted();
-    });
-    connect(gui, &QInstaller::PackageManagerGui::settingsButtonClicked, [this] {
-        emit settingsButtonClicked();
-    });
-}
-
-QWidget* GuiProxy::pageById(const int id) const {
-    return m_gui->pageById(id);
-}
-
-QWidget* GuiProxy::pageByObjectName(const QString& name) const {
-    return m_gui->pageByObjectName(name);
-}
-
-QWidget* GuiProxy::currentPageWidget() const {
-    return m_gui->currentPageWidget();
-}
-
-QWidget* GuiProxy::pageWidgetByObjectName(const QString& name) const {
-    return m_gui->pageWidgetByObjectName(name);
-}
-
-QString GuiProxy::defaultButtonText(const int wizardButton) const {
-    return m_gui->defaultButtonText(wizardButton);
-}
-
-void GuiProxy::clickButton(const int wizardButton, const int delayInMs) const {
-    m_gui->clickButton(wizardButton, delayInMs);
-}
-
-void GuiProxy::clickButton(const QString& objectName, const int delayInMs) const {
-    m_gui->clickButton(objectName, delayInMs);
-}
-
-bool GuiProxy::isButtonEnabled(const int wizardButton) const {
-    return m_gui->isButtonEnabled(wizardButton);
-}
-
-void GuiProxy::setWizardPageButtonText(const int pageId, const int buttonId, const QString& buttonText) const {
-    m_gui->setWizardPageButtonText(pageId, buttonId, buttonText);
-}
-
-void GuiProxy::showSettingsButton(const bool show) const {
-    m_gui->showSettingsButton(show);
-}
-
-void GuiProxy::setSettingsButtonEnabled(const bool enable) const {
-    m_gui->setSettingsButtonEnabled(enable);
-}
-
-void GuiProxy::setSilent(const bool silent) const {
-    m_gui->setSilent(silent);
-}
-
-void GuiProxy::setTextItems(QObject* object, const QStringList& items) const {
-    m_gui->setTextItems(object, items);
-}
-
-void GuiProxy::cancelButtonClicked() const {
-    m_gui->cancelButtonClicked();
-}
-
-void GuiProxy::reject() const {
-    m_gui->reject();
-}
-
-void GuiProxy::rejectWithoutPrompt() const {
-    m_gui->rejectWithoutPrompt();
-}
-
-void GuiProxy::showFinishedPage() const {
-    m_gui->showFinishedPage();
-}
-
-void GuiProxy::setModified(const bool value) const {
-    m_gui->setModified(value);
-}
-
-InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core) : QObject(core) {
-    m_core = core;
-
-    connect(core, &QInstaller::PackageManagerCore::aboutCalculateComponentsToInstall, [this] {
-        emit aboutCalculateComponentsToInstall();
-    });
-    connect(core, &QInstaller::PackageManagerCore::finishedCalculateComponentsToInstall, [this] {
-        emit finishedCalculateComponentsToInstall();
-    });
-    connect(core, &QInstaller::PackageManagerCore::aboutCalculateComponentsToUninstall, [this] {
-        emit aboutCalculateComponentsToUninstall();
-    });
-    connect(core, &QInstaller::PackageManagerCore::finishedCalculateComponentsToUninstall, [this] {
-        emit finishedCalculateComponentsToUninstall();
-    });
-    connect(core, &QInstaller::PackageManagerCore::componentAdded, [this](QInstaller::Component *comp) {
-        emit componentAdded(comp);
-    });
-    connect(core, &QInstaller::PackageManagerCore::valueChanged, [this](const QString &key, const QString &value) {
-        emit valueChanged(key, value);
-    });
-    connect(core, &QInstaller::PackageManagerCore::statusChanged, [this](const QInstaller::PackageManagerCore::Status status) {
-        emit statusChanged((QInstaller::Plugin::Status)status);
-    });
-    connect(core, &QInstaller::PackageManagerCore::defaultTranslationsLoadedForLanguage, [this](const QLocale lang) {
-        emit defaultTranslationsLoadedForLanguage(lang);
-    });
-    connect(core, &QInstaller::PackageManagerCore::currentPageChanged, [this](const int page) {
-        emit currentPageChanged(page);
-    });
-    connect(core, &QInstaller::PackageManagerCore::finishButtonClicked, [this] {
-        emit finishButtonClicked();
-    });
-    connect(core, &QInstaller::PackageManagerCore::metaJobProgress, [this](const int progress) {
-        emit metaJobProgress(progress);
-    });
-    connect(core, &QInstaller::PackageManagerCore::metaJobTotalProgress, [this](const int progress) {
-        emit metaJobTotalProgress(progress);
-    });
-    connect(core, &QInstaller::PackageManagerCore::metaJobInfoMessage, [this](const QString &message) {
-        emit metaJobInfoMessage(message);
-    });
-    connect(core, &QInstaller::PackageManagerCore::startAllComponentsReset, [this] {
-        emit startAllComponentsReset();
-    });
-    connect(core, &QInstaller::PackageManagerCore::finishAllComponentsReset, [this](const QList<QInstaller::Component*> &rootComponents) {
-        emit finishAllComponentsReset(rootComponents);
-    });
-    connect(core, &QInstaller::PackageManagerCore::startUpdaterComponentsReset, [this] {
-        emit startUpdaterComponentsReset();
-    });
-    connect(core, &QInstaller::PackageManagerCore::finishUpdaterComponentsReset, [this](const QList<QInstaller::Component*> &componentsWithUpdates) {
-        emit finishUpdaterComponentsReset(componentsWithUpdates);
-    });
-    connect(core, &QInstaller::PackageManagerCore::installationStarted, [this] {
-        emit installationStarted();
-    });
-    connect(core, &QInstaller::PackageManagerCore::installationInterrupted, [this] {
-        emit installationInterrupted();
-    });
-    connect(core, &QInstaller::PackageManagerCore::installationFinished, [this] {
-        emit installationFinished();
-    });
-    connect(core, &QInstaller::PackageManagerCore::updateFinished, [this] {
-        emit updateFinished();
-    });
-    connect(core, &QInstaller::PackageManagerCore::uninstallationStarted, [this] {
-        emit uninstallationStarted();
-    });
-    connect(core, &QInstaller::PackageManagerCore::uninstallationFinished, [this] {
-        emit uninstallationFinished();
-    });
-    connect(core, &QInstaller::PackageManagerCore::offlineGenerationStarted, [this] {
-        emit offlineGenerationStarted();
-    });
-    connect(core, &QInstaller::PackageManagerCore::offlineGenerationFinished, [this] {
-        emit offlineGenerationFinished();
-    });
-    connect(core, &QInstaller::PackageManagerCore::titleMessageChanged, [this](const QString &title) {
-        emit titleMessageChanged(title);
-    });
-    connect(core, &QInstaller::PackageManagerCore::downloadArchivesFinished, [this] {
-        emit downloadArchivesFinished();
-    });
-    connect(core, &QInstaller::PackageManagerCore::wizardPageInsertionRequested, [this](QWidget *widget, const QInstaller::PackageManagerCore::WizardPage page) {
-        emit wizardPageInsertionRequested(widget, (QInstaller::Plugin::WizardPage)page);
-    });
-    connect(core, &QInstaller::PackageManagerCore::wizardPageRemovalRequested, [this](QWidget *widget) {
-        emit wizardPageRemovalRequested(widget);
-    });
-    connect(core, &QInstaller::PackageManagerCore::wizardWidgetInsertionRequested, [this](QWidget *widget, const QInstaller::PackageManagerCore::WizardPage page, const int position) {
-        emit wizardWidgetInsertionRequested(widget, (QInstaller::Plugin::WizardPage)page, position);
-    });
-    connect(core, &QInstaller::PackageManagerCore::wizardWidgetRemovalRequested, [this](QWidget *widget) {
-        emit wizardWidgetRemovalRequested(widget);
-    });
-    connect(core, &QInstaller::PackageManagerCore::wizardPageWarningInsertionRequested, [this](const QString &message, const QInstaller::PackageManagerCore::WizardPage page, const QString &id, int position) {
-        emit wizardPageWarningInsertionRequested(message, (QInstaller::Plugin::WizardPage)page, id, position);
-    });
-    connect(core, &QInstaller::PackageManagerCore::wizardPageWarningRemovalRequested, [this](const QString &id) {
-        emit wizardPageWarningRemovalRequested(id);
-    });
-    connect(core, &QInstaller::PackageManagerCore::wizardPageVisibilityChangeRequested, [this](const bool visible, const int page) {
-        emit wizardPageVisibilityChangeRequested(visible, page);
-    });
-    connect(core, &QInstaller::PackageManagerCore::setValidatorForCustomPageRequested, [this](QInstaller::Component *component, const QString &name, const QString &callbackName) {
-        emit setValidatorForCustomPageRequested(component, name, callbackName);
-    });
-    connect(core, &QInstaller::PackageManagerCore::setAutomatedPageSwitchEnabled, [this](const bool request) {
-        emit setAutomatedPageSwitchEnabled(request);
-    });
-    connect(core, &QInstaller::PackageManagerCore::coreNetworkSettingsChanged, [this] {
-        emit coreNetworkSettingsChanged();
-    });
-    connect(core, &QInstaller::PackageManagerCore::guiObjectChanged, [this](QObject *gui) {
-        emit guiObjectChanged(gui);
-    });
-    connect(core, &QInstaller::PackageManagerCore::unstableComponentFound, [this](const QString &type, const QString &errorMessage, const QString &component) {
-        emit unstableComponentFound(type, errorMessage, component);
-    });
-    connect(core, &QInstaller::PackageManagerCore::installerBinaryMarkerChanged, [this](const qint64 magicMarker) {
-        emit installerBinaryMarkerChanged(magicMarker);
-    });
-    connect(core, &QInstaller::PackageManagerCore::componentsRecalculated, [this] {
-        emit componentsRecalculated();
-    });
-    connect(core, &QInstaller::PackageManagerCore::guiElementsReady, [this] {
-        emit guiElementsReady();
-    });
-    connect(core, &QInstaller::PackageManagerCore::installDirectoryChanged, [this](const QString &newDirectory) {
-        emit installDirectoryChanged(newDirectory);
-    });
-    connect(core, &QInstaller::PackageManagerCore::availableSpaceChanged, [this](const QInstaller::PackageManagerCore::SpaceInfo spaceInfo) {
-        emit availableSpaceChanged((QInstaller::Plugin::SpaceInfo)spaceInfo);
-    });
-    connect(core, &QInstaller::PackageManagerCore::metadataDownloadFailed, [this] {
-        emit metadataDownloadFailed();
-    });
-}
-
-bool InstallerProxy::virtualComponentsVisible() {
-    return QInstaller::PackageManagerCore::virtualComponentsVisible();
-}
-
-bool InstallerProxy::noForceInstallation() {
-    return QInstaller::PackageManagerCore::noForceInstallation();
-}
-
-bool InstallerProxy::noDefaultInstallation() {
-    return QInstaller::PackageManagerCore::noDefaultInstallation();
-}
-
-void InstallerProxy::setDependsOnLocalInstallerBinary() {
-    m_core->setDependsOnLocalInstallerBinary();
-}
-
-bool InstallerProxy::localInstallerBinaryUsed() {
-    return m_core->localInstallerBinaryUsed();
-}
-
-QList<QVariant> InstallerProxy::execute(const QString& program, const QStringList& arguments, const QString& stdIn, const QString& stdInCodec, const QString& stdOutCodec) const {
-    return m_core->execute(program, arguments, stdIn, stdInCodec, stdOutCodec);
-}
-
-bool InstallerProxy::executeDetached(const QString& program, const QStringList& arguments, const QString& workingDirectory) const {
-    return m_core->executeDetached(program, arguments, workingDirectory);
-}
-
-QString InstallerProxy::environmentVariable(const QString& name) const {
-    return m_core->environmentVariable(name);
-}
-
-bool InstallerProxy::operationExists(const QString& name) {
-    return m_core->operationExists(name);
-}
-
-bool InstallerProxy::performOperation(const QString& name, const QStringList& arguments) {
-    return m_core->performOperation(name, arguments);
-}
-
-bool InstallerProxy::versionMatches(const QString& version, const QString& requirement) {
-    return QInstaller::PackageManagerCore::versionMatches(version, requirement);
-}
-
-QString InstallerProxy::findLibrary(const QString& name, const QStringList& paths) {
-    return QInstaller::PackageManagerCore::findLibrary(name, paths);
-}
-
-QString InstallerProxy::findPath(const QString& name, const QStringList& paths) {
-    return QInstaller::PackageManagerCore::findPath(name, paths);
-}
-
-void InstallerProxy::setInstallerBaseBinary(const QString& path) {
-    return m_core->setInstallerBaseBinary(path);
-}
-
-bool InstallerProxy::containsValue(const QString& key) const {
-    return m_core->containsValue(key);
-}
-
-void InstallerProxy::setValue(const QString& key, const QString& value) {
-    return m_core->setValue(key, value);
-}
-
-QString InstallerProxy::value(const QString& key, const QString& defaultValue, const int& format) const {
-    return m_core->value(key, defaultValue, format);
-}
-
-QStringList InstallerProxy::values(const QString& key, const QStringList& defaultValue) const {
-    return m_core->values(key, defaultValue);
-}
-
-QString InstallerProxy::key(const QString& value) const {
-    return m_core->key(value);
-}
-
-void InstallerProxy::addUserRepositories(const QStringList& repositories) {
-    m_core->addUserRepositories(repositories);
-}
-
-void InstallerProxy::setTemporaryRepositories(const QStringList& repositories, bool replace, bool compressed) {
-    m_core->setTemporaryRepositories(repositories, replace, compressed);
-}
-
-void InstallerProxy::setAllowCompressedRepositoryInstall(bool allow) {
-    m_core->setAllowCompressedRepositoryInstall(allow);
-}
-
-void InstallerProxy::autoAcceptMessageBoxes() {
-    m_core->autoAcceptMessageBoxes();
-}
-
-void InstallerProxy::autoRejectMessageBoxes() {
-    m_core->autoRejectMessageBoxes();
-}
-
-void InstallerProxy::setMessageBoxAutomaticAnswer(const QString& identifier, int button) {
-    m_core->setMessageBoxAutomaticAnswer(identifier, button);
-}
-
-void InstallerProxy::acceptMessageBoxDefaultButton() {
-    m_core->acceptMessageBoxDefaultButton();
-}
-
-void InstallerProxy::setAutoAcceptLicenses() {
-    m_core->setAutoAcceptLicenses();
-}
-
-void InstallerProxy::setFileDialogAutomaticAnswer(const QString& identifier, const QString& value) {
-    m_core->setFileDialogAutomaticAnswer(identifier, value);
-}
-
-void InstallerProxy::removeFileDialogAutomaticAnswer(const QString& identifier) {
-    m_core->removeFileDialogAutomaticAnswer(identifier);
-}
-
-bool InstallerProxy::containsFileDialogAutomaticAnswer(const QString& identifier) const {
-    return m_core->containsFileDialogAutomaticAnswer(identifier);
-}
-
-bool InstallerProxy::isFileExtensionRegistered(const QString& extension) const {
-    return m_core->isFileExtensionRegistered(extension);
-}
-
-bool InstallerProxy::fileExists(const QString& filePath) const {
-    return m_core->fileExists(filePath);
-}
-
-QString InstallerProxy::readFile(const QString& filePath, const QString& codecName) const {
-    return m_core->readFile(filePath, codecName);
-}
-
-QString InstallerProxy::readConsoleLine(const QString& title, qint64 maxlen) const {
-    return m_core->readConsoleLine(title, maxlen);
-}
-
-QString InstallerProxy::toNativeSeparators(const QString& path) {
-    return m_core->toNativeSeparators(path);
-}
-
-QString InstallerProxy::fromNativeSeparators(const QString& path) {
-    return m_core->fromNativeSeparators(path);
-}
-
-QInstaller::Component* InstallerProxy::componentByName(const QString& identifier) const {
-    return m_core->componentByName(identifier);
-}
-
-QList<QInstaller::Component*> InstallerProxy::components(const QString& regexp) const {
-    return m_core->components(regexp);
-}
-
-bool InstallerProxy::calculateComponentsToInstall() {
-    return m_core->calculateComponentsToInstall();
-}
-
-bool InstallerProxy::recalculateAllComponents() {
-    return m_core->recalculateAllComponents();
-}
-
-bool InstallerProxy::calculateComponentsToUninstall() {
-    return m_core->calculateComponentsToUninstall();
-}
-
-void InstallerProxy::setInstaller() {
-    m_core->setInstaller();
-}
-
-bool InstallerProxy::isInstaller() const {
-    return m_core->isInstaller();
-}
-
-bool InstallerProxy::isOfflineOnly() const {
-    return m_core->isOfflineOnly();
-}
-
-void InstallerProxy::setUninstaller() {
-    m_core->setUninstaller();
-}
-
-bool InstallerProxy::isUninstaller() const {
-    return m_core->isUninstaller();
-}
-
-void InstallerProxy::setUpdater() {
-    m_core->setUpdater();
-}
-
-bool InstallerProxy::isUpdater() const {
-    return m_core->isUpdater();
-}
-
-void InstallerProxy::setPackageManager() {
-    m_core->setPackageManager();
-}
-
-bool InstallerProxy::isPackageManager() const {
-    return m_core->isPackageManager();
-}
-
-bool InstallerProxy::isOfflineGenerator() const {
-    return m_core->isOfflineGenerator();
-}
-
-bool InstallerProxy::isPackageViewer() const {
-    return m_core->isPackageViewer();
-}
-
-bool InstallerProxy::isUserSetBinaryMarker() const {
-    return m_core->isUserSetBinaryMarker();
-}
-
-bool InstallerProxy::isCommandLineInstance() const {
-    return m_core->isCommandLineInstance();
-}
-
-bool InstallerProxy::isCommandLineDefaultInstall() const {
-    return m_core->isCommandLineDefaultInstall();
-}
-
-bool InstallerProxy::gainAdminRights() {
-    return m_core->gainAdminRights();
-}
-
-void InstallerProxy::dropAdminRights() {
-    m_core->dropAdminRights();
-}
-
-bool InstallerProxy::hasAdminRights() const {
-    return m_core->hasAdminRights();
-}
-
-qint64 InstallerProxy::requiredDiskSpace() const {
-    return m_core->requiredDiskSpace();
-}
-
-quint64 InstallerProxy::requiredTemporaryDiskSpace() const {
-    return m_core->requiredTemporaryDiskSpace();
-}
-
-bool InstallerProxy::isProcessRunning(const QString& name) const {
-    return m_core->isProcessRunning(name);
-}
-
-bool InstallerProxy::killProcess(const QString& absoluteFilePath, int timeout) const {
-    return m_core->killProcess(absoluteFilePath, timeout);
-}
-
-bool InstallerProxy::addWizardPageWarning(const QString& message, WizardPage page, const QString& id, int position) {
-    return m_core->addWizardPageWarning(message, (QInstaller::PackageManagerCore::WizardPage)page, id, position);
-}
-
-bool InstallerProxy::removeWizardPageWarning(const QString& id) {
-    return m_core->removeWizardPageWarning(id);
-}
-
-bool InstallerProxy::setDefaultPageVisible(int page, bool visible) {
-    return m_core->setDefaultPageVisible(page, visible);
-}
-
-void InstallerProxy::setValidatorForCustomPage(QInstaller::Component* component, const QString& name, const QString& callbackName) {
-    m_core->setValidatorForCustomPage(component, name, callbackName);
-}
-
-void InstallerProxy::selectComponent(const QString& id) {
-    m_core->selectComponent(id);
-}
-
-void InstallerProxy::deselectComponent(const QString& id) {
-    m_core->deselectComponent(id);
-}
-
-bool InstallerProxy::runInstaller() {
-    return m_core->runInstaller();
-}
-
-bool InstallerProxy::runUninstaller() {
-    return m_core->runUninstaller();
-}
-
-bool InstallerProxy::runPackageUpdater() {
-    return m_core->runPackageUpdater();
-}
-
-bool InstallerProxy::runOfflineGenerator() {
-    return m_core->runOfflineGenerator();
-}
-
-void InstallerProxy::interrupt() {
-    m_core->interrupt();
-}
-
-void InstallerProxy::setCanceled() {
-    m_core->setCanceled();
-}
-
-void InstallerProxy::languageChanged() {
-    m_core->languageChanged();
-}
-
-void InstallerProxy::setCompleteUninstallation(bool complete) {
-    m_core->setCompleteUninstallation(complete);
-}
-
-void InstallerProxy::cancelMetaInfoJob() {
-    m_core->cancelMetaInfoJob();
-}
-
-ComponentProxy::ComponentProxy(QInstaller::Component* component) : QObject(component) {
-    m_component = component;
-
-    connect(component, &QInstaller::Component::loaded, [this] {
-        emit loaded();
-    });
-    connect(component, &QInstaller::Component::virtualStateChanged, [this] {
-        emit virtualStateChanged();
-    });
-    connect(component, &QInstaller::Component::valueChanged, [this](const QString& key, const QString& value) {
-        emit valueChanged(key, value);
-    });
-}
-
-void ComponentProxy::setValue(const QString& key, const QString& value) {
-    m_component->setValue(key, value);
-}
-
-QString ComponentProxy::value(const QString& key, const QString& defaultValue) const {
-    return m_component->value(key, defaultValue);
-}
-
-void ComponentProxy::registerPathForUninstallation(const QString& path, bool wipe) {
-    m_component->registerPathForUninstallation(path, wipe);
-}
-
-void ComponentProxy::addDownloadableArchive(const QString& path) {
-    m_component->addDownloadableArchive(path);
-}
-
-void ComponentProxy::removeDownloadableArchive(const QString& path) {
-    m_component->removeDownloadableArchive(path);
-}
-
-void ComponentProxy::addStopProcessForUpdateRequest(const QString& process) {
-    m_component->addStopProcessForUpdateRequest(process);
-}
-
-void ComponentProxy::removeStopProcessForUpdateRequest(const QString& process) {
-    m_component->removeStopProcessForUpdateRequest(process);
-}
-
-void ComponentProxy::setStopProcessForUpdateRequest(const QString& process, bool requested) {
-    m_component->setStopProcessForUpdateRequest(process, requested);
-}
-
-void ComponentProxy::addDependency(const QString& newDependency) {
-    m_component->addDependency(newDependency);
-}
-
-void ComponentProxy::addAutoDependOn(const QString& newDependOn) {
-    m_component->addAutoDependOn(newDependOn);
-}
-
-bool ComponentProxy::isDefault() const {
-    return m_component->isDefault();
-}
-
-bool ComponentProxy::isAutoDependOn(const QSet<QString>& componentsToInstall) const {
-    return m_component->isAutoDependOn(componentsToInstall);
-}
-
-void ComponentProxy::setInstalled() {
-    m_component->setInstalled();
-}
-
-bool ComponentProxy::isInstalled(const QString& version) const {
-    return m_component->isInstalled(version);
-}
-
-bool ComponentProxy::installationRequested() const {
-    return m_component->installationRequested();
-}
-
-void ComponentProxy::setUninstalled() {
-    m_component->setUninstalled();
-}
-
-bool ComponentProxy::isUninstalled() const {
-    return m_component->isUninstalled();
-}
-
-bool ComponentProxy::uninstallationRequested() const {
-    return m_component->uninstallationRequested();
-}
-
-bool ComponentProxy::isFromOnlineRepository() const {
-    return m_component->isFromOnlineRepository();
-}
-
-void ComponentProxy::setUpdateAvailable(bool isUpdateAvailable) {
-     m_component->setUpdateAvailable(isUpdateAvailable);
-}
-
-bool ComponentProxy::isUpdateAvailable() const {
-    return m_component->isUpdateAvailable();
-}
-
-bool ComponentProxy::updateRequested() const {
-    return m_component->updateRequested();
-}
-
-bool ComponentProxy::componentChangeRequested() {
-    return m_component->componentChangeRequested();
-}
-
-bool ComponentProxy::isForcedUpdate() {
-    return m_component->isForcedUpdate();
-}
-
-bool ComponentProxy::addOperation(const QString &operation, const QStringList &parameters) {
-    return m_component->addOperation(operation, parameters);
-}
-
-void ComponentProxy::setAutoCreateOperations(bool autoCreateOperations) {
-    m_component->setAutoCreateOperations(autoCreateOperations);
+SystemInfoProxy::SystemInfoProxy() {
+    currentCpuArchitecture = [] {
+        return QSysInfo::currentCpuArchitecture().toStdString();
+    };
+    buildCpuArchitecture = [] {
+        return QSysInfo::buildCpuArchitecture().toStdString();
+    };
+    kernelType = [] {
+        return QSysInfo::kernelType().toStdString();
+    };
+    kernelVersion = [] {
+        return QSysInfo::kernelVersion().toStdString();
+    };
+    productType = [] {
+        return QSysInfo::productType().toStdString();
+    };
+    productVersion = [] {
+        return QSysInfo::productVersion().toStdString();
+    };
+    prettyProductName = [] {
+        return QSysInfo::prettyProductName().toStdString();
+    };
+}
+
+GuiProxy::GuiProxy(QInstaller::PackageManagerGui* gui) {
+    pageById = [gui](int id) {
+        return gui->pageById(id);
+    };
+    pageByObjectName = [gui](const std::string& name) {
+        return gui->pageByObjectName(QString::fromStdString(name));
+    };
+
+    currentPageWidget = [gui]() {
+        return gui->currentPageWidget();
+    };
+    pageWidgetByObjectName = [gui](const std::string& name) {
+        return gui->pageWidgetByObjectName(QString::fromStdString(name));
+    };
+
+    defaultButtonText = [gui](int wizardButton) {
+        return gui->defaultButtonText(wizardButton).toStdString();
+    };
+    clickButtonById = [gui](int wizardButton, int delayInMs) {
+        return gui->clickButton(wizardButton, delayInMs);
+    };
+    clickButtonByName = [gui](const std::string& objectName, int delayInMs) {
+        return gui->clickButton(QString::fromStdString(objectName), delayInMs);
+    };
+    isButtonEnabled = [gui](int wizardButton) {
+        return gui->isButtonEnabled(wizardButton);
+    };
+    setWizardPageButtonText = [gui](int pageId, int buttonId, const std::string& buttonText) {
+        return gui->setWizardPageButtonText(pageId, buttonId, QString::fromStdString(buttonText));
+    };
+
+    showSettingsButton = [gui](bool show) {
+        return gui->showSettingsButton(show);
+    };
+    setSettingsButtonEnabled = [gui](bool enable) {
+        return gui->setSettingsButtonEnabled(enable);
+    };
+
+    setSilent = [gui](bool silent) {
+        return gui->setSilent(silent);
+    };
+
+    cancelButtonClicked = [gui]() {
+        return gui->cancelButtonClicked();
+    };
+    reject = [gui]() {
+        return gui->reject();
+    };
+    rejectWithoutPrompt = [gui]() {
+        return gui->rejectWithoutPrompt();
+    };
+    showFinishedPage = [gui]() {
+        return gui->showFinishedPage();
+    };
+    setModified = [gui](bool value) {
+        return gui->setModified(value);
+    };
+}
+
+InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core) {
+    virtualComponentsVisible = [core]() {
+        return core->virtualComponentsVisible();
+    };
+
+    noForceInstallation = [core]() {
+        return core->noForceInstallation();
+    };
+
+    noDefaultInstallation = [core]() {
+        return core->noDefaultInstallation();
+    };
+
+    setDependsOnLocalInstallerBinary = [core]() {
+        return core->setDependsOnLocalInstallerBinary();
+    };
+    localInstallerBinaryUsed = [core]() {
+        return core->localInstallerBinaryUsed();
+    };
+
+    execute = [core](const std::string& program, const std::vector<std::string>& arguments, const std::string& stdIn,
+                     const std::string& stdInCodec, const std::string& stdOutCodec) {
+        QStringList args;
+        for (const auto& arg : arguments)
+            args.append(QString::fromStdString(arg));
+
+        const auto result = core->execute(QString::fromStdString(program), args, QString::fromStdString(stdIn),
+                                          QString::fromStdString(stdInCodec), QString::fromStdString(stdOutCodec));
+        std::tuple<std::string, int> resultTup = {
+            !result.empty() ? result[0].toString().toStdString() : "",
+            result.size() > 1 ? result[1].toInt() : 0,
+        };
+
+        return resultTup;
+    };
+    executeDetached = [core](const std::string& program, const std::vector<std::string>& arguments,
+                             const std::string& workingDirectory) {
+        QStringList args;
+        for (const auto& arg : arguments)
+            args.append(QString::fromStdString(arg));
+        return core->executeDetached(QString::fromStdString(program), args, QString::fromStdString(workingDirectory));
+    };
+    environmentVariable = [core](const std::string& name) {
+        return core->environmentVariable(QString::fromStdString(name)).toStdString();
+    };
+
+    operationExists = [core](const std::string& name) {
+        return core->operationExists(QString::fromStdString(name));
+    };
+    performOperation = [core](const std::string& name, const std::vector<std::string>& arguments) {
+        QStringList args;
+        for (const auto& arg : arguments)
+            args.append(QString::fromStdString(arg));
+        return core->performOperation(QString::fromStdString(name), args);
+    };
+
+    versionMatches = [core](const std::string& version, const std::string& requirement) {
+        return core->versionMatches(QString::fromStdString(version), QString::fromStdString(requirement));
+    };
+
+    findLibrary = [core](const std::string& name, const std::vector<std::string>& paths) {
+        QStringList pathsQt;
+        for (const auto& path : paths)
+            pathsQt.append(QString::fromStdString(path));
+        return core->findLibrary(QString::fromStdString(name), pathsQt).toStdString();
+    };
+    findPath = [core](const std::string& name, const std::vector<std::string>& paths) {
+        QStringList pathsQt;
+        for (const auto& path : paths)
+            pathsQt.append(QString::fromStdString(path));
+        return core->findPath(QString::fromStdString(name), pathsQt).toStdString();
+    };
+
+    setInstallerBaseBinary = [core](const std::string& path) {
+        return core->setInstallerBaseBinary(QString::fromStdString(path));
+    };
+
+    containsValue = [core](const std::string& key) {
+        return core->containsValue(QString::fromStdString(key));
+    };
+    setValue = [core](const std::string& key, const std::string& value) {
+        return core->setValue(QString::fromStdString(key), QString::fromStdString(value));
+    };
+    value = [core](const std::string& key, const std::string& defaultValue, const int& format) {
+        return core->value(QString::fromStdString(key), QString::fromStdString(defaultValue), format).toStdString();
+    };
+    values = [core](const std::string& key, const std::vector<std::string>& defaultValue) {
+        QStringList defaults;
+        for (const auto& def : defaultValue)
+            defaults.append(QString::fromStdString(def));
+
+        const auto result = core->values(QString::fromStdString(key), defaults);
+        std::vector<std::string> resultVec;
+        for (const auto& item : result) {
+            resultVec.push_back(item.toStdString());
+        }
+
+        return resultVec;
+    };
+    key = [core](const std::string& value) {
+        return core->key(QString::fromStdString(value)).toStdString();
+    };
+
+    addUserRepositories = [core](const std::vector<std::string>& repositories) {
+        QStringList repos;
+        for (const auto& repo : repositories)
+            repos.append(QString::fromStdString(repo));
+
+        return core->addUserRepositories(repos);
+    };
+    setTemporaryRepositories = [core](const std::vector<std::string>& repositories, bool replace, bool compressed) {
+        QStringList repos;
+        for (const auto& repo : repositories)
+            repos.append(QString::fromStdString(repo));
+        return core->setTemporaryRepositories(repos, replace, compressed);
+    };
+    setAllowCompressedRepositoryInstall = [core](bool allow) {
+        return core->setAllowCompressedRepositoryInstall(allow);
+    };
+
+    autoAcceptMessageBoxes = [core]() {
+        return core->autoAcceptMessageBoxes();
+    };
+    autoRejectMessageBoxes = [core]() {
+        return core->autoRejectMessageBoxes();
+    };
+    setMessageBoxAutomaticAnswer = [core](const std::string& identifier, int button) {
+        return core->setMessageBoxAutomaticAnswer(QString::fromStdString(identifier), button);
+    };
+    acceptMessageBoxDefaultButton = [core]() {
+        return core->acceptMessageBoxDefaultButton();
+    };
+
+    setAutoAcceptLicenses = [core]() {
+        return core->setAutoAcceptLicenses();
+    };
+    setFileDialogAutomaticAnswer = [core](const std::string& identifier, const std::string& value) {
+        return core->setFileDialogAutomaticAnswer(QString::fromStdString(identifier), QString::fromStdString(value));
+    };
+    removeFileDialogAutomaticAnswer = [core](const std::string& identifier) {
+        return core->removeFileDialogAutomaticAnswer(QString::fromStdString(identifier));
+    };
+    containsFileDialogAutomaticAnswer = [core](const std::string& identifier) {
+        return core->containsFileDialogAutomaticAnswer(QString::fromStdString(identifier));
+    };
+
+    isFileExtensionRegistered = [core](const std::string& extension) {
+        return core->isFileExtensionRegistered(QString::fromStdString(extension));
+    };
+    fileExists = [core](const std::string& filePath) {
+        return core->fileExists(QString::fromStdString(filePath));
+    };
+    readFile = [core](const std::string& filePath, const std::string& codecName) {
+        return core->readFile(QString::fromStdString(filePath), QString::fromStdString(codecName)).toStdString();
+    };
+    readConsoleLine = [core](const std::string& title, int64_t maxlen) {
+        return core->readConsoleLine(QString::fromStdString(title), maxlen).toStdString();
+    };
+
+    toNativeSeparators = [core](const std::string& path) {
+        return core->toNativeSeparators(QString::fromStdString(path)).toStdString();
+    };
+    fromNativeSeparators = [core](const std::string& path) {
+        return core->fromNativeSeparators(QString::fromStdString(path)).toStdString();
+    };
+
+    componentByName = [core](const std::string& identifier) {
+        return core->componentByName(QString::fromStdString(identifier));
+    };
+    components = [core](const std::string& regexp) {
+        const auto components = core->components(QString::fromStdString(regexp));
+        std::vector<QInstaller::Component*> componentsVec;
+        for (const auto& comp : components)
+            componentsVec.push_back(comp);
+
+        return componentsVec;
+    };
+
+    calculateComponentsToInstall = [core]() {
+        return core->calculateComponentsToInstall();
+    };
+
+    recalculateAllComponents = [core]() {
+        return core->recalculateAllComponents();
+    };
+
+    calculateComponentsToUninstall = [core]() {
+        return core->calculateComponentsToUninstall();
+    };
+
+    setInstaller = [core]() {
+        return core->setInstaller();
+    };
+    isInstaller = [core]() {
+        return core->isInstaller();
+    };
+    isOfflineOnly = [core]() {
+        return core->isOfflineOnly();
+    };
+
+    setUninstaller = [core]() {
+        return core->setUninstaller();
+    };
+    isUninstaller = [core]() {
+        return core->isUninstaller();
+    };
+
+    setUpdater = [core]() {
+        return core->setUpdater();
+    };
+    isUpdater = [core]() {
+        return core->isUpdater();
+    };
+
+    setPackageManager = [core]() {
+        return core->setPackageManager();
+    };
+    isPackageManager = [core]() {
+        return core->isPackageManager();
+    };
+
+    isOfflineGenerator = [core]() {
+        return core->isOfflineGenerator();
+    };
+
+    isPackageViewer = [core]() {
+        return core->isPackageViewer();
+    };
+
+    isUserSetBinaryMarker = [core]() {
+        return core->isUserSetBinaryMarker();
+    };
+
+    isCommandLineInstance = [core]() {
+        return core->isCommandLineInstance();
+    };
+    isCommandLineDefaultInstall = [core]() {
+        return core->isCommandLineDefaultInstall();
+    };
+
+    gainAdminRights = [core]() {
+        return core->gainAdminRights();
+    };
+    dropAdminRights = [core]() {
+        return core->dropAdminRights();
+    };
+    hasAdminRights = [core]() {
+        return core->hasAdminRights();
+    };
+
+    requiredDiskSpace = [core]() {
+        return core->requiredDiskSpace();
+    };
+    requiredTemporaryDiskSpace = [core]() {
+        return core->requiredTemporaryDiskSpace();
+    };
+
+    isProcessRunning = [core](const std::string& name) {
+        return core->isProcessRunning(QString::fromStdString(name));
+    };
+    killProcess = [core](const std::string& absoluteFilePath, int timeout) {
+        return core->killProcess(QString::fromStdString(absoluteFilePath), timeout);
+    };
+
+    addWizardPageWarning = [core](const std::string& message, WizardPage page, const std::string& id, int position) {
+        return core->addWizardPageWarning(QString::fromStdString(message),
+                                          (QInstaller::PackageManagerCore::WizardPage)page, QString::fromStdString(id),
+                                          position);
+    };
+    removeWizardPageWarning = [core](const std::string& id) {
+        return core->removeWizardPageWarning(QString::fromStdString(id));
+    };
+    setDefaultPageVisible = [core](int page, bool visible) {
+        return core->setDefaultPageVisible(page, visible);
+    };
+    setValidatorForCustomPage = [core](QInstaller::Component* component, const std::string& name,
+                                       const std::string& callbackName) {
+        return core->setValidatorForCustomPage(component, QString::fromStdString(name),
+                                               QString::fromStdString(callbackName));
+    };
+    selectComponent = [core](const std::string& id) {
+        return core->selectComponent(QString::fromStdString(id));
+    };
+    deselectComponent = [core](const std::string& id) {
+        return core->deselectComponent(QString::fromStdString(id));
+    };
+
+    runInstaller = [core]() {
+        return core->runInstaller();
+    };
+    runUninstaller = [core]() {
+        return core->runUninstaller();
+    };
+    runPackageUpdater = [core]() {
+        return core->runPackageUpdater();
+    };
+    runOfflineGenerator = [core]() {
+        return core->runOfflineGenerator();
+    };
+    interrupt = [core]() {
+        return core->interrupt();
+    };
+    setCanceled = [core]() {
+        return core->setCanceled();
+    };
+    languageChanged = [core]() {
+        return core->languageChanged();
+    };
+    setCompleteUninstallation = [core](bool complete) {
+        return core->setCompleteUninstallation(complete);
+    };
+    cancelMetaInfoJob = [core]() {
+        return core->cancelMetaInfoJob();
+    };
+
+    setAboutCalculateComponentsToInstallCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::aboutCalculateComponentsToInstall, [core, callback]() {
+            callback();
+        });
+    };
+    setFinishedCalculateComponentsToInstallCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::finishedCalculateComponentsToInstall,
+                         [core, callback]() {
+                             callback();
+                         });
+    };
+    setAboutCalculateComponentsToUninstallCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::aboutCalculateComponentsToUninstall, [core, callback]() {
+            callback();
+        });
+    };
+    setFinishedCalculateComponentsToUninstallCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::finishedCalculateComponentsToUninstall,
+                         [core, callback]() {
+                             callback();
+                         });
+    };
+    setComponentAddedCallback = [core](std::function<void(QInstaller::Component* comp)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::componentAdded,
+                         [core, callback](QInstaller::Component* comp) {
+                             callback(comp);
+                         });
+    };
+    setValueChangedCallback = [core](std::function<void(const std::string& key, const std::string& value)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::valueChanged,
+                         [core, callback](const QString& key, const QString& value) {
+                             callback(key.toStdString(), value.toStdString());
+                         });
+    };
+    setStatusChangedCallback = [core](std::function<void(Status)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::statusChanged, [core, callback](QInstaller::PackageManagerCore::Status status) {
+            callback((Status)status);
+        });
+    };
+    setCurrentPageChangedCallback = [core](std::function<void(int page)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::currentPageChanged, [core, callback](int page) {
+            callback(page);
+        });
+    };
+    setFinishButtonClickedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::finishButtonClicked, [core, callback]() {
+            callback();
+        });
+    };
+
+    setMetaJobProgressCallback = [core](std::function<void(int progress)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::metaJobProgress, [core, callback](int progress) {
+            callback(progress);
+        });
+    };
+    setMetaJobTotalProgressCallback = [core](std::function<void(int progress)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::metaJobTotalProgress, [core, callback](int progress) {
+            callback(progress);
+        });
+    };
+    setMetaJobInfoMessageCallback = [core](std::function<void(const std::string& message)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::metaJobInfoMessage,
+                         [core, callback](const QString& message) {
+                             callback(message.toStdString());
+                         });
+    };
+
+    setStartAllComponentsResetCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::startAllComponentsReset, [core, callback]() {
+            callback();
+        });
+    };
+    setFinishAllComponentsResetCallback = [core](
+        std::function<void(const std::vector<QInstaller::Component*>& rootComponents)> callback) {
+            QObject::connect(core, &QInstaller::PackageManagerCore::finishAllComponentsReset,
+                             [core, callback](const QList<QInstaller::Component*>& rootComponents) {
+                                 std::vector<QInstaller::Component*> componentsVec;
+                                 for(const auto& comp : rootComponents)
+                                     componentsVec.push_back(comp);
+                                 callback(componentsVec);
+                             });
+        };
+
+    setStartUpdaterComponentsResetCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::startUpdaterComponentsReset, [core, callback]() {
+            callback();
+        });
+    };
+    setFinishUpdaterComponentsResetCallback = [core](
+        std::function<void(const std::vector<QInstaller::Component*>& componentsWithUpdates)> callback) {
+            QObject::connect(core, &QInstaller::PackageManagerCore::finishUpdaterComponentsReset,
+                             [core, callback](const QList<QInstaller::Component*>& componentsWithUpdates) {
+                                 std::vector<QInstaller::Component*> componentsVec;
+                                 for(const auto& comp : componentsWithUpdates)
+                                     componentsVec.push_back(comp);
+                                 callback(componentsVec);
+                             });
+        };
+
+    setInstallationStartedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::installationStarted, [core, callback]() {
+            callback();
+        });
+    };
+    setInstallationInterruptedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::installationInterrupted, [core, callback]() {
+            callback();
+        });
+    };
+    setInstallationFinishedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::installationFinished, [core, callback]() {
+            callback();
+        });
+    };
+    setUpdateFinishedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::updateFinished, [core, callback]() {
+            callback();
+        });
+    };
+    setUninstallationStartedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::uninstallationStarted, [core, callback]() {
+            callback();
+        });
+    };
+    setUninstallationFinishedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::uninstallationFinished, [core, callback]() {
+            callback();
+        });
+    };
+    setOfflineGenerationStartedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::offlineGenerationStarted, [core, callback]() {
+            callback();
+        });
+    };
+    setOfflineGenerationFinishedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::offlineGenerationFinished, [core, callback]() {
+            callback();
+        });
+    };
+    setTitleMessageChangedCallback = [core](std::function<void(const std::string& title)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::titleMessageChanged,
+                         [core, callback](const QString& title) {
+                             callback(title.toStdString());
+                         });
+    };
+    setDownloadArchivesFinishedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::downloadArchivesFinished, [core, callback]() {
+            callback();
+        });
+    };
+
+    setWizardPageInsertionRequestedCallback = [core](
+        std::function<void(void* /* QWidget */ widget, WizardPage page)> callback) {
+            QObject::connect(core, &QInstaller::PackageManagerCore::wizardPageInsertionRequested,
+                             [core, callback](void* /* QWidget */ widget, QInstaller::PackageManagerCore::WizardPage page) {
+                                 callback(widget, (WizardPage)page);
+                             });
+        };
+    setWizardPageRemovalRequestedCallback = [core](std::function<void(void* /* QWidget */ widget)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::wizardPageRemovalRequested,
+                         [core, callback](void* /* QWidget */ widget) {
+                             callback(widget);
+                         });
+    };
+    setWizardWidgetInsertionRequestedCallback = [core](
+        std::function<void(void* /* QWidget */ widget, WizardPage page, int position)> callback) {
+            QObject::connect(core, &QInstaller::PackageManagerCore::wizardWidgetInsertionRequested,
+                             [core, callback](void* /* QWidget */ widget, QInstaller::PackageManagerCore::WizardPage page, int position) {
+                                 callback(widget, (WizardPage)page, position);
+                             });
+        };
+    setWizardWidgetRemovalRequestedCallback = [core](std::function<void(void* /* QWidget */ widget)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::wizardWidgetRemovalRequested,
+                         [core, callback](void* /* QWidget */ widget) {
+                             callback(widget);
+                         });
+    };
+    setWizardPageWarningInsertionRequestedCallback = [core](
+        std::function<void(const std::string& message, WizardPage page, const std::string& id,
+                           int position)> callback) {
+            QObject::connect(core, &QInstaller::PackageManagerCore::wizardPageWarningInsertionRequested,
+                             [core, callback](const QString& message, QInstaller::PackageManagerCore::WizardPage page, const QString& id,
+                                              int position) {
+                                 callback(message.toStdString(), (WizardPage)page, id.toStdString(), position);
+                             });
+        };
+    setWizardPageWarningRemovalRequestedCallback = [core](std::function<void(const std::string& id)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::wizardPageWarningRemovalRequested,
+                         [core, callback](const QString& id) {
+                             callback(id.toStdString());
+                         });
+    };
+    setWizardPageVisibilityChangeRequestedCallback = [core](std::function<void(bool visible, int page)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::wizardPageVisibilityChangeRequested,
+                         [core, callback](bool visible, int page) {
+                             callback(visible, page);
+                         });
+    };
+    setSetValidatorForCustomPageRequestedCallback = [core](
+        std::function<void(QInstaller::Component* component, const std::string& name,
+                           const std::string& callbackName)> callback) {
+            QObject::connect(core, &QInstaller::PackageManagerCore::setValidatorForCustomPageRequested,
+                             [core, callback](QInstaller::Component* component, const QString& name,
+                                              const QString& callbackName) {
+                                 callback(component, name.toStdString(), callbackName.toStdString());
+                             });
+        };
+
+    setSetAutomatedPageSwitchEnabledCallback = [core](std::function<void(bool request)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::setAutomatedPageSwitchEnabled,
+                         [core, callback](bool request) {
+                             callback(request);
+                         });
+    };
+    setCoreNetworkSettingsChangedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::coreNetworkSettingsChanged, [core, callback]() {
+            callback();
+        });
+    };
+
+    setGuiObjectChangedCallback = [core](std::function<void(void* /* QObject */ gui)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::guiObjectChanged,
+                         [core, callback](void* /* QObject */ gui) {
+                             callback(gui);
+                         });
+    };
+    setUnstableComponentFoundCallback = [core](
+        std::function<void(const std::string& type, const std::string& errorMessage, const std::string& component)>
+        callback) {
+            QObject::connect(core, &QInstaller::PackageManagerCore::unstableComponentFound,
+                             [core, callback](const QString& type, const QString& errorMessage,
+                                              const QString& component) {
+                                 callback(type.toStdString(), errorMessage.toStdString(), component.toStdString());
+                             });
+        };
+    setInstallerBinaryMarkerChangedCallback = [core](std::function<void(int64_t magicMarker)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::installerBinaryMarkerChanged,
+                         [core, callback](int64_t magicMarker) {
+                             callback(magicMarker);
+                         });
+    };
+    setComponentsRecalculatedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::componentsRecalculated, [core, callback]() {
+            callback();
+        });
+    };
+    setGuiElementsReadyCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::guiElementsReady, [core, callback]() {
+            callback();
+        });
+    };
+    setInstallDirectoryChangedCallback = [core](std::function<void(const std::string& newDirectory)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::installDirectoryChanged,
+                         [core, callback](const QString& newDirectory) {
+                             callback(newDirectory.toStdString());
+                         });
+    };
+    setAvailableSpaceChangedCallback = [core](std::function<void(SpaceInfo spaceInfo)> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::availableSpaceChanged,
+                         [core, callback](QInstaller::PackageManagerCore::SpaceInfo spaceInfo) {
+                             callback((SpaceInfo)spaceInfo);
+                         });
+    };
+    setMetadataDownloadFailedCallback = [core](std::function<void()> callback) {
+        QObject::connect(core, &QInstaller::PackageManagerCore::metadataDownloadFailed, [core, callback]() {
+            callback();
+        });
+    };
+}
+
+ComponentProxy::ComponentProxy(QInstaller::Component* component) {
+    setValue = [component](const std::string& key, const std::string& value) {
+        return component->setValue(QString::fromStdString(key), QString::fromStdString(value));
+    };
+    value = [component](const std::string& key, const std::string& defaultValue) {
+        return component->value(QString::fromStdString(key), QString::fromStdString(defaultValue)).toStdString();
+    };
+
+    registerPathForUninstallation = [component](const std::string& path, bool wipe) {
+        return component->registerPathForUninstallation(QString::fromStdString(path), wipe);
+    };
+
+    addDownloadableArchive = [component](const std::string& path) {
+        return component->addDownloadableArchive(QString::fromStdString(path));
+    };
+    removeDownloadableArchive = [component](const std::string& path) {
+        return component->removeDownloadableArchive(QString::fromStdString(path));
+    };
+
+    addStopProcessForUpdateRequest = [component](const std::string& process) {
+        return component->addStopProcessForUpdateRequest(QString::fromStdString(process));
+    };
+    removeStopProcessForUpdateRequest = [component](const std::string& process) {
+        return component->removeStopProcessForUpdateRequest(QString::fromStdString(process));
+    };
+    setStopProcessForUpdateRequest = [component](const std::string& process, bool requested) {
+        return component->setStopProcessForUpdateRequest(QString::fromStdString(process), requested);
+    };
+
+    addDependency = [component](const std::string& newDependency) {
+        return component->addDependency(QString::fromStdString(newDependency));
+    };
+    addAutoDependOn = [component](const std::string& newDependOn) {
+        return component->addAutoDependOn(QString::fromStdString(newDependOn));
+    };
+
+    isDefault = [component]() {
+        return component->isDefault();
+    };
+    isAutoDependOn = [component](const std::set<std::string>& componentsToInstall) {
+        QSet<QString> components;
+        for (const auto& comp : componentsToInstall)
+            components.insert(QString::fromStdString(comp));
+        return component->isAutoDependOn(components);
+    };
+
+    setInstalled = [component]() {
+        return component->setInstalled();
+    };
+    isInstalled = [component](const std::string& version) {
+        return component->isInstalled(QString::fromStdString(version));
+    };
+    installationRequested = [component]() {
+        return component->installationRequested();
+    };
+
+    setUninstalled = [component]() {
+        return component->setUninstalled();
+    };
+    isUninstalled = [component]() {
+        return component->isUninstalled();
+    };
+    uninstallationRequested = [component]() {
+        return component->uninstallationRequested();
+    };
+
+    isFromOnlineRepository = [component]() {
+        return component->isFromOnlineRepository();
+    };
+
+    setUpdateAvailable = [component](bool isUpdateAvailable) {
+        return component->setUpdateAvailable(isUpdateAvailable);
+    };
+    isUpdateAvailable = [component]() {
+        return component->isUpdateAvailable();
+    };
+    updateRequested = [component]() {
+        return component->updateRequested();
+    };
+
+    componentChangeRequested = [component]() {
+        return component->componentChangeRequested();
+    };
+    isForcedUpdate = [component]() {
+        return component->isForcedUpdate();
+    };
+
+    addOperation = [component](const std::string& operation, const std::vector<std::string>& parameters) {
+        QStringList params;
+        for (const auto& param : parameters)
+            params.append(QString::fromStdString(param));
+        return component->addOperation(QString::fromStdString(operation), params);
+    };
+
+    setAutoCreateOperations = [component](bool autoCreateOperations) {
+        return component->setAutoCreateOperations(autoCreateOperations);
+    };
+
+    setLoadedCallback = [component](std::function<void()> callback) {
+        QObject::connect(component, &QInstaller::Component::loaded, [component, callback]() {
+            callback();
+        });
+    };
+    setVirtualStateChangedCallback = [component](std::function<void()> callback) {
+        QObject::connect(component, &QInstaller::Component::virtualStateChanged, [component, callback]() {
+            callback();
+        });
+    };
+    setValueChangedCallback = [component](
+        std::function<void(const std::string& key, const std::string& value)> callback) {
+            QObject::connect(component, &QInstaller::Component::valueChanged,
+                             [component, callback](const QString& key, const QString& value) {
+                                 callback(key.toStdString(), value.toStdString());
+                             });
+        };
 }
