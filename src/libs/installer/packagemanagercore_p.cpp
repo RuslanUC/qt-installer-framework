@@ -179,7 +179,6 @@ PackageManagerCorePrivate::PackageManagerCorePrivate(PackageManagerCore *core)
     , m_magicBinaryMarker(0) // initialize with pseudo marker
     , m_magicMarkerSupplement(BinaryContent::Default)
     , m_foundEssentialUpdate(false)
-    , m_componentScriptEngine(nullptr)
     , m_controlScriptEngine(nullptr)
     , m_installerCalculator(nullptr)
     , m_uninstallerCalculator(nullptr)
@@ -227,7 +226,6 @@ PackageManagerCorePrivate::PackageManagerCorePrivate(PackageManagerCore *core, q
     , m_magicBinaryMarker(magicInstallerMaker)
     , m_magicMarkerSupplement(BinaryContent::Default)
     , m_foundEssentialUpdate(false)
-    , m_componentScriptEngine(nullptr)
     , m_controlScriptEngine(nullptr)
     , m_installerCalculator(nullptr)
     , m_uninstallerCalculator(nullptr)
@@ -604,21 +602,9 @@ void PackageManagerCorePrivate::cleanUpComponentEnvironment()
     if (m_core->isMaintainer())
         BinaryFormatEngineHandler::instance()->clear();
 
-    // there could be still some references to already deleted components,
-    // so we need to remove the current component script engine
-    delete m_componentScriptEngine;
-    m_componentScriptEngine = nullptr;
-
     // Calculators become invalid after clearing components
     clearInstallerCalculator();
     clearUninstallerCalculator();
-}
-
-PluginEngine *PackageManagerCorePrivate::componentPluginEngine() const
-{
-    if (!m_componentScriptEngine)
-        m_componentScriptEngine = new PluginEngine(m_core);
-    return m_componentScriptEngine;
 }
 
 PluginEngine *PackageManagerCorePrivate::controlPluginEngine() const

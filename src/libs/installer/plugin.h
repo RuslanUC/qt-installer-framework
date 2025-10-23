@@ -14,6 +14,12 @@
 
 #define IFW_PLUGIN_API_VERSION 2
 
+#ifdef Q_OS_WIN
+#define IFW_PLUGIN_EXPORT __declspec(dllexport)
+#else
+#define IFW_PLUGIN_EXPORT
+#endif
+
 namespace QInstaller {
     class PackageManagerCore;
     class Component;
@@ -398,15 +404,15 @@ static_assert(QInstaller::PackageManagerCore::SpaceInfo::RecommendedSizeExceeded
 extern "C" {
 #   endif
 
-    bool ifw_control_init(ControlPluginContext*);
-    bool ifw_component_init(ComponentPluginContext*);
-    bool ifw_component_is_default(ComponentPluginContext*);
-    bool ifw_component_create_operations(ComponentPluginContext*);
-    bool ifw_component_create_operations_for_path(ComponentPluginContext*, const std::string&);
-    bool ifw_component_create_operations_for_archive(ComponentPluginContext*, const std::string&);
-    void ifw_component_begin_installation(ComponentPluginContext*);
+    IFW_PLUGIN_EXPORT bool ifw_control_init(ControlPluginContext*);
+    IFW_PLUGIN_EXPORT bool ifw_component_init(ComponentPluginContext*);
+    IFW_PLUGIN_EXPORT bool ifw_component_is_default(ComponentPluginContext*);
+    IFW_PLUGIN_EXPORT bool ifw_component_create_operations(ComponentPluginContext*);
+    IFW_PLUGIN_EXPORT bool ifw_component_create_operations_for_path(ComponentPluginContext*, const std::string&);
+    IFW_PLUGIN_EXPORT bool ifw_component_create_operations_for_archive(ComponentPluginContext*, const std::string&);
+    IFW_PLUGIN_EXPORT void ifw_component_begin_installation(ComponentPluginContext*);
 
-    int __ifw_plugin_api_version() {
+    IFW_PLUGIN_EXPORT int __ifw_plugin_api_version() {
         return IFW_PLUGIN_API_VERSION;
     }
 #   ifdef __cplusplus

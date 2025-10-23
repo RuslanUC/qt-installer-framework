@@ -30,6 +30,7 @@
 
 #include "component.h"
 #include "packagemanagercore.h"
+#include "pluginengine.h"
 
 #include <QWidget>
 
@@ -57,16 +58,20 @@ ComponentPrivate::ComponentPrivate(PackageManagerCore *core, Component *qq)
     , m_updateIsAvailable(false)
     , m_treeNameMoveChildren(false)
     , m_postLoadScript(false)
+    , m_componentScriptEngine(nullptr)
 {
 }
 
 ComponentPrivate::~ComponentPrivate()
 {
+    delete m_componentScriptEngine;
 }
 
-PluginEngine *ComponentPrivate::pluginEngine() const
+PluginEngine *ComponentPrivate::pluginEngine()
 {
-    return m_core->componentPluginEngine();
+    if (!m_componentScriptEngine)
+        m_componentScriptEngine = new PluginEngine(m_core);
+    return m_componentScriptEngine;
 }
 
 // -- ComponentModelHelper

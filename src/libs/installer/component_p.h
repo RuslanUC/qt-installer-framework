@@ -54,7 +54,7 @@ public:
     explicit ComponentPrivate(PackageManagerCore *core, Component *qq);
     ~ComponentPrivate();
 
-    PluginEngine *pluginEngine() const;
+    PluginEngine *pluginEngine();
 
     PackageManagerCore *m_core;
     Component *m_parentComponent;
@@ -62,6 +62,7 @@ public:
     Operation *m_licenseOperation;
     Operation *m_minimumProgressOperation;
     InstallState m_installState;
+    PluginEngine* m_componentScriptEngine;
 
     bool m_newlyInstalled;
     bool m_operationsCreated;

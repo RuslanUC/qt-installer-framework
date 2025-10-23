@@ -2051,16 +2051,6 @@ void PackageManagerCore::runProgram()
 
 
 /*!
-    Returns the script engine that prepares and runs the component scripts.
-
-    \sa {Component Scripting}
-*/
-PluginEngine *PackageManagerCore::componentPluginEngine() const
-{
-    return d->componentPluginEngine();
-}
-
-/*!
     Returns the script engine that prepares and runs the control script.
 
     \sa {Controller Scripting}

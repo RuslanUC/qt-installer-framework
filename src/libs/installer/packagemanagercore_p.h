@@ -118,7 +118,6 @@ public:
     bool loadComponentScripts(const T &components, const bool postScript = false);
 
     void cleanUpComponentEnvironment();
-    PluginEngine *componentPluginEngine() const;
     PluginEngine *controlPluginEngine() const;
 
     void clearAllComponentLists();
@@ -311,7 +310,6 @@ private:
 
     bool m_foundEssentialUpdate;
 
-    mutable PluginEngine *m_componentScriptEngine;
     mutable PluginEngine *m_controlScriptEngine;
     // < name (component to replace), < replacement component, component to replace > >
     QHash<QString, QPair<Component*, Component*> > m_componentsToReplaceAllMode;

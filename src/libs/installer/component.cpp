@@ -612,7 +612,8 @@ void Component::evaluateComponentScript(const QString &fileName, const bool post
 {
     // introduce the component object as javascript value and call the name to check that it
     // was successful
-    if (!d->pluginEngine()->init()) {
+    d->pluginEngine()->setComponent(this);
+    if (!d->pluginEngine()->load(fileName) || !d->pluginEngine()->init()) {
         const QString failedMessage = QLatin1String("Failed to load component plugin!");
         qCWarning(QInstaller::lcDeveloperBuild) << failedMessage;
         setUnstable(Component::UnstableError::ScriptLoadingFailed, failedMessage);
