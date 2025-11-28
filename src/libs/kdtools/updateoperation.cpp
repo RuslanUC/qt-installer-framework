@@ -248,24 +248,24 @@ bool UpdateOperation::checkArgumentCount(int minArgCount, int maxArgCount,
         setError(InvalidArguments);
         QString countRange;
         if (minArgCount == maxArgCount)
-            countRange = tr("exactly %1").arg(minArgCount);
+            countRange = QLatin1String("exactly %1").arg(QString::number(minArgCount));
         else if (maxArgCount == INT_MAX)
-            countRange = tr("at least %1").arg(minArgCount);
+            countRange = QLatin1String("at least %1").arg(QString::number(minArgCount));
         else if (minArgCount == 0)
-            countRange = tr("not more than %1").arg(maxArgCount);
+            countRange = QLatin1String("not more than %1").arg(QString::number(maxArgCount));
         else if (minArgCount == maxArgCount - 1)
-            countRange = tr("%1 or %2").arg(minArgCount).arg(maxArgCount);
+            countRange = QLatin1String("%1 or %2").arg(QString::number(minArgCount), QString::number(maxArgCount));
         else
-            countRange = tr("%1 to %2").arg(minArgCount).arg(maxArgCount);
+            countRange = QLatin1String("%1 to %2").arg(QString::number(minArgCount), QString::number(maxArgCount));
 
         if (argDescription.isEmpty())
-            setErrorString(tr("Invalid arguments in %1: %n arguments given, "
-                              "%2 arguments expected.", 0, argCount)
-                           .arg(name(), countRange));
+            setErrorString(QLatin1String("Invalid arguments in %1: %3 arguments given, "
+                              "%2 arguments expected.")
+                           .arg(name(), countRange, QString::number(argCount)));
         else
-            setErrorString(tr("Invalid arguments in %1: %n arguments given, "
-                              "%2 arguments expected in the form: %3.", 0, argCount)
-                           .arg(name(), countRange, argDescription));
+            setErrorString(QLatin1String("Invalid arguments in %1: %4 arguments given, "
+                              "%2 arguments expected in the form: %3.")
+                           .arg(name(), countRange, argDescription, QString::number(argCount)));
         return false;
     }
     return true;
@@ -490,7 +490,7 @@ bool UpdateOperation::deleteFileNowOrLater(const QString &file, QString *errorSt
     QFile f(file);
     if (!f.rename(backup)) {
         if (errorString)
-            *errorString = tr("Renaming file \"%1\" to \"%2\" failed: %3").arg(
+            *errorString = QLatin1String("Renaming file \"%1\" to \"%2\" failed: %3").arg(
                     QDir::toNativeSeparators(file), QDir::toNativeSeparators(backup), f.errorString());
         return false;
     }

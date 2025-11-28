@@ -126,7 +126,7 @@ void CreateDesktopEntryOperation::backup()
     }
 
     if (!file.copy(value(QLatin1String("backupOfExistingDesktopEntry")).toString()))
-        setErrorString(tr("Cannot backup file \"%1\": %2").arg(QDir::toNativeSeparators(filename), file.errorString()));
+        setErrorString(QLatin1String("Cannot backup file \"%1\": %2").arg(QDir::toNativeSeparators(filename), file.errorString()));
 }
 
 bool CreateDesktopEntryOperation::performOperation()
@@ -140,13 +140,13 @@ bool CreateDesktopEntryOperation::performOperation()
     QFile file(filename);
     if (file.exists() && !file.remove()) {
         setError(UserDefinedError);
-        setErrorString(tr("Failed to overwrite file \"%1\".").arg(QDir::toNativeSeparators(filename)));
+        setErrorString(QLatin1String("Failed to overwrite file \"%1\".").arg(QDir::toNativeSeparators(filename)));
         return false;
     }
 
     if(!file.open(QIODevice::WriteOnly)) {
         setError(UserDefinedError);
-        setErrorString(tr("Cannot write desktop entry to \"%1\".").arg(QDir::toNativeSeparators(filename)));
+        setErrorString(QLatin1String("Cannot write desktop entry to \"%1\".").arg(QDir::toNativeSeparators(filename)));
         return false;
     }
 

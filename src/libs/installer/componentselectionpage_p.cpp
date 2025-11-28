@@ -93,7 +93,7 @@ ComponentSelectionPagePrivate::ComponentSelectionPagePrivate(ComponentSelectionP
 
     m_rightSideVLayout = new QVBoxLayout;
 
-    QLabel *detailsLabel = new QLabel(tr("Details"));
+    QLabel *detailsLabel = new QLabel(QLatin1String("Details"));
     detailsLabel->setFont(captionFont);
     m_rightSideVLayout->addWidget(detailsLabel);
 
@@ -111,16 +111,16 @@ ComponentSelectionPagePrivate::ComponentSelectionPagePrivate(ComponentSelectionP
     descriptionScrollArea->setWidget(m_descriptionLabel);
     m_rightSideVLayout->addWidget(descriptionScrollArea);
 
-    m_advancedTitle = new QLabel(tr("Advanced"), q);
+    m_advancedTitle = new QLabel(QLatin1String("Advanced"), q);
     m_advancedTitle->setFont(captionFont);
     m_advancedTitle->setVisible(false);
 
     m_createOfflinePushButton = new QPushButton(q);
     m_createOfflinePushButton->setObjectName("CreateOfflineInstallerButton");
     m_createOfflinePushButton->setVisible(false);
-    m_createOfflinePushButton->setText(ComponentSelectionPage::tr("Create Offline Installer"));
+    m_createOfflinePushButton->setText(QLatin1String("Create Offline Installer"));
     m_createOfflinePushButton->setToolTip(
-            ComponentSelectionPage::tr("Create offline installer from selected components, instead "
+            QLatin1String("Create offline installer from selected components, instead "
             "of installing now."));
 
     connect(m_createOfflinePushButton, &QPushButton::clicked,
@@ -131,9 +131,9 @@ ComponentSelectionPagePrivate::ComponentSelectionPagePrivate(ComponentSelectionP
     m_qbspPushButton = new QPushButton(q);
     m_qbspPushButton->setObjectName("BrowseQbspButton");
     m_qbspPushButton->setVisible(false);
-    m_qbspPushButton->setText(ComponentSelectionPage::tr("Browse &QBSP files"));
+    m_qbspPushButton->setText(QLatin1String("Browse &QBSP files"));
     m_qbspPushButton->setToolTip(
-            ComponentSelectionPage::tr("Select a Qt Board Support Package file to install "
+            QLatin1String("Select a Qt Board Support Package file to install "
             "additional content that is not directly available from the online repositories."));
 
     connect(m_qbspPushButton, &QPushButton::clicked,
@@ -145,30 +145,30 @@ ComponentSelectionPagePrivate::ComponentSelectionPagePrivate(ComponentSelectionP
 
     m_topHLayout = new QHBoxLayout;
 
-    QLabel *select = new QLabel(tr("Select"));
+    QLabel *select = new QLabel(QLatin1String("Select"));
     m_topHLayout->addWidget(select);
 
-    m_selectAll = new ClickableLabel(tr("All"), QLatin1String("SelectAll"));
-    m_selectAll->setToolTip(tr("Select all components in the tree view."));
+    m_selectAll = new ClickableLabel(QLatin1String("All"), QLatin1String("SelectAll"));
+    m_selectAll->setToolTip(QLatin1String("Select all components in the tree view."));
     m_topHLayout->addWidget(m_selectAll);
 
     QLabel *spaceMark = new QLabel(SPACE_ITEM);
     m_topHLayout->addWidget(spaceMark);
 
-    m_selectNone = new ClickableLabel(tr("None"), QLatin1String("SelectNone"));
-    m_selectNone->setToolTip(tr("Deselect all components in the tree view."));
+    m_selectNone = new ClickableLabel(QLatin1String("None"), QLatin1String("SelectNone"));
+    m_selectNone->setToolTip(QLatin1String("Deselect all components in the tree view."));
     m_topHLayout->addWidget(m_selectNone);
 
     QLabel *spaceMark2 = new QLabel(SPACE_ITEM);
     m_topHLayout->addWidget(spaceMark2);
 
     if (m_core->isInstaller()) {
-        m_reset = new ClickableLabel(tr("Default"), QLatin1String("Default"));
-        m_reset->setToolTip(tr("Select default components in the tree view."));
+        m_reset = new ClickableLabel(QLatin1String("Default"), QLatin1String("Default"));
+        m_reset->setToolTip(QLatin1String("Select default components in the tree view."));
         m_topHLayout->addWidget(m_reset);
     } else {
-        m_reset = new ClickableLabel(tr("Reset"), QLatin1String("Reset"));
-        m_reset->setToolTip(tr("Reset all components to their original selection state in the tree view."));
+        m_reset = new ClickableLabel(QLatin1String("Reset"), QLatin1String("Reset"));
+        m_reset->setToolTip(QLatin1String("Reset all components to their original selection state in the tree view."));
         m_topHLayout->addWidget(m_reset);
     }
 
@@ -197,7 +197,7 @@ ComponentSelectionPagePrivate::ComponentSelectionPagePrivate(ComponentSelectionP
     m_searchAction->setIcon(QIcon(searchImageStr));
     m_searchLineEdit->addAction(m_searchAction, QLineEdit::TrailingPosition);
     m_searchLineEdit->setObjectName(QLatin1String("SearchLineEdit"));
-    m_searchLineEdit->setPlaceholderText(ComponentSelectionPage::tr("Search"));
+    m_searchLineEdit->setPlaceholderText(QLatin1String("Search"));
     m_searchLineEdit->setClearButtonEnabled(true);
     connect(m_searchLineEdit, &QLineEdit::textChanged,
             this, &ComponentSelectionPagePrivate::setSearchPattern);
@@ -277,7 +277,7 @@ void ComponentSelectionPagePrivate::showRepositoryCategories()
 {
     if (m_categoryCombobox)
         return;
-    m_categoryCombobox = new CategoryComboBox(tr("Show"));
+    m_categoryCombobox = new CategoryComboBox(QLatin1String("Show"));
     m_topHLayout->addWidget(m_categoryCombobox);
     m_categoryCombobox->setObjectName(QLatin1String("CategoryGroupBox"));
 
@@ -458,7 +458,7 @@ void ComponentSelectionPagePrivate::fetchRepositoryCategories()
 
     if (!m_core->fetchRemotePackagesTree()) {
         MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(),
-            QLatin1String("FailToFetchPackages"), tr("Error"), m_core->error());
+            QLatin1String("FailToFetchPackages"), QLatin1String("Error"), m_core->error());
     }
     updateWidgetVisibility(false);
     m_searchLineEdit->text().isEmpty() ? expandDefault() : expandSearchResults();
@@ -475,14 +475,14 @@ void ComponentSelectionPagePrivate::qbspButtonClicked()
     QString defaultDownloadDirectory =
         QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
     QStringList fileNames = QFileDialog::getOpenFileNames(nullptr,
-        ComponentSelectionPage::tr("Open File"),defaultDownloadDirectory,
+        QLatin1String("Open File"),defaultDownloadDirectory,
         QLatin1String("QBSP or 7z Files (*.qbsp *.7z)"));
 
     if (m_core->addQBspRepositories(fileNames)) {
         updateWidgetVisibility(true);
         if (!m_core->fetchCompressedPackagesTree()) {
             MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(),
-                QLatin1String("FailToFetchPackages"), tr("Error"), m_core->error());
+                QLatin1String("FailToFetchPackages"), QLatin1String("Error"), m_core->error());
         }
     }
     updateWidgetVisibility(false);
@@ -531,7 +531,7 @@ void ComponentSelectionPagePrivate::onModelStateChanged(QInstaller::ComponentMod
         const QString error = !m_core->componentsToInstallError().isEmpty()
             ? m_core->componentsToInstallError() : m_core->componentsToUninstallError();
         MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(),
-            QLatin1String("CalculateComponentsError"), tr("Error"), error);
+            QLatin1String("CalculateComponentsError"), QLatin1String("Error"), error);
     }
 
     q->setModified(state.testFlag(ComponentModel::DefaultChecked) == false);

@@ -54,8 +54,7 @@ int InstallerBase::run()
 {
     QString errorMessage;
     if (!init(errorMessage)) {
-        QInstaller::MessageBoxHandler::information(nullptr, QLatin1String("UnableToStart"),
-            tr("Unable to start installer"), errorMessage);
+        QInstaller::MessageBoxHandler::information(nullptr, QLatin1String("UnableToStart"), QLatin1String("Unable to start installer"), errorMessage);
         return EXIT_FAILURE;
     }
 

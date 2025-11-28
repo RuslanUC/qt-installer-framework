@@ -66,7 +66,7 @@ bool LineReplaceOperation::performOperation()
 
     if (searchString.isEmpty()) {
         setError(InvalidArguments);
-        setErrorString(tr("Invalid argument in %1: Empty search "
+        setErrorString(QLatin1String("Invalid argument in %1: Empty search "
             "argument is not supported.").arg(name()));
 
         return false;
@@ -75,7 +75,7 @@ bool LineReplaceOperation::performOperation()
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         setError(UserDefinedError);
-        setErrorString(tr("Cannot open file \"%1\" for reading: %2").arg(
+        setErrorString(QLatin1String("Cannot open file \"%1\" for reading: %2").arg(
                            QDir::toNativeSeparators(fileName), file.errorString()));
         return false;
     }
@@ -93,7 +93,7 @@ bool LineReplaceOperation::performOperation()
 
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         setError(UserDefinedError);
-        setErrorString(tr("Cannot open file \"%1\" for writing: %2").arg(
+        setErrorString(QLatin1String("Cannot open file \"%1\" for writing: %2").arg(
                            QDir::toNativeSeparators(fileName), file.errorString()));
         return false;
     }

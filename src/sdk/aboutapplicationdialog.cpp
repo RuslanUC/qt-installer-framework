@@ -52,9 +52,9 @@ AboutApplicationDialog::AboutApplicationDialog(QInstaller::PackageManagerCore *c
 
     const QString productName = core->value(QLatin1String("ProductName"));
     if (core->isInstaller())
-        setWindowTitle(tr("About %1 installer").arg(productName));
+        setWindowTitle(QLatin1String("About %1 installer").arg(productName));
     else
-        setWindowTitle(tr("About %1 Maintenance Tool").arg(productName));
+        setWindowTitle(QLatin1String("About %1 Maintenance Tool").arg(productName));
 
     QGridLayout *layout = new QGridLayout(this);
     layout->setSizeConstraint(QLayout::SetFixedSize);

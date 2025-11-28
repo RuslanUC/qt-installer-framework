@@ -60,14 +60,14 @@ bool LicenseOperation::performOperation()
     QVariantMap licenses = value(scLicensesValue).toMap();
     if (licenses.isEmpty()) {
         setError(UserDefinedError);
-        setErrorString(tr("No license files found to copy."));
+        setErrorString(QLatin1String("No license files found to copy."));
         return false;
     }
 
     PackageManagerCore *const core = packageManager();
     if (!core) {
         setError( UserDefinedError );
-        setErrorString(tr("Needed installer object in %1 operation is empty.").arg(name()));
+        setErrorString(QLatin1String("Needed installer object in %1 operation is empty.").arg(name()));
         return false;
     }
 
@@ -83,7 +83,7 @@ bool LicenseOperation::performOperation()
         QFile file(targetDir + QLatin1Char('/') + it.key());
         if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
             setError(UserDefinedError);
-            setErrorString(tr("Can not write license file \"%1\".").arg(QDir::toNativeSeparators(file.fileName())));
+            setErrorString(QLatin1String("Can not write license file \"%1\".").arg(QDir::toNativeSeparators(file.fileName())));
             return false;
         }
 

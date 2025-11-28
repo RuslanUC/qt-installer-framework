@@ -92,7 +92,7 @@ struct LocalPackageHub::PackagesInfoData
 void LocalPackageHub::PackagesInfoData::setInvalidContentError(const QString &detail)
 {
     error = LocalPackageHub::InvalidContentError;
-    errorMessage = tr("%1 contains invalid content: %2").arg(fileName, detail);
+    errorMessage = QLatin1String("%1 contains invalid content: %2").arg(fileName, detail);
 }
 
 /*!
@@ -253,14 +253,14 @@ void LocalPackageHub::refresh()
     // if the file does not exist then we just skip the reading
     if (!file.exists()) {
         d->error = NotYetReadError;
-        d->errorMessage = tr("The file %1 does not exist.").arg(d->fileName);
+        d->errorMessage = QLatin1String("The file %1 does not exist.").arg(d->fileName);
         return;
     }
 
     // Open Packages.xml
     if (!file.open(QFile::ReadOnly)) {
         d->error = CouldNotReadPackageFileError;
-        d->errorMessage = tr("Cannot open %1.").arg(d->fileName);
+        d->errorMessage = QLatin1String("Cannot open %1.").arg(d->fileName);
         return;
     }
 
@@ -269,7 +269,7 @@ void LocalPackageHub::refresh()
     QDomDocument::ParseResult result = doc.setContent(&file);
     if (!result) {
         d->error = InvalidXmlError;
-        d->errorMessage = tr("Parse error in %1 at %2, %3: %4")
+        d->errorMessage = QLatin1String("Parse error in %1 at %2, %3: %4")
                           .arg(d->fileName,
                                QString::number(result.errorLine),
                                QString::number(result.errorColumn),
@@ -281,7 +281,7 @@ void LocalPackageHub::refresh()
     // Now populate information from the XML file.
     QDomElement rootE = doc.documentElement();
     if (rootE.tagName() != QLatin1String("Packages")) {
-        d->setInvalidContentError(tr("Root element %1 unexpected, should be 'Packages'.")
+        d->setInvalidContentError(QLatin1String("Root element %1 unexpected, should be 'Packages'.")
             .arg(rootE.tagName()));
         return;
     }

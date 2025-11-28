@@ -487,7 +487,7 @@ void PackageManagerCore::writeMaintenanceTool()
         } catch (const Error &error) {
             qCritical() << "Error writing Maintenance Tool: " << error.message();
             MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(),
-                QLatin1String("WriteError"), tr("Error writing Maintenance Tool"), error.message(),
+                QLatin1String("WriteError"), QLatin1String("Error writing Maintenance Tool"), error.message(),
                 QMessageBox::Ok, QMessageBox::Ok);
         }
     }
@@ -849,7 +849,7 @@ int PackageManagerCore::downloadNeededArchives(double partProgressSize)
         return 0;
 
     ProgressCoordinator::instance()->emitLabelAndDetailTextChanged(QLatin1Char('\n')
-        + tr("Downloading packages..."));
+        + QLatin1String("Downloading packages..."));
 
     DownloadArchivesJob archivesJob(this, QLatin1String("downloadArchiveJob"));
     archivesJob.setAutoDelete(false);
@@ -878,9 +878,9 @@ int PackageManagerCore::downloadNeededArchives(double partProgressSize)
         throw Error(archivesJob.errorString());
 
     if (d->statusCanceledOrFailed())
-        throw Error(tr("Installation canceled by user."));
+        throw Error(QLatin1String("Installation canceled by user."));
 
-    ProgressCoordinator::instance()->emitAdditionalProgressStatus(tr("All downloads finished."));
+    ProgressCoordinator::instance()->emitAdditionalProgressStatus(QLatin1String("All downloads finished."));
     emit downloadArchivesFinished();
 
     return archivesJob.numberOfDownloads();
@@ -925,7 +925,7 @@ void PackageManagerCore::setNeedsHardRestart(bool needsHardRestart)
 */
 void PackageManagerCore::rollBackInstallation()
 {
-    emit titleMessageChanged(tr("Canceling the Installer"));
+    emit titleMessageChanged(QLatin1String("Canceling the Installer"));
 
     // this unregisters all operation progressChanged connected
     ProgressCoordinator::instance()->setUndoMode();
@@ -985,12 +985,11 @@ void PackageManagerCore::rollBackInstallation()
                 dropAdminRights();
         } catch (const Error &e) {
             MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(),
-                QLatin1String("ElevationError"), tr("Authentication Error"), tr("Some components "
+                QLatin1String("ElevationError"), QLatin1String("Authentication Error"), QLatin1String("Some components "
                 "could not be removed completely because administrative rights could not be acquired: %1.")
                 .arg(e.message()));
         } catch (...) {
-            MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("unknown"),
-                tr("Unknown error."), tr("Some components could not be removed completely because an unknown "
+            MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("unknown"), QLatin1String("Unknown error."), QLatin1String("Some components could not be removed completely because an unknown "
                 "error happened."));
         }
     }
@@ -1067,7 +1066,7 @@ QString PackageManagerCore::readConsoleLine(const QString &title, qint64 maxlen)
     if (!isCommandLineInstance())
         return QString();
     if (LoggingHandler::instance().outputRedirected()) {
-        throw Error(tr("User input is required but the output "
+        throw Error(QLatin1String("User input is required but the output "
             "device is not associated with a terminal."));
     }
     if (!title.isEmpty())
@@ -1148,21 +1147,18 @@ bool PackageManagerCore::installationAllowedToDirectory(const QString &targetDir
 
         QFileInfo fi2(targetDirectory + QDir::separator() + fileName);
         if (fi2.exists()) {
-            MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("TargetDirectoryInUse"),
-                tr("Error"), tr("The directory you selected already "
+            MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("TargetDirectoryInUse"), QLatin1String("Error"), QLatin1String("The directory you selected already "
                                 "exists and contains an installation. Choose a different target for installation."));
             return false;
         }
 
         QMessageBox::StandardButton bt =
-            MessageBoxHandler::warning(MessageBoxHandler::currentBestSuitParent(), QLatin1String("OverwriteTargetDirectory"),
-            tr("Warning"), tr("You have selected an existing, non-empty directory for installation.\nNote that it will be "
+            MessageBoxHandler::warning(MessageBoxHandler::currentBestSuitParent(), QLatin1String("OverwriteTargetDirectory"), QLatin1String("Warning"), QLatin1String("You have selected an existing, non-empty directory for installation.\nNote that it will be "
                               "completely wiped on uninstallation of this application.\nIt is not advisable to install into "
                               "this directory as installation might fail.\nDo you want to continue?"), QMessageBox::Yes | QMessageBox::No);
         return bt == QMessageBox::Yes;
     } else if (fi.isFile() || fi.isSymLink()) {
-        MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("WrongTargetDirectory"),
-            tr("Error"),  tr("You have selected an existing file "
+        MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("WrongTargetDirectory"), QLatin1String("Error"), QLatin1String("You have selected an existing file "
                              "or symlink, please choose a different target for installation."));
         return false;
     }
@@ -1176,17 +1172,17 @@ bool PackageManagerCore::installationAllowedToDirectory(const QString &targetDir
 QString PackageManagerCore::targetDirWarning(const QString &targetDirectory) const
 {
     if (targetDirectory.isEmpty())
-        return tr("The installation path cannot be empty, please specify a valid directory.");
+        return QLatin1String("The installation path cannot be empty, please specify a valid directory.");
 
     QDir target(targetDirectory);
     if (target.isRelative())
-        return tr("The installation path cannot be relative, please specify an absolute path.");
+        return QLatin1String("The installation path cannot be relative, please specify an absolute path.");
 
     QString nativeTargetDir = QDir::toNativeSeparators(target.absolutePath());
     if (!settings().allowNonAsciiCharacters()) {
         for (int i = 0; i < nativeTargetDir.length(); ++i) {
             if (nativeTargetDir.at(i).unicode() & 0xff80) {
-                return tr("The path or installation directory contains non ASCII characters. This "
+                return QLatin1String("The path or installation directory contains non ASCII characters. This "
                     "is currently not supported! Please choose a different path or installation "
                     "directory.");
             }
@@ -1195,7 +1191,7 @@ QString PackageManagerCore::targetDirWarning(const QString &targetDirectory) con
 
     target.setPath(target.canonicalPath());
     if (!target.path().isEmpty() && (target == QDir::root() || target == QDir::home())) {
-        return tr("As the install directory is completely deleted on uninstall, installing in %1 is forbidden.")
+        return QLatin1String("As the install directory is completely deleted on uninstall, installing in %1 is forbidden.")
             .arg(QDir::toNativeSeparators(target.path()));
     }
 
@@ -1203,7 +1199,7 @@ QString PackageManagerCore::targetDirWarning(const QString &targetDirectory) con
     // folder length (set by user) + maintenance tool name length (no extension) + extra padding
     if ((nativeTargetDir.length()
         + settings().maintenanceToolName().length() + 20) >= MAX_PATH) {
-        return tr("The path you have entered is too long, please make sure to "
+        return QLatin1String("The path you have entered is too long, please make sure to "
             "specify a valid path.");
     }
 
@@ -1218,7 +1214,7 @@ QString PackageManagerCore::targetDirWarning(const QString &targetDirectory) con
     const QString driveMatch = regMatch.captured(QLatin1String("drive"));
 
     if (ipMatch.isEmpty() && pathMatch.isEmpty() && driveMatch.isEmpty()) {
-        return tr("The path you have entered is not valid, please make sure to "
+        return QLatin1String("The path you have entered is not valid, please make sure to "
             "specify a valid target.");
     }
 
@@ -1232,14 +1228,14 @@ QString PackageManagerCore::targetDirWarning(const QString &targetDirectory) con
             }
         }
         if (!validDrive) {  // right now we can only verify local drives
-            return tr("The path you have entered is not valid, please make sure to "
+            return QLatin1String("The path you have entered is not valid, please make sure to "
                 "specify a valid drive.");
         }
         nativeTargetDir = nativeTargetDir.mid(2);
     }
 
     if (nativeTargetDir.endsWith(QLatin1Char('.')))
-        return tr("The installation path must not end with '.', please specify a valid directory.");
+        return QLatin1String("The installation path must not end with '.', please specify a valid directory.");
 
     QString ambiguousChars = QLatin1String("[\"~<>|?*!@#$%^&:,; ]"
         "|(\\\\CON)(\\\\|$)|(\\\\PRN)(\\\\|$)|(\\\\AUX)(\\\\|$)|(\\\\NUL)(\\\\|$)|(\\\\COM\\d)(\\\\|$)|(\\\\LPT\\d)(\\\\|$)");
@@ -1254,12 +1250,12 @@ QString PackageManagerCore::targetDirWarning(const QString &targetDirectory) con
     // check if there are not allowed characters in the target path
     QRegularExpressionMatch match = ambCharRegEx.match(nativeTargetDir);
     if (match.hasMatch()) {
-        return tr("The installation path must not contain \"%1\", "
+        return QLatin1String("The installation path must not contain \"%1\", "
             "please specify a valid directory.").arg(match.captured(0));
     }
 
     if(directoryContainsInstallation(targetDirectory)) {
-        return tr("Seems like specified directory already contains installation. You can either update existing installation or remove it.");
+        return QLatin1String("Seems like specified directory already contains installation. You can either update existing installation or remove it.");
     }
 
     return QString();
@@ -1539,14 +1535,14 @@ bool PackageManagerCore::fetchLocalPackagesTree()
     d->setStatus(Running);
 
     if (!isPackageManager()) {
-        d->setStatus(Failure, tr("Application not running in Package Manager mode."));
+        d->setStatus(Failure, QLatin1String("Application not running in Package Manager mode."));
         return false;
     }
 
     LocalPackagesMap installedPackages = d->localInstalledPackages();
     if (installedPackages.isEmpty()) {
         if (status() != Failure)
-            d->setStatus(Failure, tr("No installed packages found."));
+            d->setStatus(Failure, QLatin1String("No installed packages found."));
         return false;
     }
 
@@ -1751,7 +1747,7 @@ bool PackageManagerCore::fetchRemotePackagesTree(const QStringList& components)
     d->setStatus(Running);
 
     if (isUninstaller()) {
-        d->setStatus(Failure, tr("Application running in Uninstaller mode."));
+        d->setStatus(Failure, QLatin1String("Application running in Uninstaller mode."));
         return false;
     }
 
@@ -1818,7 +1814,7 @@ bool PackageManagerCore::fetchPackagesTree(const PackagesList &packages, const L
 
             if (!success && !d->statusCanceledOrFailed()) {
                 updateDisplayVersions(scRemoteDisplayVersion);
-                d->setStatus(ForceUpdate, tr("There is an important update available, please run the "
+                d->setStatus(ForceUpdate, QLatin1String("There is an important update available, please run the "
                     "updater first."));
                 return false;
             }
@@ -2349,7 +2345,7 @@ QString PackageManagerCore::componentResolveReasons() const
     QString htmlOutput;
     if (!componentsToInstallError().isEmpty()) {
         htmlOutput.append(QString::fromLatin1("<h2><font color=\"red\">%1</font></h2><ul>")
-            .arg(tr("Cannot resolve all dependencies.")));
+            .arg(QLatin1String("Cannot resolve all dependencies.")));
         //if we have a missing dependency or a recursion we can display it
         htmlOutput.append(QString::fromLatin1("<li> %1 </li>").arg(
             componentsToInstallError()));
@@ -2359,7 +2355,7 @@ QString PackageManagerCore::componentResolveReasons() const
 
     if (!componentsToUninstallError().isEmpty()) {
         htmlOutput.append(QString::fromLatin1("<h2><font color=\"red\">%1</font></h2><ul>")
-            .arg(tr("Cannot resolve components to uninstall.")));
+            .arg(QLatin1String("Cannot resolve components to uninstall.")));
         htmlOutput.append(QString::fromLatin1("<li> %1 </li>").arg(
             componentsToUninstallError()));
         htmlOutput.append(QLatin1String("</ul>"));
@@ -2369,7 +2365,7 @@ QString PackageManagerCore::componentResolveReasons() const
     QList<Component*> componentsToRemove = componentsToUninstall();
     if (!componentsToRemove.isEmpty()) {
         QMap<QString, QStringList> orderedUninstallReasons;
-        htmlOutput.append(QString::fromLatin1("<h3>%1</h3><ul>").arg(tr("Components about to "
+        htmlOutput.append(QString::fromLatin1("<h3>%1</h3><ul>").arg(QLatin1String("Components about to "
             "be removed:")));
         for (const Component *component : std::as_const(componentsToRemove)) {
             const QString reason = uninstallReason(component);
@@ -2816,13 +2812,13 @@ bool PackageManagerCore::checkComponentsForInstallation(const QStringList &names
             // No such component, check if we have an alias by the name
             if (ComponentAlias *alias = aliasByName(name)) {
                 if (alias->isUnstable()) {
-                    errorMessage.append(tr("Cannot select alias %1. There was a problem loading this alias, "
+                    errorMessage.append(QLatin1String("Cannot select alias %1. There was a problem loading this alias, "
                         "so it is marked unstable and cannot be selected.").arg(name) + QLatin1Char('\n'));
                     unstableAliasFound = true;
                     setCanceled();
                     return false;
                 } else if (alias->isVirtual()) {
-                    errorMessage.append(tr("Cannot select %1. Alias is marked virtual, meaning it cannot "
+                    errorMessage.append(QLatin1String("Cannot select %1. Alias is marked virtual, meaning it cannot "
                         "be selected manually.").arg(name) + QLatin1Char('\n'));
                     continue;
                 } else if (alias->missingOptionalComponents() && !fallbackReposFetched) {
@@ -2834,7 +2830,7 @@ bool PackageManagerCore::checkComponentsForInstallation(const QStringList &names
                 alias->setSelected(true);
                 installComponentsFound = true;
             } else {
-                errorMessage.append(tr("Cannot install %1. Component not found.").arg(name) + QLatin1Char('\n'));
+                errorMessage.append(QLatin1String("Cannot install %1. Component not found.").arg(name) + QLatin1Char('\n'));
             }
 
             continue;
@@ -2844,17 +2840,17 @@ bool PackageManagerCore::checkComponentsForInstallation(const QStringList &names
             if ((model->data(idx, Qt::CheckStateRole) == QVariant()) && !component->forcedInstallation()) {
                 // User cannot select the component, check why
                 if (component->autoDependencies().count() > 0) {
-                    errorMessage.append(tr("Cannot install component %1. Component is installed only as automatic "
+                    errorMessage.append(QLatin1String("Cannot install component %1. Component is installed only as automatic "
                         "dependency to %2.").arg(name, component->autoDependencies().join(QLatin1Char(','))) + QLatin1Char('\n'));
                 } else if (!component->isCheckable()) {
-                    errorMessage.append(tr("Cannot install component %1. Component is not checkable, meaning you "
+                    errorMessage.append(QLatin1String("Cannot install component %1. Component is not checkable, meaning you "
                         "have to select one of the subcomponents.").arg(name) + QLatin1Char('\n'));
                 } else if (component->isUnstable()) {
-                    errorMessage.append(tr("Cannot install component %1. There was a problem loading this component, "
+                    errorMessage.append(QLatin1String("Cannot install component %1. There was a problem loading this component, "
                         "so it is marked unstable and cannot be selected.").arg(name) + QLatin1Char('\n'));
                 }
             } else if (component->isInstalled()) {
-                errorMessage.append(tr("Component %1 already installed").arg(name) + QLatin1Char('\n'));
+                errorMessage.append(QLatin1String("Component %1 already installed").arg(name) + QLatin1Char('\n'));
             } else {
                 model->setData(idx, Qt::Checked, Qt::CheckStateRole);
                 installComponentsFound = true;
@@ -2868,7 +2864,7 @@ bool PackageManagerCore::checkComponentsForInstallation(const QStringList &names
                         // We already checked the root component if there is no parent
                         return false;
                     } else if (trace->isVirtual()) {
-                        errorMessage.append(tr("Cannot install %1. Component is a descendant "
+                        errorMessage.append(QLatin1String("Cannot install %1. Component is a descendant "
                             "of a virtual component %2.").arg(name, trace->name()) + QLatin1Char('\n'));
                         return true;
                     }
@@ -2876,9 +2872,9 @@ bool PackageManagerCore::checkComponentsForInstallation(const QStringList &names
             };
             // idx is invalid and component valid when we have invisible virtual component
             if (component->isVirtual())
-                errorMessage.append(tr("Cannot install %1. Component is virtual.").arg(name) + QLatin1Char('\n'));
+                errorMessage.append(QLatin1String("Cannot install %1. Component is virtual.").arg(name) + QLatin1Char('\n'));
             else if (!isDescendantOfVirtual())
-                errorMessage.append(tr("Cannot install %1. Component not found.").arg(name) + QLatin1Char('\n'));
+                errorMessage.append(QLatin1String("Cannot install %1. Component not found.").arg(name) + QLatin1Char('\n'));
         }
     }
     if (!installComponentsFound)
@@ -3232,12 +3228,12 @@ bool PackageManagerCore::gainAdminRights()
         return true;
 
     if (isCommandLineInstance()) {
-        throw Error(tr("Cannot elevate access rights while running from command line. "
+        throw Error(QLatin1String("Cannot elevate access rights while running from command line. "
                        "Please restart the application as administrator."));
     }
     RemoteClient::instance().setActive(true);
     if (!RemoteClient::instance().isActive())
-        throw Error(tr("Error while elevating access rights."));
+        throw Error(QLatin1String("Error while elevating access rights."));
     return true;
 }
 
@@ -3332,7 +3328,7 @@ bool PackageManagerCore::checkAvailableSpace()
         }
 
         if (required > 0 && cacheOnSameVolume && (installVolumeAvailableSize <= (static_cast<quint64>(required) + tempRequired))) {
-            m_availableSpaceMessage = tr("Not enough disk space to store temporary files and the "
+            m_availableSpaceMessage = QLatin1String("Not enough disk space to store temporary files and the "
                 "installation. %1 are available, while the minimum required is %2.").arg(
                 humanReadableSize(installVolumeAvailableSize), humanReadableSize(required + tempRequired));
             emit availableSpaceChanged(SpaceInfo::SpaceExceeded);
@@ -3340,7 +3336,7 @@ bool PackageManagerCore::checkAvailableSpace()
         }
 
         if (required > 0 && installVolumeAvailableSize < static_cast<quint64>(required)) {
-            m_availableSpaceMessage = tr("Not enough disk space to store all selected components! %1 are "
+            m_availableSpaceMessage = QLatin1String("Not enough disk space to store all selected components! %1 are "
                 "available, while the minimum required is %2.").arg(humanReadableSize(installVolumeAvailableSize),
                 humanReadableSize(required));
             emit availableSpaceChanged(SpaceInfo::SpaceExceeded);
@@ -3348,7 +3344,7 @@ bool PackageManagerCore::checkAvailableSpace()
         }
 
         if (cacheVolumeAvailableSize < tempRequired) {
-            m_availableSpaceMessage = tr("Not enough disk space to store temporary files! %1 are available, "
+            m_availableSpaceMessage = QLatin1String("Not enough disk space to store temporary files! %1 are available, "
                 "while the minimum required is %2. You may select another location for the "
                 "temporary files by modifying the local cache path from the installer settings.")
                 .arg(humanReadableSize(cacheVolumeAvailableSize), humanReadableSize(tempRequired));
@@ -3358,16 +3354,16 @@ bool PackageManagerCore::checkAvailableSpace()
 
         if (required > 0 && installVolumeAvailableSize - static_cast<quint64>(required) < 0.01 * targetVolume.size()) {
             // warn for less than 1% of the volume's space being free
-            m_availableSpaceMessage = tr("The volume you selected for installation seems to have sufficient space for "
+            m_availableSpaceMessage = QLatin1String("The volume you selected for installation seems to have sufficient space for "
                 "installation, but there will be less than 1% of the volume's space available afterwards.");
         } else if (required > 0 && installVolumeAvailableSize -  static_cast<quint64>(required) < 100 * 1024 * 1024LL) {
             // warn for less than 100MB being free
-            m_availableSpaceMessage = tr("The volume you selected for installation seems to have sufficient "
+            m_availableSpaceMessage = QLatin1String("The volume you selected for installation seems to have sufficient "
                 "space for installation, but there will be less than 100 MB available afterwards.");
         }
 #ifdef Q_OS_WIN
         if (isOfflineGenerator() && required > 0 && (static_cast<quint64>(required) > UINT_MAX)) {
-            m_availableSpaceMessage = tr("The estimated installer size %1 would exceed the supported executable "
+            m_availableSpaceMessage = QLatin1String("The estimated installer size %1 would exceed the supported executable "
                 "size limit of %2. The application may not be able to run.")
                 .arg(humanReadableSize(required), humanReadableSize(UINT_MAX));
             emit availableSpaceChanged(SpaceInfo::ExecutableSizeExceeded);
@@ -3377,8 +3373,8 @@ bool PackageManagerCore::checkAvailableSpace()
     }
     m_availableSpaceMessage = QString::fromLatin1("%1 %2").arg(m_availableSpaceMessage,
         (isOfflineGenerator()
-            ? tr("Created installer will use %1 of disk space.")
-            : tr("Installation will use %1 of disk space."))
+            ? QLatin1String("Created installer will use %1 of disk space.")
+            : QLatin1String("Installation will use %1 of disk space."))
         .arg(humanReadableSize(requiredDiskSpace()))).simplified();
 
     if (required < 0 || required < scRecommendedMaxSize)
@@ -4516,8 +4512,7 @@ bool PackageManagerCore::fetchAllPackages(const PackagesList &remotes, const Loc
         d->setStatus(PackageManagerCore::Failure, error.message());
 
         // TODO: make sure we remove all message boxes inside the library at some point.
-        MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("Error"),
-            tr("Error"), error.message());
+        MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("Error"), QLatin1String("Error"), error.message());
         return false;
     }
 
@@ -4690,8 +4685,7 @@ bool PackageManagerCore::fetchUpdaterPackages(const PackagesList &remotes, const
         d->setStatus(Failure, error.message());
 
         // TODO: make sure we remove all message boxes inside the library at some point.
-        MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("Error"),
-            tr("Error"), error.message());
+        MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("Error"), QLatin1String("Error"), error.message());
         return false;
     }
 
@@ -4796,7 +4790,7 @@ void PackageManagerCore::updateDisplayVersions(const QString &displayKey)
         const QString displayVersionRemote = findDisplayVersion(key, componentsHash,
             scVersion, visited);
         if (displayVersionRemote.isEmpty())
-            componentsHash.value(key)->setValue(displayKey, tr("Invalid"));
+            componentsHash.value(key)->setValue(displayKey, QLatin1String("Invalid"));
         else
             componentsHash.value(key)->setValue(displayKey, displayVersionRemote);
     }
@@ -4826,17 +4820,17 @@ ComponentModel *PackageManagerCore::componentModel(PackageManagerCore *core, con
 
     model->setObjectName(objectName);
     model->setHeaderData(ComponentModelHelper::NameColumn, Qt::Horizontal,
-        ComponentModel::tr("Component Name"));
+        QLatin1String("Component Name"));
     model->setHeaderData(ComponentModelHelper::ActionColumn, Qt::Horizontal,
-        ComponentModel::tr("Action"));
+        QLatin1String("Action"));
     model->setHeaderData(ComponentModelHelper::InstalledVersionColumn, Qt::Horizontal,
-        ComponentModel::tr("Installed Version"));
+        QLatin1String("Installed Version"));
     model->setHeaderData(ComponentModelHelper::NewVersionColumn, Qt::Horizontal,
-        ComponentModel::tr("New Version"));
+        QLatin1String("New Version"));
     model->setHeaderData(ComponentModelHelper::ReleaseDateColumn, Qt::Horizontal,
-        ComponentModel::tr("Release Date"));
+        QLatin1String("Release Date"));
     model->setHeaderData(ComponentModelHelper::UncompressedSizeColumn, Qt::Horizontal,
-        ComponentModel::tr("Size"));
+        QLatin1String("Size"));
 
     return model;
 }

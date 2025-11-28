@@ -229,7 +229,7 @@ bool CreateShortcutOperation::performOperation()
 {
     ensureOptionalArgumentsRead();
 
-    if (!checkArgumentCount(2, 3, tr("<target> <link location> [target arguments] "
+    if (!checkArgumentCount(2, 3, QLatin1String("<target> <link location> [target arguments] "
                                      "[\"workingDirectory=...\"] [\"iconPath=...\"] [\"iconId=...\"] "
                                      "[\"description=...\"]"))) {
         return false;
@@ -249,11 +249,11 @@ bool CreateShortcutOperation::performOperation()
 #if defined(Q_OS_WIN) && !defined(Q_CC_MINGW)
         char msg[128];
         if (strerror_s(msg, sizeof msg, errno) != 0) {
-            setErrorString(tr("Cannot create directory \"%1\": %2").arg(QDir::toNativeSeparators(linkPath),
+            setErrorString(QLatin1String("Cannot create directory \"%1\": %2").arg(QDir::toNativeSeparators(linkPath),
                 QString::fromLocal8Bit(msg)));
         }
 #else
-        setErrorString(tr("Cannot create directory \"%1\": %2").arg(QDir::toNativeSeparators(linkPath),
+        setErrorString(QLatin1String("Cannot create directory \"%1\": %2").arg(QDir::toNativeSeparators(linkPath),
             QString::fromLocal8Bit(strerror(errno))));
 #endif
         return false;
@@ -263,7 +263,7 @@ bool CreateShortcutOperation::performOperation()
     QString errorString;
     if (QFile::exists(linkLocation) && !deleteFileNowOrLater(linkLocation, &errorString)) {
         setError(UserDefinedError);
-        setErrorString(tr("Failed to overwrite \"%1\": %2").arg(QDir::toNativeSeparators(linkLocation),
+        setErrorString(QLatin1String("Failed to overwrite \"%1\": %2").arg(QDir::toNativeSeparators(linkLocation),
             errorString));
         return false;
     }
@@ -272,7 +272,7 @@ bool CreateShortcutOperation::performOperation()
                                    m_description);
     if (!linked) {
         setError(UserDefinedError);
-        setErrorString(tr("Cannot create link \"%1\": %2").arg(QDir::toNativeSeparators(linkLocation),
+        setErrorString(QLatin1String("Cannot create link \"%1\": %2").arg(QDir::toNativeSeparators(linkLocation),
             qt_error_string()));
         return false;
     }

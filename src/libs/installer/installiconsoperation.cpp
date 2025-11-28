@@ -105,7 +105,7 @@ void InstallIconsOperation::backup()
 
 bool InstallIconsOperation::performOperation()
 {
-    if (!checkArgumentCount(1, 2, tr("<source path> [vendor prefix]")))
+    if (!checkArgumentCount(1, 2, QLatin1String("<source path> [vendor prefix]")))
         return false;
 
     const QStringList args = arguments();
@@ -114,7 +114,7 @@ bool InstallIconsOperation::performOperation()
 
     if (source.isEmpty()) {
         setError(InvalidArguments);
-        setErrorString(tr("Invalid Argument: source directory must not be empty."));
+        setErrorString(QLatin1String("Invalid Argument: source directory must not be empty."));
         return false;
     }
 
@@ -164,7 +164,7 @@ bool InstallIconsOperation::performOperation()
                     backup = generateTemporaryFileName(target);
                 } catch (const QInstaller::Error &e) {
                     setError(UserDefinedError);
-                    setErrorString(tr("Cannot prepare to backup file \"%1\": %2")
+                    setErrorString(QLatin1String("Cannot prepare to backup file \"%1\": %2")
                         .arg(QDir::toNativeSeparators(target), e.message()));
                     undoOperation();
                     return false;
@@ -172,7 +172,7 @@ bool InstallIconsOperation::performOperation()
                 QFile bf(target);
                 if (!bf.copy(backup)) {
                     setError(UserDefinedError);
-                    setErrorString(tr("Cannot backup file \"%1\": %2").arg(
+                    setErrorString(QLatin1String("Cannot backup file \"%1\": %2").arg(
                                        QDir::toNativeSeparators(target), bf.errorString()));
                     undoOperation();
                     return false;
@@ -186,7 +186,7 @@ bool InstallIconsOperation::performOperation()
                 QString errStr;
                 if (!deleteFileNowOrLater(target, &errStr)) {
                     setError(UserDefinedError);
-                    setErrorString(tr("Failed to overwrite \"%1\": %2").arg(
+                    setErrorString(QLatin1String("Failed to overwrite \"%1\": %2").arg(
                                        QDir::toNativeSeparators(target), errStr));
                     undoOperation();
                     return false;
@@ -198,7 +198,7 @@ bool InstallIconsOperation::performOperation()
             QFile cf(source2);
             if (!cf.copy(target)) {
                 setError(UserDefinedError);
-                setErrorString(tr("Failed to copy file \"%1\": %2").arg(
+                setErrorString(QLatin1String("Failed to copy file \"%1\": %2").arg(
                                    QDir::toNativeSeparators(target), cf.errorString()));
                 undoOperation();
                 return false;
@@ -209,7 +209,7 @@ bool InstallIconsOperation::performOperation()
             setValue(QLatin1String("files"), files);
         } else if (fi.isDir() && !QDir(target).exists()) {
             if (!QDir().mkpath(target)) {
-                setErrorString(tr("Cannot create directory \"%1\": %2").arg(
+                setErrorString(QLatin1String("Cannot create directory \"%1\": %2").arg(
                                    QDir::toNativeSeparators(target), qt_error_string()));
                 undoOperation();
                 return false;

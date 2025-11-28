@@ -62,21 +62,21 @@ bool ConsumeOutputOperation::performOperation()
     // 3. argument for the executable
     // 4. more arguments possible ...
 
-    if (!checkArgumentCount(2, INT_MAX, tr("<to be saved installer key name> "
+    if (!checkArgumentCount(2, INT_MAX, QLatin1String("<to be saved installer key name> "
                                            "<executable> [argument1] [argument2] [...]")))
         return false;
 
     PackageManagerCore *const core = packageManager();
     if (!core) {
         setError(UserDefinedError);
-        setErrorString(tr("Needed installer object in %1 operation is empty.").arg(name()));
+        setErrorString(QLatin1String("Needed installer object in %1 operation is empty.").arg(name()));
         return false;
     }
 
     const QString installerKeyName = arguments().at(0);
     if (installerKeyName.isEmpty()) {
         setError(UserDefinedError);
-        setErrorString(tr("Cannot save the output of \"%1\" to an empty installer key value.").arg(
+        setErrorString(QLatin1String("Cannot save the output of \"%1\" to an empty installer key value.").arg(
             QDir::toNativeSeparators(arguments().at(1))));
         return false;
     }
@@ -100,7 +100,7 @@ bool ConsumeOutputOperation::performOperation()
                     << process.readAllStandardOutput() << "error output: "
                     << process.readAllStandardError();
                 setError(UserDefinedError);
-                setErrorString(tr("Failed to run command: \"%1\": %2").arg(
+                setErrorString(QLatin1String("Failed to run command: \"%1\": %2").arg(
                     QDir::toNativeSeparators(executable), process.errorString()));
                 return false;
             }

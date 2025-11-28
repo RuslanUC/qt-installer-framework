@@ -53,7 +53,7 @@ UpdatesInfoData::~UpdatesInfoData()
 void UpdatesInfoData::setInvalidContentError(const QString &detail)
 {
     error = UpdatesInfo::InvalidContentError;
-    errorMessage = tr("Updates.xml contains invalid content: %1").arg(detail);
+    errorMessage = QLatin1String("Updates.xml contains invalid content: %1").arg(detail);
 }
 
 void UpdatesInfoData::parseFile(const QString &updateXmlFile)
@@ -61,7 +61,7 @@ void UpdatesInfoData::parseFile(const QString &updateXmlFile)
     QFile file(updateXmlFile);
     if (!file.open(QFile::ReadOnly)) {
         error = UpdatesInfo::CouldNotReadUpdateInfoFileError;
-        errorMessage = tr("Cannot read \"%1\"").arg(updateXmlFile);
+        errorMessage = QLatin1String("Cannot read \"%1\"").arg(updateXmlFile);
         return;
     }
 
@@ -81,18 +81,18 @@ void UpdatesInfoData::parseFile(const QString &updateXmlFile)
                 }
             }
         } else {
-            setInvalidContentError(tr("Root element %1 unexpected, should be \"Updates\".").arg(reader.name()));
+            setInvalidContentError(QLatin1String("Root element %1 unexpected, should be \"Updates\".").arg(reader.name()));
             return;
         }
     }
 
     if (applicationName.isEmpty()) {
-        setInvalidContentError(tr("ApplicationName element is missing."));
+        setInvalidContentError(QLatin1String("ApplicationName element is missing."));
         return;
     }
 
     if (applicationVersion.isEmpty()) {
-        setInvalidContentError(tr("ApplicationVersion element is missing."));
+        setInvalidContentError(QLatin1String("ApplicationVersion element is missing."));
         return;
     }
 
@@ -154,15 +154,15 @@ bool UpdatesInfoData::parsePackageUpdateElement(QXmlStreamReader &reader)
         info.data.insert(QLatin1String("Script"), scriptHash);
 
     if (!info.data.contains(QLatin1String("Name"))) {
-        setInvalidContentError(tr("PackageUpdate element without Name"));
+        setInvalidContentError(QLatin1String("PackageUpdate element without Name"));
         return false;
     }
     if (!info.data.contains(QLatin1String("Version"))) {
-        setInvalidContentError(tr("PackageUpdate element without Version"));
+        setInvalidContentError(QLatin1String("PackageUpdate element without Version"));
         return false;
     }
     if (!info.data.contains(QLatin1String("ReleaseDate"))) {
-        setInvalidContentError(tr("PackageUpdate element without ReleaseDate"));
+        setInvalidContentError(QLatin1String("PackageUpdate element without ReleaseDate"));
         return false;
     }
     updateInfoList.append(info);

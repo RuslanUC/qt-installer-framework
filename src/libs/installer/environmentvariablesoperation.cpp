@@ -106,7 +106,7 @@ bool handleRegExpandSz(const QString &regPath, const QString &name,
                 RegCloseKey(handle);
             }
             if (res != ERROR_SUCCESS) {
-                *errorString = UpdateOperation::tr("Cannot write to registry path %1.").arg(regPath);
+                *errorString = QLatin1String("Cannot write to registry path %1.").arg(regPath);
                 *error = true;
             }
         }
@@ -131,7 +131,7 @@ UpdateOperation::Error writeSetting(const QString &regPath,
     oldValue->clear();
     SettingsType registry(regPath, QSettings::NativeFormat);
     if (!registry.isWritable()) {
-        *errorString = UpdateOperation::tr("Registry path %1 is not writable.").arg(regPath);
+        *errorString = QLatin1String("Registry path %1 is not writable.").arg(regPath);
         return UpdateOperation::UserDefinedError;
     }
 
@@ -147,7 +147,7 @@ UpdateOperation::Error writeSetting(const QString &regPath,
     registry.sync();
 
     if (registry.status() != QSettingsWrapper::NoError) {
-        *errorString = UpdateOperation::tr("Cannot write to registry path %1.").arg(regPath);
+        *errorString = QLatin1String("Cannot write to registry path %1.").arg(regPath);
         return UpdateOperation::UserDefinedError;
     }
 

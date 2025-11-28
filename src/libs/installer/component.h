@@ -121,7 +121,6 @@ public:
     void loadComponentScript(const bool postLoad = false);
     void evaluateComponentScript(const QString &fileName, const bool postScriptContext = false);
 
-    void loadTranslations(const QDir &directory, const QStringList &qms);
     void loadLicenses(const QString &directory, const QHash<QString, QVariant> &hash);
     void loadXMLOperations();
     void loadXMLExtractOperations();

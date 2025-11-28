@@ -55,19 +55,19 @@ bool SelfRestartOperation::performOperation()
     PackageManagerCore *const core = packageManager();
     if (!core) {
         setError(UserDefinedError);
-        setErrorString(tr("Installer object needed in operation %1 is empty.").arg(name()));
+        setErrorString(QLatin1String("Installer object needed in operation %1 is empty.").arg(name()));
         return false;
     }
 
     if (!core->isMaintainer()) {
         setError(UserDefinedError);
-        setErrorString(tr("Self Restart: Only valid within updater or package manager mode."));
+        setErrorString(QLatin1String("Self Restart: Only valid within updater or package manager mode."));
         return false;
     }
 
     if (!arguments().isEmpty()) {
         setError(InvalidArguments);
-        setErrorString(tr("Self Restart: Invalid arguments"));
+        setErrorString(QLatin1String("Self Restart: Invalid arguments"));
         return false;
     }
     SelfRestarter::setRestartOnQuit(true);

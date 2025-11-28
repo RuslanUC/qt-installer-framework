@@ -42,7 +42,6 @@
 #include "updateoperationfactory.h"
 
 #include <QtCore/QDirIterator>
-#include <QtCore/QTranslator>
 #include <QtCore/QRegularExpression>
 
 #include <QApplication>
@@ -344,11 +343,6 @@ void Component::loadDataFromPackage(const Package &package)
 
     setLocalTempPath(QInstaller::pathFromUrl(package.packageSource().url));
 
-#ifndef IFW_DISABLE_TRANSLATIONS
-    const QStringList qms = QInstaller::splitStringWithComma(package.data(scTranslations).toString());
-    if (!qms.isEmpty())
-        loadTranslations(QDir(scTwoArgs.arg(localTempPath(), name())), qms);
-#endif
     QHash<QString, QVariant> licenseHash = package.data(scLicenses).toHash();
     if (!licenseHash.isEmpty())
         loadLicenses(scTwoArgs.arg(localTempPath(), name()), licenseHash);
@@ -502,7 +496,7 @@ Component *Component::parentComponent() const
 void Component::appendComponent(Component *component)
 {
     if (d->m_core->isUpdater())
-        throw Error(tr("Components cannot have children in updater mode."));
+        throw Error(QLatin1String("Components cannot have children in updater mode."));
 
     if (!component->isVirtual()) {
         const QList<Component *> virtualChildComponents = d->m_allChildComponents.mid(d->m_childComponents.count());
@@ -628,46 +622,8 @@ void Component::evaluateComponentScript(const QString &fileName, const bool post
     languageChanged();
 }
 
-/*!
-    \internal
-    Calls the script method retranslateUi(), if any. This is done whenever a
-    QTranslator file is being loaded.
-*/
 void Component::languageChanged()
 {
-}
-
-/*!
-    Loads the translations matching the name filters \a qms inside \a directory. Only translations
-    with a base name matching the current locale's name are loaded. For more information, see
-    \l{Translating Pages}.
-*/
-void Component::loadTranslations(const QDir &directory, const QStringList &qms)
-{
-    QDirIterator it(directory.path(), qms, QDir::Files);
-    const QStringList translations = d->m_core->settings().translations();
-    const QString uiLanguage = QLocale().uiLanguages().value(0, scEn);
-    while (it.hasNext()) {
-        const QString filename = it.next();
-        const QString basename = QFileInfo(filename).baseName();
-
-        if (!translations.isEmpty()) {
-            bool found = false;
-            foreach (const QString &translation, translations)
-                found |= translation.startsWith(scIfw_ + basename, Qt::CaseInsensitive);
-            if (!found) // don't load the file if it does match the UI language but is not allowed to be used
-                continue;
-        } else if (!uiLanguage.startsWith(QFileInfo(filename).baseName(), Qt::CaseInsensitive)) {
-            continue; // do not load the file if it does not match the UI language
-        }
-
-        std::unique_ptr<QTranslator> translator(new QTranslator(this));
-        if (translator->load(filename)) {
-            // Do not throw if translator returns false as it may just be an intentionally
-            // empty file. See also QTBUG-31031
-            qApp->installTranslator(translator.release());
-        }
-    }
 }
 
 /*!
@@ -705,7 +661,7 @@ void Component::loadLicenses(const QString &directory, const QHash<QString, QVar
 
         QFile file(fileInfo.filePath());
         if (!file.open(QIODevice::ReadOnly)) {
-            throw Error(tr("Cannot open the requested license file \"%1\": %2.\n\n%3 \"%4\"").arg(
+            throw Error(QLatin1String("Cannot open the requested license file \"%1\": %2.\n\n%3 \"%4\"").arg(
                             file.fileName(), file.errorString(), tr(scClearCacheHint), packageManagerCore()->settings().localCachePath()));
         }
         QTextStream stream(&file);
@@ -1116,7 +1072,7 @@ Operation *Component::createOperation(const QString &operationName, const QStrin
     if (operation == 0) {
         const QMessageBox::StandardButton button =
             MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(),
-            QLatin1String("OperationDoesNotExistError"), tr("Error"), tr("Error: Operation %1 does not exist.")
+            QLatin1String("OperationDoesNotExistError"), QLatin1String("Error"), QLatin1String("Error: Operation %1 does not exist.")
                 .arg(operationName), QMessageBox::Abort | QMessageBox::Ignore, QMessageBox::Abort);
         if (button == QMessageBox::Abort)
             d->m_operationsCreatedSuccessfully = false;
@@ -1633,10 +1589,10 @@ void Component::updateModelData(const QString &key, const QString &data)
             tooltipText = QString::fromLatin1("<html><body>%1</body></html>").arg(d->m_vars.value(scDescription));
         } else {
             tooltipText = d->m_vars.value(scDescription) + scBr + scBr
-                          + tr("Update Info: ") + updateInfo;
+                          + QLatin1String("Update Info: ") + updateInfo;
         }
         if (isUnstable()) {
-            tooltipText += scBr + tr("There was an error loading the selected component. "
+            tooltipText += scBr + QLatin1String("There was an error loading the selected component. "
                                                       "This component cannot be installed.");
         }
         static const QRegularExpression externalLinkRegexp(QLatin1String("{external-link}='(.*?)'"));

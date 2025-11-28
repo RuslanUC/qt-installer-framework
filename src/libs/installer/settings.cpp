@@ -305,7 +305,7 @@ Settings Settings::fromFileAndPrefix(const QString &path, const QString &prefix,
         file.setFileName(overrideConfig.fileName());
 
     if (!file.open(QIODevice::ReadOnly))
-        throw Error(tr("Cannot open settings file %1 for reading: %2").arg(path, file.errorString()));
+        throw Error(QLatin1String("Cannot open settings file %1 for reading: %2").arg(path, file.errorString()));
 
     QXmlStreamReader reader(&file);
     if (reader.readNextStartElement()) {
@@ -1027,7 +1027,7 @@ void Settings::setSaveDefaultRepositories(bool save)
 QString Settings::repositoryCategoryDisplayName() const
 {
     QString displayName = d->m_data.value(QLatin1String(scRepositoryCategoryDisplayName)).toString();
-    return displayName.isEmpty() ? tr("Categories") : displayName;
+    return displayName.isEmpty() ? QLatin1String("Categories") : displayName;
 }
 
 void Settings::setRepositoryCategoryDisplayName(const QString& name)

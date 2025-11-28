@@ -57,7 +57,6 @@
 #include <QUuid>
 #include <QMessageBox>
 #include <QMetaEnum>
-#include <QTranslator>
 
 #include <QNetworkInformation>
 
@@ -105,7 +104,7 @@ public:
         // we should check this and prompt the user to run the executable as admin if needed.
         if (!binary.open(QIODevice::ReadOnly)) {
             QFileInfo binaryInfo(binary.fileName());
-            errorMessage = QObject::tr("Please make sure that the current user has read access "
+            errorMessage = QLatin1String("Please make sure that the current user has read access "
                 "to file \"%1\" or try running %2 as an administrator.").arg(binaryInfo.fileName(), qAppName());
             return false;
         }
@@ -172,7 +171,7 @@ public:
 
         dumpResourceTree();
 
-        SDKApp::registerMetaResources(manager.collectionByName("QResources"));
+        registerMetaResources(manager.collectionByName("QResources"));
         QInstaller::BinaryFormatEngineHandler::instance()->registerResources(manager.collections());
 
         const QHash<QString, QString> userArgs = userArguments();
@@ -191,34 +190,6 @@ public:
         }
 
         QLocale lang = QLocale::English;
-#ifndef IFW_DISABLE_TRANSLATIONS
-        if (!isCommandLineInterface) {
-            const QStringList translations = m_core->settings().translations();
-            if (translations.isEmpty()) {
-                if (m_parser.isSet(CommandLineOptions::scLanguage)) {
-                    const QLocale locale(m_parser.value(CommandLineOptions::scLanguage));
-                    if (localeFound(locale))
-                        lang = locale;
-                } else {
-                    for (const QString &language : QLocale().uiLanguages()) {
-                        const QLocale locale(language);
-                        if (localeFound(locale)) {
-                            lang = locale;
-                            break;
-                        }
-                    }
-                }
-            } else {
-                foreach (const QString &translation, translations) {
-                    std::unique_ptr<QTranslator> translator(new QTranslator(QCoreApplication::instance()));
-                    if (translator->load(translation, QLatin1String(":/translations")))
-                        QCoreApplication::instance()->installTranslator(translator.release());
-                }
-                QLocale currentLocale(translations.at(0).section(QLatin1Char('_'), 1));
-                lang = currentLocale;
-            }
-        }
-#endif
 
         if (m_runCheck.isRunning(RunOnceChecker::ConditionFlag::Lockfile)) {
             // It is possible to install an application and thus the maintenance tool into a
@@ -226,7 +197,7 @@ public:
             // cannot be done without requesting credentials from the user, we silently ignore
             // the fact that we could not create the lock file and check the running processes.
             if (m_runCheck.isRunning(RunOnceChecker::ConditionFlag::ProcessList)) {
-                errorMessage = QObject::tr("Another %1 instance is already running. Wait "
+                errorMessage = QLatin1String("Another %1 instance is already running. Wait "
                         "until it finishes, close it, or restart your system.").arg(qAppName());
                 return false;
             }
@@ -236,16 +207,16 @@ public:
         // QT_USE_SYSTEM_PROXIES false then system proxies are not used by default.
         if (m_parser.isSet(CommandLineOptions::scNoProxyLong)) {
             m_core->settings().setProxyType(QInstaller::Settings::NoProxy);
-            KDUpdater::FileDownloaderFactory::instance().setProxyFactory(m_core->proxyFactory());
+            KDUpdater::FileDownloaderFactory::setProxyFactory(m_core->proxyFactory());
         } else if (QNetworkProxyFactory::usesSystemConfiguration()) {
             m_core->settings().setProxyType(QInstaller::Settings::SystemProxy);
-            KDUpdater::FileDownloaderFactory::instance().setProxyFactory(m_core->proxyFactory());
+            KDUpdater::FileDownloaderFactory::setProxyFactory(m_core->proxyFactory());
         }
 
         if (m_parser.isSet(CommandLineOptions::scLocalCachePathLong)) {
             const QString cachePath = m_parser.value(CommandLineOptions::scLocalCachePathLong);
             if (cachePath.isEmpty()) {
-                errorMessage = QObject::tr("Empty value for option 'cache-path'.");
+                errorMessage = QLatin1String("Empty value for option 'cache-path'.");
                 return false;
             }
             m_core->settings().setLocalCachePath(cachePath);
@@ -257,7 +228,7 @@ public:
 
         if (m_parser.isSet(CommandLineOptions::scStartUpdaterLong)) {
             if (m_core->isInstaller()) {
-                errorMessage = QObject::tr("Cannot start installer binary as updater.");
+                errorMessage = QLatin1String("Cannot start installer binary as updater.");
                 return false;
             }
             m_core->setUserSetBinaryMarker(QInstaller::BinaryContent::MagicUpdaterMarker);
@@ -265,7 +236,7 @@ public:
 
         if (m_parser.isSet(CommandLineOptions::scStartPackageManagerLong)) {
             if (m_core->isInstaller()) {
-                errorMessage = QObject::tr("Cannot start installer binary as package manager.");
+                errorMessage = QLatin1String("Cannot start installer binary as package manager.");
                 return false;
             }
             m_core->setUserSetBinaryMarker(QInstaller::BinaryContent::MagicPackageManagerMarker);
@@ -273,7 +244,7 @@ public:
 
         if (m_parser.isSet(CommandLineOptions::scStartUninstallerLong)) {
             if (m_core->isInstaller()) {
-                errorMessage = QObject::tr("Cannot start installer binary as uninstaller.");
+                errorMessage = QLatin1String("Cannot start installer binary as uninstaller.");
                 return false;
             }
             m_core->setUserSetBinaryMarker(QInstaller::BinaryContent::MagicUninstallerMarker);
@@ -282,7 +253,7 @@ public:
         if (m_parser.isSet(CommandLineOptions::scAddRepositoryLong)) {
             const QStringList repoList = repositories(m_parser.value(CommandLineOptions::scAddRepositoryLong));
             if (repoList.isEmpty()) {
-                errorMessage = QObject::tr("Empty repository list for option 'addRepository'.");
+                errorMessage = QLatin1String("Empty repository list for option 'addRepository'.");
                 return false;
             }
             m_core->addUserRepositories(repoList);
@@ -291,7 +262,7 @@ public:
         if (m_parser.isSet(CommandLineOptions::scAddTmpRepositoryLong)) {
             const QStringList repoList = repositories(m_parser.value(CommandLineOptions::scAddTmpRepositoryLong));
             if (repoList.isEmpty()) {
-                errorMessage = QObject::tr("Empty repository list for option 'addTempRepository'.");
+                errorMessage = QLatin1String("Empty repository list for option 'addTempRepository'.");
                 return false;
             }
             m_core->setTemporaryRepositories(repoList, false);
@@ -300,7 +271,7 @@ public:
         if (m_parser.isSet(CommandLineOptions::scSetTmpRepositoryLong)) {
             const QStringList repoList = repositories(m_parser.value(CommandLineOptions::scSetTmpRepositoryLong));
             if (repoList.isEmpty()) {
-                errorMessage = QObject::tr("Empty repository list for option 'setTempRepository'.");
+                errorMessage = QLatin1String("Empty repository list for option 'setTempRepository'.");
                 return false;
             }
             m_core->setTemporaryRepositories(repoList, true);
@@ -309,12 +280,12 @@ public:
         if (m_parser.isSet(CommandLineOptions::scInstallCompressedRepositoryLong)) {
             const QStringList repoList = repositories(m_parser.value(CommandLineOptions::scInstallCompressedRepositoryLong));
             if (repoList.isEmpty()) {
-                errorMessage = QObject::tr("Empty repository list for option 'installCompressedRepository'.");
+                errorMessage = QLatin1String("Empty repository list for option 'installCompressedRepository'.");
                 return false;
             }
             foreach (QString repository, repoList) {
                 if (!QFileInfo::exists(repository)) {
-                    errorMessage = QObject::tr("The file %1 does not exist.").arg(repository);
+                    errorMessage = QLatin1String("The file %1 does not exist.").arg(repository);
                     return false;
                 }
             }
@@ -336,7 +307,7 @@ public:
             bool isValid;
             const int count = m_parser.value(CommandLineOptions::scMaxConcurrentOperationsLong).toInt(&isValid);
             if (!isValid) {
-                errorMessage = QObject::tr("Invalid value for 'max-concurrent-operations'.");
+                errorMessage = QLatin1String("Invalid value for 'max-concurrent-operations'.");
                 return false;
             }
             QInstaller::PackageManagerCore::setMaxConcurrentOperations(count);
@@ -367,7 +338,7 @@ public:
                     if (!errorMessage.isEmpty())
                         return false;
                 } else {
-                    errorMessage = QObject::tr("Arguments missing for option %1")
+                    errorMessage = QLatin1String("Arguments missing for option %1")
                             .arg(CommandLineOptions::scMessageAutomaticAnswerLong);
                     return false;
                 }
@@ -537,10 +508,10 @@ public:
                     if (ok)
                         m_core->setMessageBoxAutomaticAnswer(name, buttonValue);
                     else
-                        return QObject::tr("Invalid button value %1 ").arg(value);
+                        return QLatin1String("Invalid button value %1 ").arg(value);
                 }
             } else {
-                return QObject::tr("Incorrect arguments for %1")
+                return QLatin1String("Incorrect arguments for %1")
                         .arg(CommandLineOptions::scMessageAutomaticAnswerLong);
             }
         }
@@ -571,44 +542,6 @@ public:
                 + m_core->settings().controlScript();
         }
         return controlScript;
-    }
-
-    bool localeFound(const QLocale &locale) const
-    {
-        const QString directory = QLatin1String(":/translations");
-        // Check if there is a modified translation first to enable people
-        // to easily provide corrected translations to Qt/IFW for their installers
-        const QString newDirectory = QLatin1String(":/translations_new");
-
-        std::unique_ptr<QTranslator> qtTranslator(new QTranslator(QCoreApplication::instance()));
-        bool qtLoaded = qtTranslator->load(locale, QLatin1String("qt"),
-                                           QLatin1String("_"), newDirectory);
-        if (!qtLoaded)
-            qtLoaded = qtTranslator->load(locale, QLatin1String("qt"),
-                                          QLatin1String("_"), directory);
-
-        if (qtLoaded || locale.language() == QLocale::English) {
-            if (qtLoaded)
-                QCoreApplication::instance()->installTranslator(qtTranslator.release());
-
-            std::unique_ptr <QTranslator> ifwTranslator(new QTranslator(QCoreApplication::instance()));
-            bool ifwLoaded = ifwTranslator->load(locale, QLatin1String("ifw"), QLatin1String("_"), newDirectory);
-            if (!ifwLoaded)
-                ifwLoaded = ifwTranslator->load(locale, QLatin1String("ifw"), QLatin1String("_"), directory);
-            if (ifwLoaded) {
-                QCoreApplication::instance()->installTranslator(ifwTranslator.release());
-            } else {
-                qCWarning(QInstaller::lcDeveloperBuild) << "Could not load IFW translation for language"
-                                                        << QLocale::languageToString(locale.language());
-            }
-            // To stop loading other translations it's sufficient that
-            // qt was loaded successfully or we hit English as system language
-            return true;
-        } else {
-            qCWarning(QInstaller::lcDeveloperBuild) << "Could not load Qt translation for language"
-                                                    << QLocale::languageToString(locale.language());
-        }
-        return false;
     }
 
 private:

@@ -84,21 +84,21 @@ void ExtractArchiveOperation::backup()
     QScopedPointer<AbstractArchive> archive(ArchiveFactory::instance().create(archivePath));
     if (!archive) {
         setError(UserDefinedError);
-        setErrorString(tr("Unsupported archive \"%1\": no handler registered for file suffix \"%2\".")
+        setErrorString(QLatin1String("Unsupported archive \"%1\": no handler registered for file suffix \"%2\".")
             .arg(archivePath, QFileInfo(archivePath).suffix()));
         return;
     }
 
     if (!(archive->open(QIODevice::ReadOnly) && archive->isSupported())) {
         setError(UserDefinedError);
-        setErrorString(tr("Cannot open archive \"%1\" for reading: %2")
+        setErrorString(QLatin1String("Cannot open archive \"%1\" for reading: %2")
             .arg(archivePath, archive->errorString()));
         return;
     }
     const QVector<ArchiveEntry> entries = archive->list();
     if (entries.isEmpty()) {
         setError(UserDefinedError);
-        setErrorString(tr("Error while reading contents of archive \"%1\": %2")
+        setErrorString(QLatin1String("Error while reading contents of archive \"%1\": %2")
             .arg(archivePath, archive->errorString()));
         return;
     }
@@ -148,7 +148,7 @@ bool ExtractArchiveOperation::performOperation()
         connect(core, &PackageManagerCore::statusChanged, worker, &Worker::onStatusChanged);
 
     QFileInfo fileInfo(archivePath);
-    emit outputTextChanged(tr("Extracting \"%1\"").arg(fileInfo.fileName()));
+    emit outputTextChanged(QLatin1String("Extracting \"%1\"").arg(fileInfo.fileName()));
     {
         QEventLoop loop;
         QThread workerThread;
@@ -275,7 +275,7 @@ void ExtractArchiveOperation::startUndoProcess(const QStringList &files)
         &ExtractArchiveOperation::progressChanged);
 
     const QFileInfo archive(arguments().at(0));
-    emit outputTextChanged(tr("Removing files extracted from \"%1\"").arg(archive.fileName()));
+    emit outputTextChanged(QLatin1String("Removing files extracted from \"%1\"").arg(archive.fileName()));
 
     QEventLoop loop;
     connect(thread, &QThread::finished, &loop, &QEventLoop::quit, Qt::QueuedConnection);

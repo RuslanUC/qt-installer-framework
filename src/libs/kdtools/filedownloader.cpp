@@ -268,7 +268,7 @@ void KDUpdater::FileDownloader::shaDownloadTaskFinished()
                 doDownload(DownloadType::ChecksumFile);
             } else {
                 reset();
-                setDownloadAborted(QInstaller::DownloadError, tr("Missing proxy credentials."));
+                setDownloadAborted(QInstaller::DownloadError, QLatin1String("Missing proxy credentials."));
             }
         }
     } catch (const TaskException &e) {
@@ -276,7 +276,7 @@ void KDUpdater::FileDownloader::shaDownloadTaskFinished()
     } catch (const QUnhandledException &e) {
         setDownloadAborted(QInstaller::DownloadError, QLatin1String(e.what()));
     } catch (...) {
-        setDownloadAborted(QInstaller::DownloadError, tr("Unknown exception during download."));
+        setDownloadAborted(QInstaller::DownloadError, QLatin1String("Unknown exception during download."));
     }
 }
 
@@ -300,7 +300,7 @@ void KDUpdater::FileDownloader::archiveDownloadTaskFinished()
                     item.insert(TaskRole::SourceFile, sourceUrl);
                     item.insert(TaskRole::TargetFile, targetUrl);
                     failedItems.append(item);
-                    qCWarning(QInstaller::lcInstallerInstallLog) << tr("Hash verification while "
+                    qCWarning(QInstaller::lcInstallerInstallLog) << QLatin1String("Hash verification while "
                         "downloading %1. This can be a temporary error, retrying.\n\n"
                         "Expected: %2 \nDownloaded: %3").arg(item.source(),
                         QString::fromLatin1(expectedChecksum), QString::fromLatin1(checksum));
@@ -317,7 +317,7 @@ void KDUpdater::FileDownloader::archiveDownloadTaskFinished()
         } else {
             --d->m_retryCount;
             if (d->m_retryCount <= 0) {
-                setDownloadAborted(QInstaller::DownloadError, tr("Cannot verify Hash"));
+                setDownloadAborted(QInstaller::DownloadError, QLatin1String("Cannot verify Hash"));
             } else {
                 resetFileItems();
                 addFileItems(failedItems);
@@ -329,7 +329,7 @@ void KDUpdater::FileDownloader::archiveDownloadTaskFinished()
     } catch (const QUnhandledException &e) {
         setDownloadAborted(QInstaller::DownloadError, QLatin1String(e.what()));
     } catch (...) {
-        setDownloadAborted(QInstaller::DownloadError, tr("Unknown exception during download."));
+        setDownloadAborted(QInstaller::DownloadError, QLatin1String("Unknown exception during download."));
     }
 }
 

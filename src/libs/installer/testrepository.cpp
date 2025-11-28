@@ -74,13 +74,13 @@ void TestRepository::doStart()
 {
     reset();
     if (!m_core) {
-        emitFinishedWithError(Job::Canceled, tr("Missing package manager core engine."));
+        emitFinishedWithError(Job::Canceled, QLatin1String("Missing package manager core engine."));
         return; // We can't do anything here without core, so avoid tons of !m_core checks.
     }
 
     const QUrl url = m_repository.url();
     if (url.isEmpty()) {
-        emitFinishedWithError(QInstaller::InvalidUrl, tr("Empty repository URL."));
+        emitFinishedWithError(QInstaller::InvalidUrl, QLatin1String("Empty repository URL."));
         return;
     }
 
@@ -102,13 +102,13 @@ void TestRepository::doStart()
 void TestRepository::doCancel()
 {
     reset();
-    emitFinishedWithError(Job::Canceled, tr("Download canceled."));
+    emitFinishedWithError(Job::Canceled, QLatin1String("Download canceled."));
 }
 
 void TestRepository::onTimeout()
 {
     reset();
-    emitFinishedWithError(Job::Canceled, tr("Timeout while testing repository \"%1\".")
+    emitFinishedWithError(Job::Canceled, QLatin1String("Timeout while testing repository \"%1\".")
         .arg(m_repository.displayname()));
 }
 
@@ -126,14 +126,12 @@ void TestRepository::downloadCompleted()
             QDomDocument doc;
             QDomDocument::ParseResult result = doc.setContent(&file);
             if (!result) {
-                emitFinishedWithError(QInstaller::InvalidUpdatesXml,
-                    tr("Cannot parse Updates.xml: %1").arg(result.errorMessage));
+                emitFinishedWithError(QInstaller::InvalidUpdatesXml, QLatin1String("Cannot parse Updates.xml: %1").arg(result.errorMessage));
             } else {
                 emitFinishedWithError(Job::NoError, QString(/*Success*/)); // OPK
             }
         } else {
-            emitFinishedWithError(QInstaller::DownloadError,
-                tr("Cannot open Updates.xml for reading: %1").arg(file.errorString()));
+            emitFinishedWithError(QInstaller::DownloadError, QLatin1String("Cannot open Updates.xml for reading: %1").arg(file.errorString()));
         }
     } catch (const AuthenticationRequiredException &e) {
         m_timer.stop();
@@ -159,7 +157,7 @@ void TestRepository::downloadCompleted()
             QMetaObject::invokeMethod(this, "doStart", Qt::QueuedConnection);
             return;
         } else {
-            emitFinishedWithError(QInstaller::DownloadError, tr("Authentication failed."));
+            emitFinishedWithError(QInstaller::DownloadError, QLatin1String("Authentication failed."));
         }
     } catch (const TaskException &e) {
         m_timer.stop();
@@ -169,8 +167,7 @@ void TestRepository::downloadCompleted()
         emitFinishedWithError(QInstaller::DownloadError, QLatin1String(e.what()));
     } catch (...) {
         m_timer.stop();
-        emitFinishedWithError(QInstaller::DownloadError,
-            tr("Unknown error while testing repository \"%1\".").arg(m_repository.displayname()));
+        emitFinishedWithError(QInstaller::DownloadError, QLatin1String("Unknown error while testing repository \"%1\".").arg(m_repository.displayname()));
     }
 }
 

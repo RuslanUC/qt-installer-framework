@@ -206,7 +206,7 @@ void UpdateFinder::computeUpdates()
     // First do some quick sanity checks on the packages info
     std::shared_ptr<LocalPackageHub> packages = m_localPackageHub.lock();
     if (!packages) {
-        reportError(tr("Cannot access the package information of this application."));
+        reportError(QLatin1String("Cannot access the package information of this application."));
         return;
     }
 
@@ -217,7 +217,7 @@ void UpdateFinder::computeUpdates()
 
     // Now do some quick sanity checks on the package sources.
     if (m_packageSources.count() <= 0) {
-        reportError(tr("No package sources set for this application."));
+        reportError(QLatin1String("No package sources set for this application."));
         return;
     }
 
@@ -240,7 +240,7 @@ void UpdateFinder::computeUpdates()
     }
 
     // All done
-    reportProgress(100, tr("%n update(s) found.", "", m_updates.count()));
+    reportProgress(100, QLatin1String("%n update(s) found.").arg(QString::number(m_updates.count())));
     reportDone();
 }
 
@@ -313,7 +313,7 @@ bool UpdateFinder::removeInvalidObjects()
     if (m_updatesInfoList.isEmpty())
         return false;
 
-    reportProgress(49, tr("Updates.xml file(s) downloaded from update sources."));
+    reportProgress(49, QLatin1String("Updates.xml file(s) downloaded from update sources."));
     return true;
 }
 
@@ -347,11 +347,11 @@ bool UpdateFinder::computeApplicableUpdates()
 
         // Report progress
         reportProgress(computeProgressPercentage(51, 100, computePercent(i,
-            m_updatesInfoList.count())), tr("Computing applicable updates."));
+            m_updatesInfoList.count())), QLatin1String("Computing applicable updates."));
         ++i;
     }
 
-    reportProgress(99, tr("Application updates computed."));
+    reportProgress(99, QLatin1String("Application updates computed."));
     return true;
 }
 
@@ -462,8 +462,7 @@ bool UpdateFinder::waitForJobToFinish(const int &currentCount, const int &totals
         if (currentCount == totalsCount)
             break;
 
-        reportProgress(computePercent(currentCount, totalsCount),
-                       tr("Downloading Updates.xml from update sources."));
+        reportProgress(computePercent(currentCount, totalsCount), QLatin1String("Downloading Updates.xml from update sources."));
     }
     return true;
 }
@@ -476,7 +475,7 @@ void UpdateFinder::parseUpdatesXmlTaskFinished()
 
     int pc = computePercent(m_updatesXmlTasks, m_updatesXmlTasksToComplete);
     pc = computeProgressPercentage(0, 45, pc);
-    reportProgress( pc, tr("Downloading Updates.xml from update sources.") );
+    reportProgress( pc, QLatin1String("Downloading Updates.xml from update sources.") );
 
     QFutureWatcher<void> *watcher = static_cast<QFutureWatcher<void> *>(sender());
     watcher->waitForFinished();

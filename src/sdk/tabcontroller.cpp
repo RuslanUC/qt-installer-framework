@@ -233,7 +233,7 @@ void TabController::onClearCacheClicked()
         : QMessageBox::Critical);
 
     msgBox.setText(success
-        ? tr("Cache cleared successfully!")
+        ? QLatin1String("Cache cleared successfully!")
         : errorMessage);
 
     msgBox.exec();

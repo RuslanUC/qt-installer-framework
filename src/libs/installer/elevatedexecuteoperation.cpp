@@ -158,7 +158,7 @@ int ElevatedExecuteOperation::Private::run(QStringList &arguments, const Operati
         const bool success = QProcessWrapper::startDetached(args.front(), args.mid(1));
         if (!success) {
             q->setError(UserDefinedError);
-            setErrorMessage(tr("Cannot start detached: \"%1\"").arg(callstr));
+            setErrorMessage(QLatin1String("Cannot start detached: \"%1\"").arg(callstr));
 
             returnValue = Error;
         }
@@ -204,7 +204,7 @@ int ElevatedExecuteOperation::Private::run(QStringList &arguments, const Operati
     int returnValue = NoError;
     if (!success) {
         q->setError(UserDefinedError);
-        setErrorMessage(tr("Cannot start: \"%1\": %2").arg(callstr,
+        setErrorMessage(QLatin1String("Cannot start: \"%1\": %2").arg(callstr,
             process->errorString()));
         if (!needsRerunWithReplacedVariables(arguments, type)) {
             returnValue = Error;
@@ -230,12 +230,12 @@ int ElevatedExecuteOperation::Private::run(QStringList &arguments, const Operati
 
         if (process->exitStatus() == QProcessWrapper::CrashExit) {
             q->setError(UserDefinedError);
-            setErrorMessage(tr("Program crashed: \"%1\"").arg(callstr));
+            setErrorMessage(QLatin1String("Program crashed: \"%1\"").arg(callstr));
             returnValue = Error;
         } else if (!allowedExitCodes.contains(process->exitCode()) && returnValue != NeedsRerun) {
             if (!needsRerunWithReplacedVariables(arguments, type)) {
                 q->setError(UserDefinedError);
-                setErrorMessage(tr("Execution failed (Unexpected exit code: %1): \"%2\"")
+                setErrorMessage(QLatin1String("Execution failed (Unexpected exit code: %1): \"%2\"")
                     .arg(QString::number(process->exitCode()), callstr));
                 returnValue = Error;
             } else {

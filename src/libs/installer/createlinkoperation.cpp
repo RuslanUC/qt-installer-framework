@@ -62,7 +62,7 @@ bool CreateLinkOperation::performOperation()
 
     if (!link.exists()) {
         setError(UserDefinedError);
-        setErrorString(tr("Cannot create link from \"%1\" to \"%2\".").arg(
+        setErrorString(QLatin1String("Cannot create link from \"%1\" to \"%2\".").arg(
                            QDir::toNativeSeparators(linkPath), QDir::toNativeSeparators(targetPath)));
         return false;
     }
@@ -83,7 +83,7 @@ bool CreateLinkOperation::undoOperation()
     }
     if (!link.remove()) {
         setError(UserDefinedError);
-        setErrorString(tr("Cannot remove link from \"%1\" to \"%2\".").arg(
+        setErrorString(QLatin1String("Cannot remove link from \"%1\" to \"%2\".").arg(
                            QDir::toNativeSeparators(linkPath), QDir::toNativeSeparators(targetPath)));
         return false;
     }

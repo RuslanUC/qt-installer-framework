@@ -144,7 +144,7 @@ bool RegisterFileTypeOperation::performOperation()
     return true;
 #else
     setError(UserDefinedError);
-    setErrorString(tr("Registering file types is only supported on Windows."));
+    setErrorString(QLatin1String("Registering file types is only supported on Windows."));
     return false;
 #endif
 }
@@ -157,7 +157,7 @@ bool RegisterFileTypeOperation::undoOperation()
         return true;
 
     QStringList args = arguments();
-    if (!checkArgumentCount(2, 5, tr("Register File Type: Invalid arguments")))
+    if (!checkArgumentCount(2, 5, QLatin1String("Register File Type: Invalid arguments")))
         return false;
 
     bool allUsers = false;
@@ -206,7 +206,7 @@ bool RegisterFileTypeOperation::undoOperation()
 
     return true;
 #else
-    setErrorString(tr("Registering file types is only supported on Windows."));
+    setErrorString(QLatin1String("Registering file types is only supported on Windows."));
     return false;
 #endif
 }

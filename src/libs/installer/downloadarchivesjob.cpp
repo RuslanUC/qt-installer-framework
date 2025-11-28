@@ -107,7 +107,7 @@ void DownloadArchivesJob::doCancel()
         if (i.value())
             i.value()->reset();
     }
-    emitFinishedWithError(Job::Canceled, tr("Download canceled."));
+    emitFinishedWithError(Job::Canceled, QLatin1String("Download canceled."));
 }
 
 void DownloadArchivesJob::fetchArchives()
@@ -165,9 +165,9 @@ void DownloadArchivesJob::onDownloadStatusChanged(const quint64 currentDownloade
         if (bytesReceived.endsWith(tmp))
             bytesReceived.chop(tmp.length());
 
-        status = tr("%1 of %2").arg(bytesReceived, bytesToReceive);
+        status = QLatin1String("%1 of %2").arg(bytesReceived, bytesToReceive);
     } else if (currentDownloaded > 0) {
-        status = tr("%1 downloaded.").arg(humanReadableSize(currentDownloaded));
+        status = QLatin1String("%1 downloaded.").arg(humanReadableSize(currentDownloaded));
     }
 
     quint64 totalDownloadSpeed = 0;
@@ -187,27 +187,27 @@ void DownloadArchivesJob::onDownloadStatusChanged(const quint64 currentDownloade
 
         QString days;
         if (d > 0)
-            days = tr("%n day(s), ", "", d);
+            days = QLatin1String("%1 day(s), ").arg(QString::number(d));
 
         QString hours;
         if (h > 0)
-            hours = tr("%n hour(s), ", "", h);
+            hours = QLatin1String("%1 hour(s), ").arg(QString::number(h));
 
         QString minutes;
         if (m > 0)
-            minutes = tr("%n minute(s)", "", m);
+            minutes = QLatin1String("%1 minute(s)").arg(QString::number(m));
 
         QString seconds;
         if (s >= 0 && minutes.isEmpty()) {
             s = (s <= 0 ? 1 : s);
-            seconds = tr("%n second(s)", "", s);
+            seconds = QLatin1String("%1 second(s)").arg(QString::number(s));
         }
-        status += tr(" - %1%2%3%4 remaining.").arg(days, hours, minutes, seconds);
+        status += QLatin1String(" - %1%2%3%4 remaining.").arg(days, hours, minutes, seconds);
     } else {
-        status += tr(" - unknown time remaining.");
+        status += QLatin1String(" - unknown time remaining.");
     }
     m_currentDownloaded = currentDownloaded;
-    emit downloadStatusChanged(tr("Downloading: ")+ status);
+    emit downloadStatusChanged(QLatin1String("Downloading: ")+ status);
 }
 
 void DownloadArchivesJob::setTotalProcessedAmount()
@@ -238,7 +238,7 @@ void DownloadArchivesJob::registerFile(const FileTaskItem &item)
 
 void DownloadArchivesJob::fileDownloaded(const QString &fileName, const QString &componentName)
 {
-    emit outputTextChanged(tr("Archive \"%1\" downloaded for component %2.")
+    emit outputTextChanged(QLatin1String("Archive \"%1\" downloaded for component %2.")
                                .arg(fileName, componentName));
 }
 
@@ -286,7 +286,7 @@ void DownloadArchivesJob::setupDownloaders()
         const QFileInfo fi = QFileInfo(item.first);
         const Component *const component = m_core->componentByName(PackageManagerCore::checkableName(QFileInfo(fi.path()).fileName()));
         if (!component) {
-            emit outputTextChanged(tr("Cannot find component for %1.").arg(QFileInfo(fi.path()).fileName()));
+            emit outputTextChanged(QLatin1String("Cannot find component for %1.").arg(QFileInfo(fi.path()).fileName()));
             continue;
         }
         QString fullQueryString;
@@ -299,7 +299,7 @@ void DownloadArchivesJob::setupDownloaders()
         } else {
             downloader = FileDownloaderFactory::instance().create(scheme, this);
             if (!downloader) {
-                emit outputTextChanged(tr("Scheme %1 not supported (URL: %2).").arg(scheme, url.toString()));
+                emit outputTextChanged(QLatin1String("Scheme %1 not supported (URL: %2).").arg(scheme, url.toString()));
                 return;
             }
             downloader->setPackageManagerCore(m_core);

@@ -241,9 +241,9 @@ public:
         if (m_showSettingsButton == show)
             return;
         q->setOption(QWizard::HaveCustomButton1, show);
-        q->setButtonText(QWizard::CustomButton1, tr("&Settings"));
+        q->setButtonText(QWizard::CustomButton1, QLatin1String("&Settings"));
         q->button(QWizard::CustomButton1)->setToolTip(
-            PackageManagerGui::tr("Specify proxy settings and configure repositories for add-on components."));
+            QLatin1String("Specify proxy settings and configure repositories for add-on components."));
 
         q->updateButtonLayout();
         m_showSettingsButton = show;
@@ -344,9 +344,9 @@ PackageManagerGui::PackageManagerGui(PackageManagerCore *core, QWidget *parent)
     , m_core(core)
 {
     if (m_core->isInstaller())
-        setWindowTitle(tr("%1 Setup").arg(m_core->value(scTitle)));
+        setWindowTitle(QLatin1String("%1 Setup").arg(m_core->value(scTitle)));
     else
-        setWindowTitle(tr("Maintain %1").arg(m_core->value(scTitle)));
+        setWindowTitle(QLatin1String("Maintain %1").arg(m_core->value(scTitle)));
     setWindowFlags(windowFlags() &~ Qt::WindowContextHelpButtonHint);
 
 #ifdef Q_OS_MACOS
@@ -1024,20 +1024,20 @@ void PackageManagerGui::cancelButtonClicked()
         && m_core->status() != PackageManagerCore::Canceled
         && m_core->status() != PackageManagerCore::Failure) {
             interrupt = true;
-            question = tr("Do you want to cancel the installation process?");
+            question = QLatin1String("Do you want to cancel the installation process?");
             if (m_core->isUninstaller())
-                question = tr("Do you want to cancel the removal process?");
+                question = QLatin1String("Do you want to cancel the removal process?");
     } else {
-        question = tr("Do you want to quit the installer application?");
+        question = QLatin1String("Do you want to quit the installer application?");
         if (m_core->isUninstaller())
-            question = tr("Do you want to quit the uninstaller application?");
+            question = QLatin1String("Do you want to quit the uninstaller application?");
         if (m_core->isMaintainer())
-            question = tr("Do you want to quit the maintenance application?");
+            question = QLatin1String("Do you want to quit the maintenance application?");
     }
 
     const QMessageBox::StandardButton button =
         MessageBoxHandler::question(MessageBoxHandler::currentBestSuitParent(),
-        QLatin1String("cancelInstallation"), tr("%1 Question").arg(m_core->value(scTitle)), question,
+        QLatin1String("cancelInstallation"), QLatin1String("%1 Question").arg(m_core->value(scTitle)), question,
         QMessageBox::Yes | QMessageBox::No);
 
     if (button == QMessageBox::Yes) {
@@ -1169,8 +1169,7 @@ void PackageManagerGui::dependsOnLocalInstallerBinary()
 {
     if (m_core->settings().dependsOnLocalInstallerBinary() && !m_core->localInstallerBinaryUsed()) {
         MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(),
-            QLatin1String("Installer_Needs_To_Be_Local_Error"), tr("Error"),
-            tr("It is not possible to install from network location.\n"
+            QLatin1String("Installer_Needs_To_Be_Local_Error"), QLatin1String("Error"), QLatin1String("It is not possible to install from network location.\n"
                "Please copy the installer to a local drive"), QMessageBox::Ok);
         rejectWithoutPrompt();
     }
@@ -1548,27 +1547,27 @@ IntroductionPage::IntroductionPage(PackageManagerCore *core)
     m_msgLabel->setWordWrap(true);
     m_msgLabel->setObjectName(QLatin1String("MessageLabel"));
     if (packageManagerCore()->isInstaller()) {
-        setColoredTitle(tr("Welcome"));
-        m_msgLabel->setText(tr("Welcome to the %1 Setup.").arg(productName()));
+        setColoredTitle(QLatin1String("Welcome"));
+        m_msgLabel->setText(QLatin1String("Welcome to the %1 Setup.").arg(productName()));
     } else {
-        setColoredTitle(tr("Maintenance Actions"));
-        m_msgLabel->setText(tr("Select from following options, which way you want to proceed."));
+        setColoredTitle(QLatin1String("Maintenance Actions"));
+        m_msgLabel->setText(QLatin1String("Select from following options, which way you want to proceed."));
     }
 
     QWidget *widget = new QWidget(this);
     QVBoxLayout *boxLayout = new QVBoxLayout(widget);
 
-    m_packageManager = new QRadioButton(tr("&Add or remove components"), this);
+    m_packageManager = new QRadioButton(QLatin1String("&Add or remove components"), this);
     m_packageManager->setObjectName(QLatin1String("PackageManagerRadioButton"));
     boxLayout->addWidget(m_packageManager);
     connect(m_packageManager, &QAbstractButton::toggled, this, &IntroductionPage::setPackageManager);
 
-    m_updateComponents = new QRadioButton(tr("&Update components"), this);
+    m_updateComponents = new QRadioButton(QLatin1String("&Update components"), this);
     m_updateComponents->setObjectName(QLatin1String("UpdaterRadioButton"));
     boxLayout->addWidget(m_updateComponents);
     connect(m_updateComponents, &QAbstractButton::toggled, this, &IntroductionPage::setUpdater);
 
-    m_removeAllComponents = new QRadioButton(tr("&Remove all components"), this);
+    m_removeAllComponents = new QRadioButton(QLatin1String("&Remove all components"), this);
     m_removeAllComponents->setObjectName(QLatin1String("UninstallerRadioButton"));
     boxLayout->addWidget(m_removeAllComponents);
     connect(m_removeAllComponents, &QAbstractButton::toggled,
@@ -1581,7 +1580,7 @@ IntroductionPage::IntroductionPage(PackageManagerCore *core)
     m_label = new QLabel(this);
     m_label->setWordWrap(true);
     m_label->setObjectName(QLatin1String("InformationLabel"));
-    m_label->setText(tr("Retrieving information from remote installation sources..."));
+    m_label->setText(QLatin1String("Retrieving information from remote installation sources..."));
     boxLayout->addWidget(m_label);
 
     m_progressBar = new QProgressBar(this);
@@ -1640,7 +1639,7 @@ bool IntroductionPage::validatePage()
     bool isOfflineOnlyInstaller = core->isInstaller() && core->isOfflineOnly();
     // If not offline only installer, at least one valid repository needs to be available
     if (!isOfflineOnlyInstaller && !core->validRepositoriesAvailable()) {
-        setErrorMessage(QLatin1String("<font color=\"red\">") + tr("At least one valid and enabled "
+        setErrorMessage(QLatin1String("<font color=\"red\">") + QLatin1String("At least one valid and enabled "
             "repository required for this action to succeed.") + QLatin1String("</font>"));
         return isComplete();
     }
@@ -1663,7 +1662,7 @@ bool IntroductionPage::validatePage()
 
         if (m_updatesFetched) {
             if (core->components(QInstaller::PackageManagerCore::ComponentType::Root).count() <= 0)
-                setErrorMessage(QString::fromLatin1("<b>%1</b>").arg(tr("No updates available.")));
+                setErrorMessage(QString::fromLatin1("<b>%1</b>").arg(QLatin1String("No updates available.")));
             else
                 setComplete(true);
         }
@@ -1678,7 +1677,7 @@ bool IntroductionPage::validatePage()
                 QString error = core->error();
                 if (core->status() == PackageManagerCore::ForceUpdate) {
                     // replaces the error string from packagemanagercore
-                    error = tr("There is an important update available. Please select '%1' first")
+                    error = QLatin1String("There is an important update available. Please select '%1' first")
                         .arg(m_updateComponents->text().remove(QLatin1Char('&')));
 
                     m_forceUpdate = true;
@@ -1920,7 +1919,7 @@ void IntroductionPage::entering()
     showWidgets(false);
     setMessage(QString());
     setErrorMessage(QString());
-    setButtonText(QWizard::CancelButton, tr("&Quit"));
+    setButtonText(QWizard::CancelButton, QLatin1String("&Quit"));
 
     m_progressBar->setValue(0);
     m_progressBar->setRange(0, 0);
@@ -2014,7 +2013,7 @@ LicenseAgreementPage::LicenseAgreementPage(PackageManagerCore *core)
 {
     setPixmap(QWizard::WatermarkPixmap, QPixmap());
     setObjectName(QLatin1String("LicenseAgreementPage"));
-    setColoredTitle(tr("License Agreement"));
+    setColoredTitle(QLatin1String("License Agreement"));
 
     m_infoLabel = new QLabel(this);
     m_infoLabel->setWordWrap(true);
@@ -2047,7 +2046,7 @@ LicenseAgreementPage::LicenseAgreementPage(PackageManagerCore *core)
     layout->addWidget(licenseSplitter);
 
     m_acceptCheckBox = new QCheckBox(this);
-    m_acceptCheckBox->setShortcut(QKeySequence(tr("Alt+A", "Agree license")));
+    m_acceptCheckBox->setShortcut(QKeySequence(QLatin1String("Alt+A", "Agree license")));
     m_acceptCheckBox->setObjectName(QLatin1String("AcceptLicenseCheckBox"));
     ClickForwarder *acceptClickForwarder = new ClickForwarder(m_acceptCheckBox);
 
@@ -2151,13 +2150,13 @@ void LicenseAgreementPage::updateUi()
     QString subTitleText;
     QString acceptButtonText;
     if (m_licenseListWidget->count() == 1) {
-        subTitleText = tr("Please read the following license agreement. You must accept the terms "
+        subTitleText = QLatin1String("Please read the following license agreement. You must accept the terms "
                           "contained in this agreement before continuing with the installation.");
-        acceptButtonText = tr("I accept the license.");
+        acceptButtonText = QLatin1String("I accept the license.");
     } else {
-        subTitleText = tr("Please read the following license agreements. You must accept the terms "
+        subTitleText = QLatin1String("Please read the following license agreements. You must accept the terms "
                           "contained in these agreements before continuing with the installation.");
-        acceptButtonText = tr("I accept the licenses.");
+        acceptButtonText = QLatin1String("I accept the licenses.");
     }
     m_licenseListWidget->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     setColoredSubTitle(subTitleText);
@@ -2184,7 +2183,7 @@ ComponentSelectionPage::ComponentSelectionPage(PackageManagerCore *core)
 {
     setPixmap(QWizard::WatermarkPixmap, QPixmap());
     setObjectName(QLatin1String("ComponentSelectionPage"));
-    setColoredTitle(tr("Select Components"));
+    setColoredTitle(QLatin1String("Select Components"));
     if (packageManagerCore()->settings().wizardShowPageList())
         layout()->setContentsMargins(QMargins(0, -1, -1, -1));
 }
@@ -2277,8 +2276,7 @@ bool ComponentSelectionPage::validatePage()
         // marked as unselected. Recalculate so that unselected component is removed from install.
         // User is then able to select other components for install.
         core->calculateComponentsToInstall();
-        MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("Error"),
-                                    tr("Error"), error.message());
+        MessageBoxHandler::critical(MessageBoxHandler::currentBestSuitParent(), QLatin1String("Error"), QLatin1String("Error"), error.message());
         return false;
     }
     return true;
@@ -2401,14 +2399,14 @@ TargetDirectoryPage::TargetDirectoryPage(PackageManagerCore *core)
 {
     setPixmap(QWizard::WatermarkPixmap, QPixmap());
     setObjectName(QLatin1String("TargetDirectoryPage"));
-    setColoredTitle(tr("Installation Folder"));
+    setColoredTitle(QLatin1String("Installation Folder"));
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     QLabel *msgLabel = new QLabel(this);
     msgLabel->setWordWrap(true);
     msgLabel->setObjectName(QLatin1String("MessageLabel"));
-    msgLabel->setText(tr("Please specify the directory where %1 will be installed.").arg(productName()));
+    msgLabel->setText(QLatin1String("Please specify the directory where %1 will be installed.").arg(productName()));
     layout->addWidget(msgLabel);
 
     QHBoxLayout *hlayout = new QHBoxLayout;
@@ -2426,9 +2424,9 @@ TargetDirectoryPage::TargetDirectoryPage(PackageManagerCore *core)
     QPushButton *browseButton = new QPushButton(this);
     browseButton->setObjectName(QLatin1String("BrowseDirectoryButton"));
     connect(browseButton, &QAbstractButton::clicked, this, &TargetDirectoryPage::dirRequested);
-    browseButton->setShortcut(QKeySequence(tr("Alt+R", "Browse file system to choose a file")));
-    browseButton->setText(tr("B&rowse..."));
-    browseButton->setToolTip(TargetDirectoryPage::tr("Browse file system to choose the installation directory."));
+    browseButton->setShortcut(QKeySequence(QLatin1String("Alt+R", "Browse file system to choose a file")));
+    browseButton->setText(QLatin1String("B&rowse..."));
+    browseButton->setToolTip(QLatin1String("Browse file system to choose the installation directory."));
     hlayout->addWidget(browseButton);
 
     layout->addLayout(hlayout);
@@ -2527,8 +2525,7 @@ void TargetDirectoryPage::leaving()
 
 void TargetDirectoryPage::dirRequested()
 {
-    QString newDirName = QFileDialog::getExistingDirectory(this,
-        tr("Select Installation Folder"), targetDir());
+    QString newDirName = QFileDialog::getExistingDirectory(this, QLatin1String("Select Installation Folder"), targetDir());
     if (newDirName.isEmpty() || newDirName == targetDir())
         return;
     const QDir newDir(newDirName);
@@ -2571,12 +2568,12 @@ StartMenuDirectoryPage::StartMenuDirectoryPage(PackageManagerCore *core)
 {
     setPixmap(QWizard::WatermarkPixmap, QPixmap());
     setObjectName(QLatin1String("StartMenuDirectoryPage"));
-    setColoredTitle(tr("Choose a Start Menu folder"));
-    setPageListTitle(tr("Start Menu Folder"));
+    setColoredTitle(QLatin1String("Choose a Start Menu folder"));
+    setPageListTitle(QLatin1String("Start Menu Folder"));
 
     QLabel *infoLabel = new QLabel(this);
     infoLabel->setWordWrap(true);
-    infoLabel->setText(tr("Select the Start Menu folder in which you would like to create the "
+    infoLabel->setText(QLatin1String("Select the Start Menu folder in which you would like to create the "
         "program’s shortcuts. You can also enter a name to create a new directory"));
 
     m_lineEdit = new QLineEdit(this);
@@ -2660,7 +2657,7 @@ ReadyForInstallationPage::ReadyForInstallationPage(PackageManagerCore *core)
 {
     setPixmap(QWizard::WatermarkPixmap, QPixmap());
     setObjectName(QLatin1String("ReadyForInstallationPage"));
-    setColoredTitle(tr("Installation Summary"));
+    setColoredTitle(QLatin1String("Installation Summary"));
     setCommitPage(true);
 }
 
@@ -2798,23 +2795,23 @@ void PerformInstallationPage::entering()
         m_performInstallationForm->toggleDetails();
     }
     if (packageManagerCore()->isUninstaller()) {
-        setButtonText(QWizard::CommitButton, tr("U&ninstall"));
-        setColoredTitle(tr("Uninstalling %1").arg(productName()));
+        setButtonText(QWizard::CommitButton, QLatin1String("U&ninstall"));
+        setColoredTitle(QLatin1String("Uninstalling %1").arg(productName()));
 
         QTimer::singleShot(30, packageManagerCore(), SLOT(runUninstaller()));
     } else if (packageManagerCore()->isMaintainer()) {
-        setButtonText(QWizard::CommitButton, tr("&Update"));
-        setColoredTitle(tr("Updating components of %1").arg(productName()));
+        setButtonText(QWizard::CommitButton, QLatin1String("&Update"));
+        setColoredTitle(QLatin1String("Updating components of %1").arg(productName()));
 
         QTimer::singleShot(30, packageManagerCore(), SLOT(runPackageUpdater()));
     } else if (packageManagerCore()->isOfflineGenerator()) {
-        setButtonText(QWizard::CommitButton, tr("&Create Offline Installer"));
-        setColoredTitle(tr("Creating Offline Installer for %1").arg(productName()));
+        setButtonText(QWizard::CommitButton, QLatin1String("&Create Offline Installer"));
+        setColoredTitle(QLatin1String("Creating Offline Installer for %1").arg(productName()));
 
         QTimer::singleShot(30, packageManagerCore(), SLOT(runOfflineGenerator()));
     } else {
-        setButtonText(QWizard::CommitButton, tr("&Install"));
-        setColoredTitle(tr("Installing %1").arg(productName()));
+        setButtonText(QWizard::CommitButton, QLatin1String("&Install"));
+        setColoredTitle(QLatin1String("Installing %1").arg(productName()));
 
         QTimer::singleShot(30, packageManagerCore(), SLOT(runInstaller()));
     }
@@ -2837,13 +2834,13 @@ void PerformInstallationPage::updatePageListTitle()
 {
     PackageManagerCore *core = packageManagerCore();
     if (core->isOfflineGenerator())
-        setPageListTitle(tr("Creating Offline Installer"));
+        setPageListTitle(QLatin1String("Creating Offline Installer"));
     else if (core->isInstaller())
-        setPageListTitle(tr("Installing"));
+        setPageListTitle(QLatin1String("Installing"));
     else if (core->isMaintainer())
-        setPageListTitle(tr("Updating"));
+        setPageListTitle(QLatin1String("Updating"));
     else if (core->isUninstaller())
-        setPageListTitle(tr("Uninstalling"));
+        setPageListTitle(QLatin1String("Uninstalling"));
 }
 
 // -- public slots
@@ -2942,7 +2939,7 @@ FinishedPage::FinishedPage(PackageManagerCore *core)
     , m_commitButton(nullptr)
 {
     setObjectName(QLatin1String("FinishedPage"));
-    setColoredTitle(tr("Finished"));
+    setColoredTitle(QLatin1String("Finished"));
 
     m_msgLabel = new QLabel(this);
     m_msgLabel->setWordWrap(true);
@@ -3002,7 +2999,7 @@ void FinishedPage::entering()
             connect(gui()->button(QWizard::CommitButton), &QAbstractButton::clicked,
                     this, &FinishedPage::cleanupChangedConnects);
         }
-        setButtonText(QWizard::CommitButton, tr("Restart"));
+        setButtonText(QWizard::CommitButton, QLatin1String("Restart"));
         setButtonText(QWizard::CancelButton, gui()->defaultButtonText(QWizard::FinishButton));
     } else {
         if (packageManagerCore()->isInstaller()) {
@@ -3032,7 +3029,7 @@ void FinishedPage::entering()
         wizard()->button(QWizard::CancelButton)->setDisabled(true);
     }
 
-    m_clickFinishLabel->setText(QLatin1String("\n") + tr("Select %1 to close the %2 Setup.")
+    m_clickFinishLabel->setText(QLatin1String("\n") + QLatin1String("Select %1 to close the %2 Setup.")
                             .arg(gui()->defaultButtonText(QWizard::FinishButton).remove(QLatin1Char('&')), productName()));
     QString finishedText;
 
@@ -3045,23 +3042,23 @@ void FinishedPage::entering()
         if (!packageManagerCore()->isUninstaller()) {
             m_locationLabel->setText(packageManagerCore()->value(scTargetDir));
             m_locationLabel->setVisible(true);
-            finishedText.prepend(tr("You find your installation in this location on your computer:"));
+            finishedText.prepend(QLatin1String("You find your installation in this location on your computer:"));
             finishedText.prepend(QLatin1String("\n\n"));
         }
         if (packageManagerCore()->isUninstaller())
-            finishedText.prepend(tr("%1 has now been uninstalled from your computer.").arg(productName()));
+            finishedText.prepend(QLatin1String("%1 has now been uninstalled from your computer.").arg(productName()));
         else if (packageManagerCore()->isUpdater())
-            finishedText.prepend(tr("%1 has now been updated on your computer.").arg(productName()));
+            finishedText.prepend(QLatin1String("%1 has now been updated on your computer.").arg(productName()));
         else if (packageManagerCore()->isOfflineGenerator())
-            finishedText.prepend(tr("Offline installer has now been generated."));
+            finishedText.prepend(QLatin1String("Offline installer has now been generated."));
         else
-            finishedText.prepend(tr("%1 has now been installed on your computer.").arg(productName()));
+            finishedText.prepend(QLatin1String("%1 has now been installed on your computer.").arg(productName()));
     } else {
         // TODO: how to handle this using the config.xml
-        finishedText.prepend(tr("%1 installation was not complete or was interrupted by some reason.").arg(productName()));
+        finishedText.prepend(QLatin1String("%1 installation was not complete or was interrupted by some reason.").arg(productName()));
         m_clickFinishLabel->setVisible(true);
-        setColoredTitle(tr("%1 installation was unsuccessful.").arg(productName()));
-        setPageListTitle(tr("Finished"));
+        setColoredTitle(QLatin1String("%1 installation was unsuccessful.").arg(productName()));
+        setPageListTitle(QLatin1String("Finished"));
         installationSucceeded = false;
     }
 
@@ -3074,8 +3071,7 @@ void FinishedPage::entering()
             && installationSucceeded
             && !QVariant(disableRunProgram).toBool()) {
         m_runItCheckBox->show();
-        m_runItCheckBox->setText(packageManagerCore()->value(scRunProgramDescription,
-                tr("Run %1 now.")).arg(productName()));
+        m_runItCheckBox->setText(packageManagerCore()->value(scRunProgramDescription, QLatin1String("Run %1 now.")).arg(productName()));
     } else {
         m_runItCheckBox->hide();
         m_runItCheckBox->setChecked(false);
@@ -3158,7 +3154,7 @@ RestartPage::RestartPage(PackageManagerCore *core)
 {
     setObjectName(QLatin1String("RestartPage"));
 
-    setColoredTitle(tr("Finished"));
+    setColoredTitle(QLatin1String("Finished"));
 
     // Never show this page on the page list
     setShowOnPageList(false);

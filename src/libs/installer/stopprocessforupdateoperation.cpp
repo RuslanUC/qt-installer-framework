@@ -58,7 +58,7 @@ bool StopProcessForUpdateOperation::performOperation()
     PackageManagerCore *const core = packageManager();
     if (!core) {
         setError(KDUpdater::UpdateOperation::UserDefinedError);
-        setErrorString(tr("Cannot get package manager core."));
+        setErrorString(QLatin1String("Cannot get package manager core."));
         return false;
     }
 
@@ -66,7 +66,7 @@ bool StopProcessForUpdateOperation::performOperation()
     for (const QString &process : std::as_const(processes)) {
         if (!core->killProcess(process, 5000)) {
             setError(UserDefinedError);
-            setErrorString(tr("Could not terminate process \"%1\"").arg(process));
+            setErrorString(QLatin1String("Could not terminate process \"%1\"").arg(process));
             return false;
         }
     }

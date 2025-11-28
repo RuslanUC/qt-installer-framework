@@ -224,7 +224,7 @@ void MetadataJob::doStart()
     setProgressTotalAmount(100);
 
     if (!m_core) {
-        emitFinishedWithError(Job::Canceled, tr("Missing package manager core engine."));
+        emitFinishedWithError(Job::Canceled, QLatin1String("Missing package manager core engine."));
         return; // We can't do anything here without core, so avoid tons of !m_core checks.
     }
     if (!m_metaFromCache.isValid() && !resetCache(true)) {
@@ -233,7 +233,7 @@ void MetadataJob::doStart()
     }
 
     if (m_downloadType != DownloadType::CompressedPackage) {
-        emit infoMessage(this, tr("Fetching latest update information..."));
+        emit infoMessage(this, QLatin1String("Fetching latest update information..."));
         const bool onlineInstaller = m_core->isInstaller() && !m_core->isOfflineOnly();
         const QSet<Repository> repositories = getRepositories();
 
@@ -335,7 +335,7 @@ void MetadataJob::doStart()
         }
         else {
             setProgressTotalAmount(0);
-            emit infoMessage(this, tr("Unpacking compressed repositories. This may take a while..."));
+            emit infoMessage(this, QLatin1String("Unpacking compressed repositories. This may take a while..."));
         }
     }
 }
@@ -352,7 +352,7 @@ bool MetadataJob::startXMLTask()
                 &MetadataJob::progressChanged);
         m_xmlTask.setFuture(QtConcurrent::run(&DownloadFileTask::doTask, xmlTask));
 
-        setInfoMessage(tr("Retrieving information from remote repositories..."));
+        setInfoMessage(QLatin1String("Retrieving information from remote repositories..."));
         return true;
     }
     return false;
@@ -362,7 +362,7 @@ void MetadataJob::doCancel()
 {
     reset();
     resetCache();
-    emitFinishedWithError(Job::Canceled, tr("Metadata download canceled."));
+    emitFinishedWithError(Job::Canceled, QLatin1String("Metadata download canceled."));
 }
 
 void MetadataJob::startUnzipRepositoryTask(const Repository &repo)
@@ -389,8 +389,7 @@ void MetadataJob::startUpdateCacheTask()
 {
     const int toRegisterCount = m_fetchedMetadata.count();
     if (toRegisterCount > 0)
-        emit infoMessage(this, tr("Updating local cache with %n new items...",
-                                  nullptr, toRegisterCount));
+        emit infoMessage(this, QLatin1String("Updating local cache with %1 new items...").arg(QString::number(toRegisterCount)));
 
     UpdateCacheTask *task = new UpdateCacheTask(m_metaFromCache, m_fetchedMetadata);
     m_updateCacheTask.setFuture(QtConcurrent::run(&UpdateCacheTask::doTask, task));
@@ -478,7 +477,7 @@ void MetadataJob::unzipRepositoryTaskFinished()
         emitFinishedWithError(QInstaller::DownloadError, QLatin1String(e.what()));
     } catch (...) {
         reset();
-        emitFinishedWithError(QInstaller::DownloadError, tr("Unknown exception during extracting."));
+        emitFinishedWithError(QInstaller::DownloadError, QLatin1String("Unknown exception during extracting."));
     }
 }
 
@@ -503,7 +502,7 @@ void MetadataJob::xmlTaskFinished()
                 status = XmlDownloadRetry;
             } else {
                 reset();
-                emitFinishedWithError(QInstaller::DownloadError, tr("Missing proxy credentials."));
+                emitFinishedWithError(QInstaller::DownloadError, QLatin1String("Missing proxy credentials."));
             }
         } else if (e.type() == AuthenticationRequiredException::Type::Server) {
             qCWarning(QInstaller::lcInstallerInstallLog) << e.message();
@@ -557,7 +556,7 @@ void MetadataJob::xmlTaskFinished()
                 status = XmlDownloadRetry;
             } else {
                 reset();
-                emitFinishedWithError(QInstaller::DownloadError, tr("Authentication failed."));
+                emitFinishedWithError(QInstaller::DownloadError, QLatin1String("Authentication failed."));
             }
         }
     } catch (const TaskException &e) {
@@ -571,7 +570,7 @@ void MetadataJob::xmlTaskFinished()
         emitFinishedWithError(QInstaller::DownloadError, QLatin1String(e.what()));
     } catch (...) {
         reset();
-        emitFinishedWithError(QInstaller::DownloadError, tr("Unknown exception during download."));
+        emitFinishedWithError(QInstaller::DownloadError, QLatin1String("Unknown exception during download."));
     }
 
     if (error() != Job::NoError)
@@ -588,7 +587,7 @@ void MetadataJob::xmlTaskFinished()
         QMetaObject::invokeMethod(this, "doStart", Qt::QueuedConnection);
     } else {
         reset();
-        emitFinishedWithError(QInstaller::DownloadError, tr("Failure to fetch repositories."));
+        emitFinishedWithError(QInstaller::DownloadError, QLatin1String("Failure to fetch repositories."));
     }
 }
 
@@ -602,7 +601,7 @@ void MetadataJob::unzipTaskFinished()
     } catch (const QUnhandledException &e) {
         emitFinishedWithError(QInstaller::DownloadError, QLatin1String(e.what()));
     } catch (...) {
-        emitFinishedWithError(QInstaller::DownloadError, tr("Unknown exception during extracting."));
+        emitFinishedWithError(QInstaller::DownloadError, QLatin1String("Unknown exception during extracting."));
     }
 
     if (error() != Job::NoError)
@@ -633,14 +632,14 @@ void MetadataJob::metadataTaskFinished()
         m_metadataResult.append(m_metadataTask.future().results());
         if (!fetchMetaDataPackages()) {
             if (m_metadataResult.count() > 0) {
-                emit infoMessage(this, tr("Extracting meta information..."));
+                emit infoMessage(this, QLatin1String("Extracting meta information..."));
                 foreach (const FileTaskResult &result, m_metadataResult) {
                     const FileTaskItem item = result.value(TaskRole::TaskItem).value<FileTaskItem>();
                     QByteArray observedChecksum = result.value(TaskRole::Checksum).toByteArray().toHex();
                     QByteArray expectedCheckSum = item.value(TaskRole::Checksum).toByteArray();
 
                     if (!expectedCheckSum.isEmpty() && observedChecksum != expectedCheckSum) {
-                        QString mismatchMessage = tr("Checksum mismatch detected for \"%1\".")
+                        QString mismatchMessage = QLatin1String("Checksum mismatch detected for \"%1\".")
                                 .arg(item.value(TaskRole::SourceFile).toString());
                         if (m_core->settings().allowUnstableComponents()) {
                             m_shaMissmatchPackages.append(item.value(TaskRole::Name).toString());
@@ -681,7 +680,7 @@ void MetadataJob::metadataTaskFinished()
         emitFinishedWithError(QInstaller::DownloadError, QLatin1String(e.what()));
     } catch (...) {
         reset();
-        emitFinishedWithError(QInstaller::DownloadError, tr("Unknown exception during download."));
+        emitFinishedWithError(QInstaller::DownloadError, QLatin1String("Unknown exception during download."));
     }
 }
 
@@ -694,7 +693,7 @@ void MetadataJob::updateCacheTaskFinished()
     } catch (const QUnhandledException &e) {
         emitFinishedWithError(QInstaller::CacheError, QLatin1String(e.what()));
     } catch (...) {
-        emitFinishedWithError(QInstaller::CacheError, tr("Unknown exception during updating cache."));
+        emitFinishedWithError(QInstaller::CacheError, QLatin1String("Unknown exception during updating cache."));
     }
 
     if (error() != Job::NoError)
@@ -718,7 +717,7 @@ bool MetadataJob::fetchMetaDataPackages()
         DownloadFileTask *const metadataTask = new DownloadFileTask(tempPackages);
         metadataTask->setProxyFactory(m_core->proxyFactory());
         m_metadataTask.setFuture(QtConcurrent::run(&DownloadFileTask::doTask, metadataTask));
-        setInfoMessage(tr("Retrieving meta information from remote repository..."));
+        setInfoMessage(QLatin1String("Retrieving meta information from remote repository..."));
         return true;
     }
     return false;

@@ -163,7 +163,7 @@ bool Resource::open(std::optional<QFile::Permissions> permissions)
     }
 
     if (!QIODevice::open(QIODevice::ReadOnly)) {
-        setErrorString(tr("Cannot open resource %1 for reading.").arg(QString::fromUtf8(m_name)));
+        setErrorString(QLatin1String("Cannot open resource %1 for reading.").arg(QString::fromUtf8(m_name)));
         return false;
     }
     return true;
@@ -232,12 +232,12 @@ void Resource::copyData(Resource *resource, QFileDevice *out)
         const qint64 len = qMin<qint64>(left, 4096);
         const qint64 bytesRead = resource->read(data, len);
         if (bytesRead != len) {
-            throw QInstaller::Error(tr("Read failed after %1 bytes: %2")
+            throw QInstaller::Error(QLatin1String("Read failed after %1 bytes: %2")
                 .arg(QString::number(resource->size() - left), resource->errorString()));
         }
         const qint64 bytesWritten = out->write(data, len);
         if (bytesWritten != len) {
-            throw QInstaller::Error(tr("Write failed after %1 bytes: %2")
+            throw QInstaller::Error(QLatin1String("Write failed after %1 bytes: %2")
                 .arg(QString::number(resource->size() - left), out->errorString()));
         }
         left -= len;
@@ -391,7 +391,7 @@ Range<qint64> ResourceCollectionManager::write(QFileDevice *out, qint64 offset) 
 
         foreach (const QSharedPointer<Resource> &resource, collection.resources()) {
             if (!resource->open()) {
-                throw QInstaller::Error(tr("Cannot open resource %1: %2")
+                throw QInstaller::Error(QLatin1String("Cannot open resource %1: %2")
                     .arg(QString::fromUtf8(resource->name()), resource->errorString()));
             }
             resource->copyData(out);

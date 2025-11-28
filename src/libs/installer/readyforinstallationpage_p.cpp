@@ -126,24 +126,24 @@ bool ReadyForInstallationPagePrivate::entering()
     m_ui->InstallComponentsWidget->setVisible(false);
 
     if (m_core->isUpdater()) {
-        initializeInstallTree(tr("You are updating"));
-        q->setButtonText(QWizard::CommitButton, tr("U&pdate"));
+        initializeInstallTree(QLatin1String("You are updating"));
+        q->setButtonText(QWizard::CommitButton, QLatin1String("U&pdate"));
     } else if (m_core->isPackageManager()) {
-        initializeInstallTree(tr("You are installing"));
+        initializeInstallTree(QLatin1String("You are installing"));
         initializeUninstallTree();
-        q->setButtonText(QWizard::CommitButton, tr("U&pdate"));
+        q->setButtonText(QWizard::CommitButton, QLatin1String("U&pdate"));
     } else if (m_core->isUninstaller()) {
         initializeUninstaller();
-        q->setButtonText(QWizard::CommitButton, tr("U&ninstall"));
+        q->setButtonText(QWizard::CommitButton, QLatin1String("U&ninstall"));
         showSpaceWidget(false);
         return true;
     } else if (m_core->isOfflineGenerator()) {
-        initializeInstallTree(tr("You are including following packages"));
-        q->setButtonText(QWizard::CommitButton, tr("Create Offline Installer"));
+        initializeInstallTree(QLatin1String("You are including following packages"));
+        q->setButtonText(QWizard::CommitButton, QLatin1String("Create Offline Installer"));
     } else {
         Q_ASSERT(m_core->isInstaller());
-        initializeInstallTree(tr("You are installing"));
-        q->setButtonText(QWizard::CommitButton, tr("&Install"));
+        initializeInstallTree(QLatin1String("You are installing"));
+        q->setButtonText(QWizard::CommitButton, QLatin1String("&Install"));
     }
 
     isComplete = m_core->recalculateAllComponents();
@@ -203,7 +203,7 @@ void ReadyForInstallationPagePrivate::initializeTree(QSortFilterProxyModel *mode
 void ReadyForInstallationPagePrivate::initializeUninstaller()
 {
     m_ui->RemoveAllMsgLabel->show();
-    m_ui->RemoveAllMsgLabel->setText(tr("All required information is now available to begin removing %1 from your computer.<br>"
+    m_ui->RemoveAllMsgLabel->setText(QLatin1String("All required information is now available to begin removing %1 from your computer.<br>"
                                 "<font color=\"red\">The program directory %2 will be deleted completely</font>, "
                                 "including all content in that directory!").arg(q->productName(),
                                 QDir::toNativeSeparators(QDir(m_core->value(scTargetDir)).absolutePath())));

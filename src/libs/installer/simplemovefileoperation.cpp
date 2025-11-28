@@ -60,7 +60,7 @@ bool SimpleMoveFileOperation::performOperation()
 
     if (source.isEmpty() || target.isEmpty()) {
         setError(UserDefinedError);
-        setErrorString(tr("None of the arguments can be empty: source \"%1\", target \"%2\".")
+        setErrorString(QLatin1String("None of the arguments can be empty: source \"%1\", target \"%2\".")
             .arg(QDir::toNativeSeparators(source), QDir::toNativeSeparators(target)));
         return false;
     }
@@ -71,7 +71,7 @@ bool SimpleMoveFileOperation::performOperation()
     if (file.exists()) {
         if (!file.remove()) {
             setError(UserDefinedError);
-            setErrorString(tr("Cannot move file from \"%1\" to \"%2\", because the target path exists and is "
+            setErrorString(QLatin1String("Cannot move file from \"%1\" to \"%2\", because the target path exists and is "
                 "not removable.").arg(QDir::toNativeSeparators(source), QDir::toNativeSeparators(target)));
             return false;
         }
@@ -80,13 +80,13 @@ bool SimpleMoveFileOperation::performOperation()
     file.setFileName(source);
     if (!file.rename(target)) {
         setError(UserDefinedError);
-        setErrorString(tr("Cannot move file \"%1\" to \"%2\": %3").arg(
+        setErrorString(QLatin1String("Cannot move file \"%1\" to \"%2\": %3").arg(
                            QDir::toNativeSeparators(source), QDir::toNativeSeparators(target),
                            file.errorString()));
         return false;
     }
 
-    emit outputTextChanged(tr("Moving file \"%1\" to \"%2\".").arg(QDir::toNativeSeparators(source),
+    emit outputTextChanged(QLatin1String("Moving file \"%1\" to \"%2\".").arg(QDir::toNativeSeparators(source),
                                                                    QDir::toNativeSeparators(target)));
     return true;
 }
@@ -99,7 +99,7 @@ bool SimpleMoveFileOperation::undoOperation()
     const QString target = arguments().at(1);
 
     QFile(target).rename(source);
-    emit outputTextChanged(tr("Moving file \"%1\" to \"%2\".").arg(QDir::toNativeSeparators(target),
+    emit outputTextChanged(QLatin1String("Moving file \"%1\" to \"%2\".").arg(QDir::toNativeSeparators(target),
                                                                    QDir::toNativeSeparators(source)));
 
     return true;

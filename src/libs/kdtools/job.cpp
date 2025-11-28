@@ -180,7 +180,7 @@ void Job::cancel()
         doCancel();
         if (error() == NoError) {
             setError(Canceled);
-            setErrorString(tr("Canceled"));
+            setErrorString(QLatin1String("Canceled"));
         }
         emitFinished();
     } else {

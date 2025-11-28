@@ -124,13 +124,13 @@ QVariant RepositoryItem::data(int column, int role) const
         case Qt::ToolTipRole:
             switch (column) {
                 case 1:
-                    return SettingsDialog::tr("Check this to use repository during fetch.");
+                    return QLatin1String("Check this to use repository during fetch.");
                 case 2:
-                    return SettingsDialog::tr("Add the username to authenticate on the server.");
+                    return QLatin1String("Add the username to authenticate on the server.");
                 case 3:
-                    return SettingsDialog::tr("Add the password to authenticate on the server.");
+                    return QLatin1String("Add the password to authenticate on the server.");
                 case 4:
-                    return SettingsDialog::tr("The server's URL that contains a valid repository.");
+                    return QLatin1String("The server's URL that contains a valid repository.");
                 default:
                     return QVariant();
             }   break;
@@ -377,8 +377,8 @@ void SettingsDialog::testRepository()
         const bool isEnabled = current->data(1, Qt::CheckStateRole).toBool();
 
         msgBox.setText(isError
-            ? tr("An error occurred while testing this repository.")
-            : tr("The repository was tested successfully."));
+            ? QLatin1String("An error occurred while testing this repository.")
+            : QLatin1String("The repository was tested successfully."));
 
         const bool showQuestion = (isError == isEnabled);
         msgBox.setStandardButtons(showQuestion ? QMessageBox::Yes | QMessageBox::No
@@ -386,8 +386,8 @@ void SettingsDialog::testRepository()
         msgBox.setDefaultButton(showQuestion ? QMessageBox::Yes : QMessageBox::Close);
         if (showQuestion) {
             msgBox.setInformativeText(isEnabled
-                ? tr("Do you want to disable the repository?")
-                : tr("Do you want to enable the repository?")
+                ? QLatin1String("Do you want to disable the repository?")
+                : QLatin1String("Do you want to enable the repository?")
             );
         }
         if (msgBox.exec() == QMessageBox::Yes)
@@ -402,7 +402,7 @@ void SettingsDialog::updatePasswords()
 {
     m_showPasswords = !m_showPasswords;
     m_delegate->showPasswords(m_showPasswords);
-    m_ui->m_showPasswords->setText(m_showPasswords ? tr("Hide Passwords") : tr("Show Passwords"));
+    m_ui->m_showPasswords->setText(m_showPasswords ? QLatin1String("Hide Passwords") : QLatin1String("Show Passwords"));
 
     // force an tree view update so the delegate has to repaint
     m_ui->m_repositoriesView->viewport()->update();
@@ -465,11 +465,11 @@ void SettingsDialog::setupRepositoriesTreeWidget()
 {
     QTreeWidget *treeWidget = m_ui->m_repositoriesView;
     treeWidget->header()->setVisible(true);
-    treeWidget->setHeaderLabels(QStringList() << QString() << tr("Use") << tr("Username") << tr("Password")
-         << tr("Repository"));
-    m_rootItems.append(new RepositoryItem(tr("Default repositories")));
-    m_rootItems.append(new RepositoryItem(tr("Temporary repositories")));
-    m_rootItems.append(new RepositoryItem(tr("User defined repositories")));
+    treeWidget->setHeaderLabels(QStringList() << QString() << QLatin1String("Use") << QLatin1String("Username") << QLatin1String("Password")
+         << QLatin1String("Repository"));
+    m_rootItems.append(new RepositoryItem(QLatin1String("Default repositories")));
+    m_rootItems.append(new RepositoryItem(QLatin1String("Temporary repositories")));
+    m_rootItems.append(new RepositoryItem(QLatin1String("User defined repositories")));
     treeWidget->addTopLevelItems(m_rootItems);
 
     const Settings &settings = m_core->settings();

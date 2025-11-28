@@ -68,7 +68,7 @@ void CopyFileTask::doTask(QFutureInterface<FileTaskResult> &fi)
     fi.setExpectedResultCount(items.count());
 
     if (items.isEmpty()) {
-        fi.reportException(TaskException(tr("Invalid task item count.")));
+        fi.reportException(TaskException(QLatin1String("Invalid task item count.")));
         fi.reportFinished(); return;    // error
     }
 
@@ -77,7 +77,7 @@ void CopyFileTask::doTask(QFutureInterface<FileTaskResult> &fi)
         FileTaskObserver observer(QCryptographicHash::Sha1);
         QFile source(item.source());
         if (!source.open(QIODevice::ReadOnly)) {
-            fi.reportException(TaskException(tr("Cannot open file \"%1\" for reading: %2")
+            fi.reportException(TaskException(QLatin1String("Cannot open file \"%1\" for reading: %2")
                 .arg(QDir::toNativeSeparators(source.fileName()), source.errorString())));
             fi.reportFinished(); return;    // error
         }
@@ -93,7 +93,7 @@ void CopyFileTask::doTask(QFutureInterface<FileTaskResult> &fi)
             file.reset(new QFile(target));
         }
         if (!file->open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-            fi.reportException(TaskException(tr("Cannot open file \"%1\" for writing: %2")
+            fi.reportException(TaskException(QLatin1String("Cannot open file \"%1\" for writing: %2")
                 .arg(QDir::toNativeSeparators(file->fileName()), file->errorString())));
             fi.reportFinished(); return;    // error
         }
@@ -110,7 +110,7 @@ void CopyFileTask::doTask(QFutureInterface<FileTaskResult> &fi)
             while (written < read) {
                 const qint64 toWrite = file->write(buffer.constData() + written, read - written);
                 if (toWrite < 0) {
-                    fi.reportException(TaskException(tr("Writing to file \"%1\" failed: %2")
+                    fi.reportException(TaskException(QLatin1String("Writing to file \"%1\" failed: %2")
                         .arg(QDir::toNativeSeparators(file->fileName()), file->errorString())));
                 }
                 written += toWrite;

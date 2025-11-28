@@ -199,13 +199,13 @@ QVariant ComponentModel::data(const QModelIndex &index, int role) const
                 if (role == Qt::ToolTipRole) {
                     switch (component->installAction()) {
                     case ComponentModelHelper::Install:
-                        return tr("Component is marked for installation.");
+                        return QLatin1String("Component is marked for installation.");
                     case ComponentModelHelper::Uninstall:
-                        return tr("Component is marked for uninstallation.");
+                        return QLatin1String("Component is marked for uninstallation.");
                     case ComponentModelHelper::KeepInstalled:
-                        return tr("Component is installed.");
+                        return QLatin1String("Component is installed.");
                     case ComponentModelHelper::KeepUninstalled:
-                        return tr("Component is not installed.");
+                        return QLatin1String("Component is not installed.");
                     default:
                         return QString();
                     }

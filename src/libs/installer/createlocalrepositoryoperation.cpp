@@ -87,7 +87,7 @@ static void fixPermissions(const QString &repoPath)
             continue;
 
         if (!setDefaultFilePermissions(it.filePath(), DefaultFilePermissions::NonExecutable)) {
-                throw Error(CreateLocalRepositoryOperation::tr("Cannot set permissions for file \"%1\".")
+                throw Error(QLatin1String("Cannot set permissions for file \"%1\".")
                     .arg(QDir::toNativeSeparators(it.filePath())));
         }
     }
@@ -108,7 +108,7 @@ static void removeFiles(const QString &path, AutoHelper *const helper)
         if (fi.isSymLink() || fi.isFile()) {
             QFile f(fi.filePath());
             if (!f.remove()) {
-                throw Error(CreateLocalRepositoryOperation::tr("Cannot remove file \"%1\": %2")
+                throw Error(QLatin1String("Cannot remove file \"%1\": %2")
                     .arg(QDir::toNativeSeparators(f.fileName()), f.errorString()));
             }
             helper->m_files.removeAll(f.fileName());
@@ -125,17 +125,17 @@ static QString createArchive(const QString repoPath, const QString &sourceDir, c
 
     QScopedPointer<AbstractArchive> archiveFile(ArchiveFactory::instance().create(archive.fileName()));
     if (!archiveFile) {
-        throw Error(CreateLocalRepositoryOperation::tr("Unsupported archive \"%1\": no handler "
+        throw Error(QLatin1String("Unsupported archive \"%1\": no handler "
             "registered for file suffix \"%2\".").arg(archive.fileName(), QFileInfo(archive.fileName()).suffix()));
     }
     if (!(archiveFile->open(QIODevice::WriteOnly) && archiveFile->create(QStringList() << sourceDir))) {
-        throw Error(CreateLocalRepositoryOperation::tr("Cannot create archive \"%1\": %2")
+        throw Error(QLatin1String("Cannot create archive \"%1\": %2")
             .arg(QDir::toNativeSeparators(archive.fileName()), archiveFile->errorString()));
     }
     archiveFile->close();
     removeFiles(sourceDir, helper); // cleanup the files we compressed
     if (!archive.rename(sourceDir + fileName)) {
-        throw Error(CreateLocalRepositoryOperation::tr("Cannot move file \"%1\" to \"%2\": %3")
+        throw Error(QLatin1String("Cannot move file \"%1\" to \"%2\": %3")
             .arg(QDir::toNativeSeparators(archive.fileName()),
                  QDir::toNativeSeparators(sourceDir + fileName), archive.errorString()));
     }
@@ -175,7 +175,7 @@ bool CreateLocalRepositoryOperation::performOperation()
         // check if this is an offline version, otherwise there will be no binary data
         PackageManagerCore *const core = packageManager();
         if (core && !core->isOfflineOnly()) {
-            throw QInstaller::Error(tr("Installer at \"%1\" needs to be an offline one.")
+            throw QInstaller::Error(QLatin1String("Installer at \"%1\" needs to be an offline one.")
                 .arg(QDir::toNativeSeparators(binaryPath)));
         }
 
@@ -218,7 +218,7 @@ bool CreateLocalRepositoryOperation::performOperation()
             metaSourceDir.setPath(metaSource);
             if (!metaSourceDir.mkpath(metaSource)) {
                 setError(UserDefinedError);
-                setErrorString(tr("Cannot create path \"%1\".")
+                setErrorString(QLatin1String("Cannot create path \"%1\".")
                     .arg(QDir::toNativeSeparators(metaSource)));
                 return false;
             }
@@ -244,7 +244,7 @@ bool CreateLocalRepositoryOperation::performOperation()
 
         if (createdMetaDir && !metaSourceDir.removeRecursively()) {
             setError(UserDefinedError);
-            setErrorString(tr("Cannot remove directory \"%1\".")
+            setErrorString(QLatin1String("Cannot remove directory \"%1\".")
                 .arg(QDir::toNativeSeparators(metaSourceDir.absolutePath())));
             return false;
         }
@@ -263,14 +263,14 @@ bool CreateLocalRepositoryOperation::performOperation()
         // open the updates xml file we previously copied
         QFile updatesXml(repoPath + QLatin1String("Updates.xml"));
         if (!updatesXml.exists() || !updatesXml.open(QIODevice::ReadOnly))
-            throw QInstaller::Error(tr("Cannot open file \"%1\" for reading.").arg(
+            throw QInstaller::Error(QLatin1String("Cannot open file \"%1\" for reading.").arg(
                                         QDir::toNativeSeparators(updatesXml.fileName())));
 
         // read the content of the updates xml
         QDomDocument doc;
         QDomDocument::ParseResult result = doc.setContent(&updatesXml);
         if (!result)
-            throw QInstaller::Error(tr("Cannot read file \"%1\": %2").arg(
+            throw QInstaller::Error(QLatin1String("Cannot read file \"%1\": %2").arg(
                 QDir::toNativeSeparators(updatesXml.fileName()), result.errorMessage));
 
         // build for each available package a name - version mapping
@@ -300,7 +300,7 @@ bool CreateLocalRepositoryOperation::performOperation()
 
         QFile file(binaryPath);
         if (!file.open(QIODevice::ReadOnly)) {
-            throw QInstaller::Error(tr("Cannot open file \"%1\" for reading: %2").arg(
+            throw QInstaller::Error(QLatin1String("Cannot open file \"%1\" for reading: %2").arg(
                                         QDir::toNativeSeparators(file.fileName()),
                                         file.errorString()));
         }
@@ -319,7 +319,7 @@ bool CreateLocalRepositoryOperation::performOperation()
             for (int i = 0; i < names.count(); ++i) {
                 const QString name = names.at(i);
                 if (!repo.mkpath(name)) {
-                    throw QInstaller::Error(tr("Cannot create target directory: \"%1\".")
+                    throw QInstaller::Error(QLatin1String("Cannot create target directory: \"%1\".")
                         .arg(QDir::toNativeSeparators(repo.filePath(name))));
                 }
                 // zip the meta files that come with the offline installer
@@ -368,7 +368,7 @@ bool CreateLocalRepositoryOperation::performOperation()
         return false;
     } catch (...) {
         setError(UserDefinedError);
-        setErrorString(tr("Unknown exception caught: %1.").arg(QLatin1String(Q_FUNC_INFO)));
+        setErrorString(QLatin1String("Unknown exception caught: %1.").arg(QLatin1String(Q_FUNC_INFO)));
         return false;
     }
     return true;
@@ -388,10 +388,10 @@ bool CreateLocalRepositoryOperation::undoOperation()
     QDir dir;
     const QStringList files = value(QLatin1String("files")).toStringList();
     foreach (const QString &file, files) {
-        emit outputTextChanged(tr("Removing file \"%1\".").arg(QDir::toNativeSeparators(file)));
+        emit outputTextChanged(QLatin1String("Removing file \"%1\".").arg(QDir::toNativeSeparators(file)));
         if (!QFile::remove(file)) {
             setError(InvalidArguments);
-            setErrorString(tr("Cannot remove file \"%1\".").arg(QDir::toNativeSeparators(file)));
+            setErrorString(QLatin1String("Cannot remove file \"%1\".").arg(QDir::toNativeSeparators(file)));
             return false;
         }
         dir.rmpath(QFileInfo(file).absolutePath());
@@ -410,11 +410,11 @@ bool CreateLocalRepositoryOperation::undoOperation()
 #if defined(Q_OS_WIN) && !defined(Q_CC_MINGW)
         char msg[128];
         if (strerror_s(msg, sizeof msg, errno) != 0) {
-            setError(UserDefinedError, tr("Cannot remove directory \"%1\": %2").arg(
+            setError(UserDefinedError, QLatin1String("Cannot remove directory \"%1\": %2").arg(
                          QDir::toNativeSeparators(createdDir.path()), QString::fromLocal8Bit(msg)));
         }
 #else
-        setError(UserDefinedError, tr("Cannot remove directory \"%1\": %2").arg(
+        setError(UserDefinedError, QLatin1String("Cannot remove directory \"%1\": %2").arg(
                      QDir::toNativeSeparators(createdDir.path()), QString::fromLocal8Bit(strerror(errno))));
 #endif
     }

@@ -85,15 +85,15 @@ public:
 
         QScopedPointer<AbstractArchive> archive(ArchiveFactory::instance().create(m_archive));
         if (!archive) {
-            fi.reportException(UnzipArchiveException(MetadataJob::tr("Unsupported archive \"%1\": no handler "
+            fi.reportException(UnzipArchiveException(QLatin1String("Unsupported archive \"%1\": no handler "
                 "registered for file suffix \"%2\".").arg(m_archive, QFileInfo(m_archive).suffix())));
             return;
         } else if (!archive->open(QIODevice::ReadOnly)) {
-            fi.reportException(UnzipArchiveException(MetadataJob::tr("Cannot open file \"%1\" for "
+            fi.reportException(UnzipArchiveException(QLatin1String("Cannot open file \"%1\" for "
                 "reading: %2").arg(QDir::toNativeSeparators(m_archive), archive->errorString())));
             return;
         } else if (!archive->extract(m_targetDir)) {
-            fi.reportException(UnzipArchiveException(MetadataJob::tr("Error while extracting "
+            fi.reportException(UnzipArchiveException(QLatin1String("Error while extracting "
                 "archive \"%1\": %2").arg(QDir::toNativeSeparators(m_archive), archive->errorString())));
             return;
         }
@@ -107,7 +107,7 @@ public:
 
                 QFile file(m_targetDir + QDir::separator() + entry.path);
                 if (!file.open(QIODevice::ReadOnly)) {
-                    fi.reportException(UnzipArchiveException(MetadataJob::tr("Cannot open extracted file \"%1\" for "
+                    fi.reportException(UnzipArchiveException(QLatin1String("Cannot open extracted file \"%1\" for "
                         "reading: %2").arg(QDir::toNativeSeparators(file.fileName()), file.errorString())));
                     break;
                 }
@@ -119,7 +119,7 @@ public:
                 QFile hashFile(fileInfo.absolutePath() + QDir::separator()
                     + QString::fromLatin1(hexChecksum) + QLatin1String(".sha1"));
                 if (!hashFile.open(QIODevice::WriteOnly)) {
-                    fi.reportException(UnzipArchiveException(MetadataJob::tr("Cannot open file \"%1\" for "
+                    fi.reportException(UnzipArchiveException(QLatin1String("Cannot open file \"%1\" for "
                         "writing: %2").arg(QDir::toNativeSeparators(hashFile.fileName()), hashFile.errorString())));
                     break;
                 }
@@ -191,7 +191,7 @@ public:
         // Bail out if there was error while registering items
         if (!success) {
             fi.reportException(CacheTaskException(m_cache->errorString() + u' '
-                + MetadataJob::tr("Clearing the cache directory and restarting the application may solve this.")));
+                + QLatin1String("Clearing the cache directory and restarting the application may solve this.")));
             m_cache->sync();
             fi.reportFinished();
             return;
@@ -204,7 +204,7 @@ public:
 
         if (!m_cache->sync()) {
             fi.reportException(CacheTaskException(m_cache->errorString() + u' '
-                + MetadataJob::tr("Clearing the cache directory and restarting the application may solve this.")));
+                + QLatin1String("Clearing the cache directory and restarting the application may solve this.")));
         }
 
         fi.reportFinished();

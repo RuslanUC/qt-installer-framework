@@ -78,7 +78,7 @@ bool ReplaceOperation::performOperation()
 
     if (before.isEmpty()) {
         setError(InvalidArguments);
-        setErrorString(tr("Current search argument calling \"%1\" with "
+        setErrorString(QLatin1String("Current search argument calling \"%1\" with "
             "empty search argument is not supported.").arg(name()));
 
         return false;
@@ -86,7 +86,7 @@ bool ReplaceOperation::performOperation()
 
     if (!(mode == stringMode || mode == regexMode)) {
         setError(InvalidArguments);
-        setErrorString(tr("Current mode argument calling \"%1\" with "
+        setErrorString(QLatin1String("Current mode argument calling \"%1\" with "
             "arguments \"%2\" is not supported. Please use string or regex.")
             .arg(name(), arguments().join(QLatin1String("; "))));
 
@@ -96,7 +96,7 @@ bool ReplaceOperation::performOperation()
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)) {
         setError(UserDefinedError);
-        setErrorString(tr("Cannot open file \"%1\" for reading: %2").arg(
+        setErrorString(QLatin1String("Cannot open file \"%1\" for reading: %2").arg(
                            QDir::toNativeSeparators(fileName), file.errorString()));
         return false;
     }
@@ -107,7 +107,7 @@ bool ReplaceOperation::performOperation()
 
     if (!file.open(QIODevice::WriteOnly)) {
         setError(UserDefinedError);
-        setErrorString(tr("Cannot open file \"%1\" for writing: %2").arg(
+        setErrorString(QLatin1String("Cannot open file \"%1\" for writing: %2").arg(
                            QDir::toNativeSeparators(fileName), file.errorString()));
         return false;
     }

@@ -189,7 +189,7 @@ void Task::run()
     m_finished = false; // for the sake of completeness
     m_started = true;
     emit started();
-    reportProgress(0, tr("%1 started").arg(m_name));
+    reportProgress(0, QLatin1String("%1 started").arg(m_name));
 
     doRun();
 }
@@ -202,7 +202,7 @@ void Task::run()
 void Task::stop()
 {
     if (!(m_caps & Stoppable)) {
-        const QString errorMsg = tr("%1 cannot be stopped").arg(m_name);
+        const QString errorMsg = QLatin1String("%1 cannot be stopped").arg(m_name);
         reportError(ECannotStopTask, errorMsg);
         return;
     }
@@ -220,7 +220,7 @@ void Task::stop()
 
     m_stopped = doStop();
     if (!m_stopped) {
-        const QString errorMsg = tr("Cannot stop task %1").arg(m_name);
+        const QString errorMsg = QLatin1String("Cannot stop task %1").arg(m_name);
         reportError(ECannotStopTask, errorMsg);
         return;
     }
@@ -239,7 +239,7 @@ void Task::stop()
 void Task::pause()
 {
     if (!(m_caps & Pausable)) {
-        const QString errorMsg = tr("%1 cannot be paused").arg(m_name);
+        const QString errorMsg = QLatin1String("%1 cannot be paused").arg(m_name);
         reportError(ECannotPauseTask, errorMsg);
         return;
     }
@@ -257,7 +257,7 @@ void Task::pause()
     m_paused = doPause();
 
     if (!m_paused) {
-        const QString errorMsg = tr("Cannot pause task %1").arg(m_name);
+        const QString errorMsg = QLatin1String("Cannot pause task %1").arg(m_name);
         reportError(ECannotPauseTask, errorMsg);
         return;
     }
@@ -285,7 +285,7 @@ void Task::resume()
     const bool val = doResume();
 
     if (!val) {
-        const QString errorMsg = tr("Cannot resume task %1").arg(m_name);
+        const QString errorMsg = QLatin1String("Cannot resume task %1").arg(m_name);
         reportError(ECannotResumeTask, errorMsg);
         return;
     }
@@ -341,7 +341,7 @@ void Task::reportError(const QString &errorText)
 */
 void Task::reportDone()
 {
-    QString msg = tr("%1 done");
+    QString msg = QLatin1String("%1 done");
     reportProgress(100, msg);
 
     // State should be finished, but not started, paused or stopped.

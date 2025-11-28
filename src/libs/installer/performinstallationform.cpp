@@ -124,7 +124,7 @@ void PerformInstallationForm::setupUi(QWidget *widget)
     connect(ProgressCoordinator::instance(), &ProgressCoordinator::additionalProgressStatusChanged, this,
         &PerformInstallationForm::onAdditionalProgressStatusChanged);
 
-    m_detailsButton = new QPushButton(tr("&Show Details"), widget);
+    m_detailsButton = new QPushButton(QLatin1String("&Show Details"), widget);
     m_detailsButton->setObjectName(QLatin1String("DetailsButton"));
     m_detailsButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
     connect(m_detailsButton, &QAbstractButton::clicked, this, &PerformInstallationForm::toggleDetails);
@@ -208,7 +208,7 @@ void PerformInstallationForm::updateProgress()
 void PerformInstallationForm::toggleDetails()
 {
     const bool willShow = !isShowingDetails();
-    m_detailsButton->setText(willShow ? tr("&Hide Details") : tr("&Show Details"));
+    m_detailsButton->setText(willShow ? QLatin1String("&Hide Details") : QLatin1String("&Show Details"));
     m_detailsBrowser->setVisible(willShow);
     m_productImagesScrollArea->setVisible(!willShow);
     emit showDetailsChanged();
@@ -229,7 +229,7 @@ void PerformInstallationForm::clearDetailsBrowser()
 void PerformInstallationForm::enableDetails()
 {
     m_detailsButton->setEnabled(true);
-    m_detailsButton->setText(tr("&Show Details"));
+    m_detailsButton->setText(QLatin1String("&Show Details"));
     m_detailsBrowser->setVisible(false);
     m_productImagesScrollArea->setVisible(true);
 }

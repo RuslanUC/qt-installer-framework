@@ -65,7 +65,7 @@ bool FakeStopProcessForUpdateOperation::undoOperation()
 
     PackageManagerCore *const core = packageManager();
     if (!core) {
-        setError(KDUpdater::UpdateOperation::UserDefinedError, tr("Cannot get package manager "
+        setError(KDUpdater::UpdateOperation::UserDefinedError, QLatin1String("Cannot get package manager "
             "core."));
         return false;
     }
@@ -80,11 +80,11 @@ bool FakeStopProcessForUpdateOperation::undoOperation()
         return true;
 
     if (processes.count() == 1) {
-        setError(UpdateOperation::UserDefinedError, tr("This process should be stopped before "
+        setError(UpdateOperation::UserDefinedError, QLatin1String("This process should be stopped before "
             "continuing: %1").arg(QDir::toNativeSeparators(processes.first())));
     } else {
         const QString sep = QString::fromWCharArray(L"\n   \u2022 ");   // Unicode bullet
-        setError(UpdateOperation::UserDefinedError, tr("These processes should be stopped before "
+        setError(UpdateOperation::UserDefinedError, QLatin1String("These processes should be stopped before "
             "continuing: %1").arg(sep + QDir::toNativeSeparators(processes.join(sep))));
     }
     return false;

@@ -173,7 +173,7 @@ public Q_SLOTS:
     {
         m_archive.reset(ArchiveFactory::instance().create(m_archivePath));
         if (!m_archive) {
-            emit finished(false, tr("Could not create handler object for archive \"%1\": \"%2\".")
+            emit finished(false, QLatin1String("Could not create handler object for archive \"%1\": \"%2\".")
                 .arg(m_archivePath, QLatin1String(Q_FUNC_INFO)));
             return;
         }
@@ -182,13 +182,13 @@ public Q_SLOTS:
         connect(m_archive.get(), &AbstractArchive::completedChanged, m_callback, &Callback::onCompletedChanged);
 
         if (!m_archive->open(QIODevice::ReadOnly)) {
-            emit finished(false, tr("Cannot open archive \"%1\" for reading: %2").arg(m_archivePath,
+            emit finished(false, QLatin1String("Cannot open archive \"%1\" for reading: %2").arg(m_archivePath,
                 m_archive->errorString()));
             return;
         }
 
         if (!m_archive->extract(m_targetDir, m_totalEntries)) {
-            emit finished(false, tr("Error while extracting archive \"%1\": %2").arg(m_archivePath,
+            emit finished(false, QLatin1String("Error while extracting archive \"%1\": %2").arg(m_archivePath,
                 m_archive->errorString()));
         } else {
             emit finished(true, QString());

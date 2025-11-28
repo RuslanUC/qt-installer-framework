@@ -74,15 +74,15 @@ QString FileTaskObserver::progressText() const
         if (bytesReceived.endsWith(tmp))
             bytesReceived.chop(tmp.length());
 
-        progressText = tr("%1 of %2").arg(bytesReceived, bytesToReceive);
+        progressText = QLatin1String("%1 of %2").arg(bytesReceived, bytesToReceive);
     } else {
         if (m_bytesTransfered > 0)
-            progressText = tr("%1 received.").arg(QInstaller::humanReadableSize(m_bytesTransfered));
+            progressText = QLatin1String("%1 received.").arg(QInstaller::humanReadableSize(m_bytesTransfered));
     }
 
     if (!progressText.isEmpty())
         progressText += QLatin1Char(' ');
-    progressText += tr("(%1/sec)").arg(QInstaller::humanReadableSize(m_bytesPerSecond));
+    progressText += QLatin1String("(%1/sec)").arg(QInstaller::humanReadableSize(m_bytesPerSecond));
     if (m_bytesToTransfer > 0 && m_bytesPerSecond > 0) {
         const qint64 time = (m_bytesToTransfer - m_bytesTransfered) / m_bytesPerSecond;
 
@@ -93,24 +93,24 @@ QString FileTaskObserver::progressText() const
 
         QString days;
         if (d > 0)
-            days = tr("%n day(s), ", "", d);
+            days = QLatin1String("%1 day(s), ").arg(QString::number(d));
 
         QString hours;
         if (h > 0)
-            hours = tr("%n hour(s), ", "", h);
+            hours = QLatin1String("%1 hour(s), ").arg(QString::number(h));
 
         QString minutes;
         if (m > 0)
-            minutes = tr("%n minute(s)", "", m);
+            minutes = QLatin1String("%1 minute(s)").arg(QString::number(m));
 
         QString seconds;
         if (s >= 0 && minutes.isEmpty()) {
             s = (s <= 0 ? 1 : s);
-            seconds = tr("%n second(s)", "", s);
+            seconds = QLatin1String("%1 second(s)").arg(QString::number(s));
         }
-        progressText += tr(" - %1%2%3%4 remaining.").arg(days, hours, minutes, seconds);
+        progressText += QLatin1String(" - %1%2%3%4 remaining.").arg(days, hours, minutes, seconds);
     } else {
-        progressText += tr(" - unknown time remaining.");
+        progressText += QLatin1String(" - unknown time remaining.");
     }
 
     return progressText;
