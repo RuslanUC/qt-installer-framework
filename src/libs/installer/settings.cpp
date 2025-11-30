@@ -71,7 +71,6 @@ static const QLatin1String scTmpRepositories("TemporaryRepositories");
 static const QLatin1String scMaintenanceToolIniFile("MaintenanceToolIniFile");
 static const QLatin1String scMaintenanceToolAlias("MaintenanceToolAlias");
 static const QLatin1String scDependsOnLocalInstallerBinary("DependsOnLocalInstallerBinary");
-static const QLatin1String scTranslations("Translations");
 static const QLatin1String scCreateLocalRepository("CreateLocalRepository");
 static const QLatin1String scInstallActionColumnVisible("InstallActionColumnVisible");
 
@@ -318,7 +317,7 @@ Settings Settings::fromFileAndPrefix(const QString &path, const QString &prefix,
     elementList << scName << scVersion << scTitle << scPublisher << scProductUrl
                 << scTargetDir << scAdminTargetDir
                 << scInstallerApplicationIcon << scInstallerWindowIcon
-                << scLogo << scWatermark << scBanner << scBackground << scPageListPixmap << scAliasDefinitionsFile
+                << scLogo << scWatermark << scBanner << scAliasDefinitionsFile
                 << scStartMenuDir << scMaintenanceToolName << scMaintenanceToolIniFile << scMaintenanceToolAlias
                 << scRemoveTargetDir << scLocalCacheDir << scPersistentLocalCache
                 << scRunProgram << scRunProgramArguments << scRunProgramDescription
@@ -329,7 +328,7 @@ Settings Settings::fromFileAndPrefix(const QString &path, const QString &prefix,
                 << scWizardDefaultWidth << scWizardDefaultHeight << scWizardMinimumWidth << scWizardMinimumHeight
                 << scWizardShowPageList << scProductImages
                 << scRepositorySettingsPageVisible << scTargetConfigurationFile
-                << scRemoteRepositories << scTranslations << scUrlQueryString << QLatin1String(scControlScript)
+                << scRemoteRepositories  << scUrlQueryString << QLatin1String(scControlScript)
                 << scCreateLocalRepository << scInstallActionColumnVisible << scSupportsModify << scAllowUnstableComponents
                 << scSaveDefaultRepositories << scRepositoryCategories;
 
@@ -348,9 +347,7 @@ Settings Settings::fromFileAndPrefix(const QString &path, const QString &prefix,
         if (s.d->m_data.contains(name))
             reader.raiseError(QString::fromLatin1("Element \"%1\" has been defined before.").arg(name));
 
-        if (name == scTranslations) {
-            s.setTranslations(readArgumentAttributes(reader, parseMode, QLatin1String("Translation"), false));
-        } else if (name == scRunProgramArguments) {
+        if (name == scRunProgramArguments) {
             s.setRunProgramArguments(readArgumentAttributes(reader, parseMode, QLatin1String("Argument")));
         } else if (name == scProductImages) {
             s.setProductImages(readProductImages(reader));
@@ -453,16 +450,6 @@ QString Settings::watermark() const
 QString Settings::banner() const
 {
     return d->absolutePathFromKey(scBanner);
-}
-
-QString Settings::background() const
-{
-    return d->absolutePathFromKey(scBackground);
-}
-
-QString Settings::pageListPixmap() const
-{
-    return d->absolutePathFromKey(scPageListPixmap);
 }
 
 QString Settings::wizardStyle() const
@@ -979,19 +966,6 @@ QNetworkProxy Settings::httpProxy() const
 void Settings::setHttpProxy(const QNetworkProxy &proxy)
 {
     d->m_data.replace(scHttpProxy, QVariant::fromValue(proxy));
-}
-
-QStringList Settings::translations() const
-{
-    const QVariant variant = d->m_data.value(scTranslations);
-    if (variant.canConvert<QStringList>())
-        return variant.value<QStringList>();
-    return QStringList();
-}
-
-void Settings::setTranslations(const QStringList &translations)
-{
-    d->m_data.replace(scTranslations, translations);
 }
 
 QString Settings::controlScript() const

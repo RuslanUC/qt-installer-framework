@@ -79,8 +79,6 @@ public:
     QString url() const;
     QString watermark() const;
     QString banner() const;
-    QString background() const;
-    QString pageListPixmap() const;
     QString installerApplicationIcon() const;
     QString installerWindowIcon() const;
     QString systemIconSuffix() const;
@@ -174,9 +172,6 @@ public:
 
     QNetworkProxy httpProxy() const;
     void setHttpProxy(const QNetworkProxy &proxy);
-
-    QStringList translations() const;
-    void setTranslations(const QStringList &translations);
 
     QString controlScript() const;
 

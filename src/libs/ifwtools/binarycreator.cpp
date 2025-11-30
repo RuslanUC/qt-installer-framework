@@ -40,12 +40,12 @@
 
 #include <QDateTime>
 #include <QDirIterator>
-#include <QDomDocument>
 #include <QProcess>
 #include <QRegularExpression>
 #include <QSettings>
 #include <QTemporaryFile>
 #include <QTemporaryDir>
+#include <QXmlStreamReader>
 
 #include <iostream>
 
@@ -598,87 +598,97 @@ void QInstallerTools::copyConfigData(const BinaryCreatorArgs &args, const QStrin
     // Permissions might be set to bogus values
     QInstaller::setDefaultFilePermissions(targetConfigFile, DefaultFilePermissions::NonExecutable);
 
+    const QString sourceConfigFilePath = QFileInfo(sourceConfigFile).absolutePath();
+    static const QRegularExpression regex(QLatin1String("\\\\|/|\\.|:"));
+
     QFile configXml(targetConfigFile);
     QInstaller::openForRead(&configXml);
 
-    QDomDocument dom;
-    dom.setContent(&configXml);
-    configXml.close();
+    QBuffer writerBuf;
+    QXmlStreamReader reader(&configXml);
+    QXmlStreamWriter writer(&writerBuf);
 
-    // iterate over all child elements, searching for relative file names
-    const QDomNodeList children = dom.documentElement().childNodes();
-    const QString sourceConfigFilePath = QFileInfo(sourceConfigFile).absolutePath();
-    for (int i = 0; i < children.count(); ++i) {
-        QDomElement domElement = children.at(i).toElement();
-        if (domElement.isNull())
-            continue;
+    writer.setAutoFormatting(true);
+    writer.writeStartDocument();
 
-        const QString tagName = domElement.tagName();
-        const QString elementText = domElement.text();
-        qDebug().noquote() << QString::fromLatin1("Read dom element: <%1>%2</%1>.").arg(tagName, elementText);
+    bool enterProductImages = false;
+    bool enterProductImage = false;
+    QStringView currentElement;
 
-        if (tagName == QLatin1String("ProductImages")) {
-            const QDomNodeList productImageNode = domElement.childNodes();
-            for (int j = 0; j < productImageNode.count(); ++j) {
-                QDomElement productImagesElement = productImageNode.at(j).toElement();
-                if (productImagesElement.isNull())
-                    continue;
-                const QString childName = productImagesElement.tagName();
-                if (childName != QLatin1String("ProductImage"))
-                    continue;
-                const QDomNodeList imageNode = productImagesElement.childNodes();
-                for (int k = 0; k < imageNode.count(); ++k) {
-                    QDomElement productImageElement = imageNode.at(k).toElement();
-                    if (productImageElement.isNull())
-                        continue;
-                    const QString imageChildName = productImageElement.tagName();
-                    if (imageChildName != QLatin1String("Image"))
-                        continue;
-                    const QString targetFile = targetDir + QLatin1Char('/') + productImageElement.text();
-                    const QFileInfo childFileInfo = QFileInfo(sourceConfigFilePath, productImageElement.text());
+    while(!reader.atEnd()) {
+        reader.readNext();
+
+        if(reader.isStartElement()) {
+            currentElement = reader.name();
+            if(currentElement == scProductImages)
+                enterProductImages = true;
+            if(enterProductImages && currentElement == scProductImage)
+                enterProductImage = true;
+
+            writer.writeStartElement(currentElement);
+        } else if(reader.isEndElement()) {
+            const auto tag = reader.name();
+
+            if(enterProductImages && tag == scProductImage)
+                enterProductImage = false;
+            if(tag == scProductImages)
+                enterProductImages = false;
+
+            writer.writeEndElement();
+        } else if(reader.isCharacters() && !reader.isWhitespace()) {
+            const auto textView = reader.text();
+            auto text = textView.toString();
+
+            if(reader.tokenType() == QXmlStreamReader::Characters && reader.name().isEmpty()) {
+                if(enterProductImages && enterProductImage && currentElement == scImage) {
+                    const QString targetFile = targetDir + QLatin1Char('/') + textView;
+                    const auto childFileInfo = QFileInfo(sourceConfigFilePath, text);
                     if (!QFileInfo::exists(targetFile))
-                        QInstallerTools::copyWithException(childFileInfo.absoluteFilePath(), targetFile, imageChildName);
-                    copyHighDPIImage(childFileInfo, imageChildName, targetFile);
+                        copyWithException(childFileInfo.absoluteFilePath(), targetFile, scImage);
+                    copyHighDPIImage(childFileInfo, scImage, targetFile);
+                    writer.writeCharacters(textView);
+                    continue;
                 }
-
             }
-            continue;
-        }
 
-        static const QRegularExpression regex(QLatin1String("\\\\|/|\\.|:"));
-        QString newName = domElement.text().replace(regex, QLatin1String("_"));
-
-        QString targetFile;
-        QFileInfo elementFileInfo;
-        if (tagName == QLatin1String("InstallerApplicationIcon")) {
+            QString newName = text.replace(regex, QLatin1String("_"));
+            QString targetFile;
+            QFileInfo elementFileInfo;
+            if (currentElement == scInstallerApplicationIcon) {
 #if defined(Q_OS_MACOS)
-            const QString suffix = QLatin1String(".icns");
+                const QString suffix = QLatin1String(".icns");
 #elif defined(Q_OS_WIN)
-            const QString suffix = QLatin1String(".ico");
+                const QString suffix = QLatin1String(".ico");
 #else
-            const QString suffix = QLatin1String(".png");
+                const QString suffix = QLatin1String(".png");
 #endif
-            elementFileInfo = QFileInfo(sourceConfigFilePath, elementText + suffix);
-            targetFile = targetDir + QLatin1Char('/') + newName + suffix;
-        } else {
-            elementFileInfo = QFileInfo(sourceConfigFilePath, elementText);
-            const QString suffix = elementFileInfo.completeSuffix();
-            if (!suffix.isEmpty())
-                newName.append(QLatin1Char('.') + suffix);
-            targetFile = targetDir + QLatin1Char('/') + newName;
-        }
-        if (!elementFileInfo.exists() || elementFileInfo.isDir())
-            continue;
+                elementFileInfo = QFileInfo(sourceConfigFilePath, text + suffix);
+                targetFile = targetDir + QLatin1Char('/') + newName + suffix;
+            } else {
+                elementFileInfo = QFileInfo(sourceConfigFilePath, text);
+                const QString suffix = elementFileInfo.completeSuffix();
+                if (!suffix.isEmpty())
+                    newName.append(QLatin1Char('.') + suffix);
+                targetFile = targetDir + QLatin1Char('/') + newName;
+            }
+            if (!elementFileInfo.exists() || elementFileInfo.isDir())
+                continue;
 
-        domElement.replaceChild(dom.createTextNode(newName), domElement.firstChild());
-        if (!QFileInfo::exists(targetFile))
-            QInstallerTools::copyWithException(elementFileInfo.absoluteFilePath(), targetFile, tagName);
-        copyHighDPIImage(elementFileInfo, tagName, targetFile);
+            text = newName;
+            if (!QFileInfo::exists(targetFile))
+                copyWithException(elementFileInfo.absoluteFilePath(), targetFile, currentElement.toString());
+            copyHighDPIImage(elementFileInfo, currentElement.toString(), targetFile);
+
+            writer.writeCharacters(text);
+        }
     }
 
-    QInstaller::openForWrite(&configXml);
-    QTextStream stream(&configXml);
-    dom.save(stream, 4);
+    configXml.close();
+
+    writerBuf.seek(0);
+    openForWrite(&configXml);
+    configXml.write(writerBuf.buffer());
+    configXml.close();
 
     qDebug() << "done.\n";
 }

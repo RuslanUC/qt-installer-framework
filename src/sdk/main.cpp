@@ -42,12 +42,9 @@
 #include <archive.h>
 #endif
 
-#include <QCommandLineParser>
 #include <QDateTime>
 #include <QNetworkProxyFactory>
-#include <QThread>
 #include <QThreadPool>
-#include <QDeadlineTimer>
 
 #include <iostream>
 

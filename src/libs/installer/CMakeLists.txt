@@ -144,7 +144,6 @@ add_library(installer ${IFW_LINK_TYPE}
         ../ifwtools/rcc/rccmain.cpp
         ../ifwtools/repositorygen.cpp
         ../ifwtools/binarycreator.cpp
-        ../ifwtools/binarydump.cpp
 
         ../kdtools/authenticationdialog.ui
         ../kdtools/job.cpp

@@ -362,11 +362,6 @@ PackageManagerGui::PackageManagerGui(PackageManagerCore *core, QWidget *parent)
 #else
     setWindowIcon(QIcon(m_core->settings().installerWindowIcon()));
 #endif
-    if (!m_core->settings().wizardShowPageList()) {
-        QString pixmapStr = m_core->settings().background();
-        QInstaller::replaceHighDpiImage(pixmapStr);
-        setPixmap(QWizard::BackgroundPixmap, pixmapStr);
-    }
 #ifdef Q_OS_LINUX
     setWizardStyle(QWizard::ModernStyle);
     setSizeGripEnabled(true);
@@ -401,15 +396,6 @@ PackageManagerGui::PackageManagerGui(PackageManagerCore *core, QWidget *parent)
 
         QVBoxLayout *sideWidgetLayout = new QVBoxLayout(sideWidget);
         sideWidgetLayout->setContentsMargins(0, 0, 0, 0);
-        QString pageListPixmap = m_core->settings().pageListPixmap();
-        if (!pageListPixmap.isEmpty()) {
-            QInstaller::replaceHighDpiImage(pageListPixmap);
-            QLabel *pageListPixmapLabel = new QLabel(sideWidget);
-            pageListPixmapLabel->setObjectName(QLatin1String("PageListPixmapLabel"));
-            pageListPixmapLabel->setPixmap(pageListPixmap);
-            pageListPixmapLabel->setMinimumWidth(QPixmap(pageListPixmap).width());
-            sideWidgetLayout->addWidget(pageListPixmapLabel);
-        }
         sideWidgetLayout->addWidget(m_pageListWidget);
         sideWidget->setLayout(sideWidgetLayout);
 

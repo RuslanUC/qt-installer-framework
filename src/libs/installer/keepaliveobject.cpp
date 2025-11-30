@@ -48,12 +48,10 @@ KeepAliveObject::KeepAliveObject()
 
 void KeepAliveObject::start()
 {
-    if (m_timer)
-        delete m_timer;
+    delete m_timer;
     m_timer = new QTimer(this);
 
-    if (m_socket)
-        delete m_socket;
+    delete m_socket;
     m_socket = new QLocalSocket(this);
 
     connect(m_timer, &QTimer::timeout, [this]() {

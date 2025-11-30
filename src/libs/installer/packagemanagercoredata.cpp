@@ -85,7 +85,6 @@ PackageManagerCoreData::PackageManagerCoreData(const QHash<QString, QString> &va
     addNewVariable(scLogo, m_settings.logo());
     addNewVariable(scWatermark, m_settings.watermark());
     addNewVariable(scBanner, m_settings.banner());
-    addNewVariable(scPageListPixmap, m_settings.pageListPixmap());
 
     const QString description = m_settings.runProgramDescription();
     if (!description.isEmpty())

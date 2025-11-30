@@ -37,7 +37,7 @@
 
 QT_BEGIN_NAMESPACE
 
-void showHelp(const QString &argv0, const QString &error)
+static void showHelp(const QString &argv0, const QString &error)
 {
     fprintf(stderr, "Qt resource compiler\n");
     if (!error.isEmpty())
@@ -59,7 +59,7 @@ void showHelp(const QString &argv0, const QString &error)
         qPrintable(argv0));
 }
 
-void dumpRecursive(const QDir &dir, QTextStream &out)
+static void dumpRecursive(const QDir &dir, QTextStream &out)
 {
     QFileInfoList entries = dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot
                                               | QDir::NoSymLinks);
@@ -74,7 +74,7 @@ void dumpRecursive(const QDir &dir, QTextStream &out)
     }
 }
 
-int createProject(const QString &outFileName)
+static int createProject(const QString &outFileName)
 {
     QFile file;
     bool isOk = false;
