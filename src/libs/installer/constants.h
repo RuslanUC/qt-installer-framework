@@ -178,7 +178,6 @@ static constexpr QLatin1String scBanner("Banner");
 static constexpr QLatin1String scLogo("Logo");
 static constexpr QLatin1String scBackground("Background");
 static constexpr QLatin1String scPageListPixmap("PageListPixmap");
-static constexpr QLatin1String scAliasDefinitionsFile("AliasDefinitionsFile");
 constexpr char scRelocatable[] = "@RELOCATABLE_PATH@";
 
 constexpr quint64 scEstimatedMaintenancetoolSize = 56 * 1024 * 1024LL; // MT size is approximately 56 MB

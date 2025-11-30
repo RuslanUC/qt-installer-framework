@@ -29,7 +29,6 @@
 #include "installercalculator.h"
 
 #include "component.h"
-#include "componentalias.h"
 #include "componentmodel.h"
 #include "packagemanagercore.h"
 #include "settings.h"
@@ -55,9 +54,6 @@ InstallerCalculator::~InstallerCalculator()
 
 bool InstallerCalculator::solve()
 {
-    if (!solve(m_core->aliasesMarkedForInstallation()))
-        return false;
-
     // Subtract components added by aliases
     QList<Component *> components = m_core->componentsMarkedForInstallation();
     for (auto *component : std::as_const(m_resolvedComponents))
@@ -128,44 +124,6 @@ bool InstallerCalculator::solve(const QList<Component *> &components)
     return true;
 }
 
-bool InstallerCalculator::solve(const QList<ComponentAlias *> &aliases)
-{
-    if (aliases.isEmpty())
-        return true;
-
-    QList<ComponentAlias *> notAppendedAliases; // Aliases that require other aliases
-    for (auto *alias : aliases) {
-        if (!alias)
-            continue;
-
-        if (m_toInstallComponentAliases.contains(alias->name())) {
-            const QString errorMessage = QCoreApplication::translate("InstallerCalculator",
-                "Recursion detected, component alias \"%1\" already added.").arg(alias->name());
-            qCWarning(QInstaller::lcInstallerInstallLog).noquote() << errorMessage;
-            m_errorString.append(errorMessage);
-
-            Q_ASSERT_X(!m_toInstallComponentAliases.contains(alias->name()), Q_FUNC_INFO,
-                qPrintable(errorMessage));
-
-            return false;
-        }
-
-        if (alias->aliases().isEmpty()) {
-            if (!addComponentsFromAlias(alias))
-                return false;
-        } else {
-            notAppendedAliases.append(alias);
-        }
-    }
-
-    for (auto *alias : std::as_const(notAppendedAliases)) {
-        if (!solveAlias(alias))
-            return false;
-    }
-
-    return true;
-}
-
 void InstallerCalculator::addComponentForInstall(Component *component, const QString &version)
 {
     if (!m_componentsForAutodepencencyCheck.contains(component))
@@ -175,25 +133,6 @@ void InstallerCalculator::addComponentForInstall(Component *component, const QSt
         m_resolvedComponents.append(component);
         m_resolvedComponentNames.insert(component->name());
     }
-}
-
-bool InstallerCalculator::addComponentsFromAlias(ComponentAlias *alias)
-{
-    QList<Component *> componentsToAdd;
-    QList<Component *> components = alias->components();
-    for (auto *component : std::as_const(components)) {
-        if (m_resolvedComponentNames.contains(component->name()))
-            continue; // Already added
-
-        componentsToAdd.append(component);
-        // Updates the model, so that we also check the descendant
-        // components when calculating components to install
-        updateCheckState(component, Qt::Checked);
-        insertResolution(component, Resolution::Alias, alias->name());
-    }
-
-    m_toInstallComponentAliases.insert(alias->name());
-    return solve(componentsToAdd);
 }
 
 QString InstallerCalculator::recursionError(Component *component) const
@@ -283,20 +222,6 @@ bool InstallerCalculator::solveComponent(Component *component, const QString &ve
         insertResolution(component, Resolution::Resolved);
     }
     return true;
-}
-
-bool InstallerCalculator::solveAlias(ComponentAlias *alias)
-{
-    QList<ComponentAlias *> aliases = alias->aliases();
-    for (auto *requiredAlias : std::as_const(aliases)) {
-        if (!solveAlias(requiredAlias))
-            return false;
-    }
-
-    if (m_toInstallComponentAliases.contains(alias->name()))
-        return true;
-
-    return addComponentsFromAlias(alias);
 }
 
 QSet<Component *> InstallerCalculator::autodependencyComponents()

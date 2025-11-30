@@ -31,7 +31,6 @@
 #include "adminauthorization.h"
 #include "binarycontent.h"
 #include "component.h"
-#include "componentalias.h"
 #include "componentmodel.h"
 #include "downloadarchivesjob.h"
 #include "errors.h"
@@ -57,7 +56,6 @@
 #include <QtCore/QTemporaryFile>
 #include <QtCore/QTextStream>
 
-#include <QDesktopServices>
 #include <QFileDialog>
 #include <QRegularExpression>
 #include <QtConcurrentFilter>
@@ -2194,15 +2192,6 @@ Component *PackageManagerCore::componentByName(const QString &name) const
 }
 
 /*!
-    Searches for a component alias matching \a name and returns it.
-    If no alias matches the name, \c nullptr is returned.
-*/
-ComponentAlias *PackageManagerCore::aliasByName(const QString &name) const
-{
-    return d->m_componentAliases.value(name);
-}
-
-/*!
     Searches \a components for a component matching \a name and returns it.
     \a name can also contain a version requirement. For example, \c org.qt-project.sdk.qt
     returns any component with that name, whereas \c{org.qt-project.sdk.qt->=4.5} requires
@@ -2273,24 +2262,6 @@ QList<Component *> PackageManagerCore::componentsMarkedForInstallation() const
             }
         }
     }
-    return markedForInstallation;
-}
-
-/*!
-    Returns a list of component aliases that are marked for installation.
-    The list can be empty.
-*/
-QList<ComponentAlias *> PackageManagerCore::aliasesMarkedForInstallation() const
-{
-    if (isUpdater()) // Aliases not supported on update at the moment
-        return QList<ComponentAlias *>();
-
-    QList<ComponentAlias *> markedForInstallation;
-    for (auto *alias : std::as_const(d->m_componentAliases)) {
-        if (alias && alias->isSelected())
-            markedForInstallation.append(alias);
-    }
-
     return markedForInstallation;
 }
 
@@ -2716,49 +2687,6 @@ bool PackageManagerCore::listAvailablePackages(const QString &regexp, const QHas
     return true;
 }
 
-/*!
-    Lists available component aliases filtered with \a regexp without GUI. Virtual
-    aliases are not listed unless set visible.
-
-    Returns \c true if matching package aliases were found, \c false otherwise.
-
-    \sa setVirtualComponentsVisible()
-*/
-bool PackageManagerCore::listAvailableAliases(const QString &regexp)
-{
-    setPackageViewer();
-    d->enableAllCategories();
-    qCDebug(QInstaller::lcInstallerInstallLog)
-        << "Searching aliases with regular expression:" << regexp;
-
-    if (!d->buildComponentAliases())
-        return false;
-
-    QRegularExpression re(regexp);
-    re.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
-
-    QList<ComponentAlias *> matchedAliases;
-    for (auto *alias : std::as_const(d->m_componentAliases)) {
-        if (!alias)
-            continue;
-
-        if (re.match(alias->name()).hasMatch()) {
-            if (alias->isVirtual() && !virtualComponentsVisible())
-                continue;
-
-            matchedAliases.append(alias);
-        }
-    }
-
-    if (matchedAliases.isEmpty()) {
-        qCDebug(QInstaller::lcInstallerInstallLog) << "No matching package aliases found.";
-        return false;
-    }
-
-    LoggingHandler::instance().printAliasInformation(matchedAliases);
-    return true;
-}
-
 bool PackageManagerCore::componentUninstallableFromCommandLine(const QString &componentName)
 {
     // We will do a recursive check for every child this component has.
@@ -2801,7 +2729,7 @@ bool PackageManagerCore::componentUninstallableFromCommandLine(const QString &co
     eligible for installation, otherwise returns \c false. An error message can be retrieved
     with \a errorMessage.
 */
-bool PackageManagerCore::checkComponentsForInstallation(const QStringList &names, QString &errorMessage, bool &unstableAliasFound, bool fallbackReposFetched)
+bool PackageManagerCore::checkComponentsForInstallation(const QStringList &names, QString &errorMessage, bool fallbackReposFetched)
 {
     bool installComponentsFound = false;
 
@@ -2809,30 +2737,7 @@ bool PackageManagerCore::checkComponentsForInstallation(const QStringList &names
     foreach (const QString &name, names) {
         Component *component = componentByName(name);
         if (!component) {
-            // No such component, check if we have an alias by the name
-            if (ComponentAlias *alias = aliasByName(name)) {
-                if (alias->isUnstable()) {
-                    errorMessage.append(QLatin1String("Cannot select alias %1. There was a problem loading this alias, "
-                        "so it is marked unstable and cannot be selected.").arg(name) + QLatin1Char('\n'));
-                    unstableAliasFound = true;
-                    setCanceled();
-                    return false;
-                } else if (alias->isVirtual()) {
-                    errorMessage.append(QLatin1String("Cannot select %1. Alias is marked virtual, meaning it cannot "
-                        "be selected manually.").arg(name) + QLatin1Char('\n'));
-                    continue;
-                } else if (alias->missingOptionalComponents() && !fallbackReposFetched) {
-                    unstableAliasFound = true;
-                    setCanceled();
-                    return false;
-                }
-
-                alias->setSelected(true);
-                installComponentsFound = true;
-            } else {
-                errorMessage.append(QLatin1String("Cannot install %1. Component not found.").arg(name) + QLatin1Char('\n'));
-            }
-
+            errorMessage.append(QLatin1String("Cannot install %1. Component not found.").arg(name) + QLatin1Char('\n'));
             continue;
         }
         const QModelIndex &idx = model->indexFromComponentName(component->treeName());
@@ -3946,14 +3851,6 @@ QString PackageManagerCore::offlineBinaryName() const
 }
 
 /*!
-    Add new \a source for looking component aliases.
-*/
-void PackageManagerCore::addAliasSource(const AliasSource &source)
-{
-    d->m_aliasSources.insert(source);
-}
-
-/*!
     \sa {installer::setInstaller}{installer.setInstaller}
     \sa isInstaller(), setUpdater(), setPackageManager()
 */
@@ -4503,9 +4400,6 @@ bool PackageManagerCore::fetchAllPackages(const PackagesList &remotes, const Loc
             return false;
 
         d->commitPendingUnstableComponents();
-
-        if (!d->buildComponentAliases())
-            return false;
 
     } catch (const Error &error) {
         d->clearAllComponentLists();

@@ -42,9 +42,7 @@
 
 namespace QInstaller {
 
-struct AliasSource;
 class ComponentModel;
-class ComponentAlias;
 class PackageManagerCorePrivate;
 class PackageManagerProxyFactory;
 class Settings;
@@ -209,8 +207,6 @@ public:
     void setOfflineBinaryName(const QString &name);
     QString offlineBinaryName() const;
 
-    void addAliasSource(const AliasSource &source);
-
     Q_INVOKABLE void addUserRepositories(const QStringList &repositories);
     Q_INVOKABLE void setTemporaryRepositories(const QStringList &repositories,
                                               bool replace = false, bool compressed = false);
@@ -263,8 +259,6 @@ public:
     Q_INVOKABLE QInstaller::Component *componentByName(const QString &identifier) const;
     Q_INVOKABLE QList<QInstaller::Component *> components(const QString &regexp = QString()) const;
 
-    ComponentAlias *aliasByName(const QString &name) const;
-
     Q_INVOKABLE bool calculateComponentsToInstall();
     QList<Component*> orderedComponentsToInstall() const;
     QSet<QString> componentsToInstallNames() const;
@@ -277,7 +271,6 @@ public:
     QSet<QString> componentsToUninstallNames() const;
 
     QList<Component *> componentsMarkedForInstallation() const;
-    QList<ComponentAlias *> aliasesMarkedForInstallation() const;
 
     QString componentsToInstallError() const;
     QString componentsToUninstallError() const;
@@ -295,7 +288,6 @@ public:
     void listInstalledPackages(const QString &regexp = QString());
     bool listAvailablePackages(const QString &regexp = QString(),
                                const QHash<QString, QString> &filters = QHash<QString, QString>());
-    bool listAvailableAliases(const QString &regexp = QString());
 
     PackageManagerCore::Status searchAvailableUpdates();
     PackageManagerCore::Status updateComponentsSilently(const QStringList &componentsToUpdate);
@@ -490,7 +482,7 @@ private:
 
     bool fetchPackagesTree(const PackagesList &packages, const LocalPackagesMap installedPackages);
     bool componentUninstallableFromCommandLine(const QString &componentName);
-    bool checkComponentsForInstallation(const QStringList &names, QString &errorMessage, bool &unstableAliasFound, bool fallbackReposFetched);
+    bool checkComponentsForInstallation(const QStringList &names, QString &errorMessage, bool fallbackReposFetched);
 
 private:
     PackageManagerCorePrivate *const d;

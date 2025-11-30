@@ -317,7 +317,7 @@ Settings Settings::fromFileAndPrefix(const QString &path, const QString &prefix,
     elementList << scName << scVersion << scTitle << scPublisher << scProductUrl
                 << scTargetDir << scAdminTargetDir
                 << scInstallerApplicationIcon << scInstallerWindowIcon
-                << scLogo << scWatermark << scBanner << scAliasDefinitionsFile
+                << scLogo << scWatermark << scBanner
                 << scStartMenuDir << scMaintenanceToolName << scMaintenanceToolIniFile << scMaintenanceToolAlias
                 << scRemoveTargetDir << scLocalCacheDir << scPersistentLocalCache
                 << scRunProgram << scRunProgramArguments << scRunProgramDescription
@@ -524,11 +524,6 @@ QMap<QString, QVariant> Settings::productImages() const
 void Settings::setProductImages(const QMap<QString, QVariant> &images)
 {
     d->m_data.insert(scProductImages, QVariant::fromValue(images));
-}
-
-QString Settings::aliasDefinitionsFile() const
-{
-    return d->absolutePathFromKey(scAliasDefinitionsFile);
 }
 
 QString Settings::installerApplicationIcon() const

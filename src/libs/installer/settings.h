@@ -93,8 +93,6 @@ public:
     QMap<QString, QVariant> productImages() const;
     void setProductImages(const QMap<QString, QVariant> &images);
 
-    QString aliasDefinitionsFile() const;
-
     QString applicationName() const;
     QString version() const;
 

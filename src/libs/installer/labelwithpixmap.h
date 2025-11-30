@@ -31,7 +31,8 @@
 #include "installer_global.h"
 
 #include <QWidget>
-#include <QLabel>
+
+class QLabel;
 
 namespace QInstaller {
 

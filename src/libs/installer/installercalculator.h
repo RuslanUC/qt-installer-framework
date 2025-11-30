@@ -40,7 +40,6 @@
 namespace QInstaller {
 
 class Component;
-class ComponentAlias;
 class PackageManagerCore;
 
 class INSTALLER_EXPORT InstallerCalculator : public CalculatorBase
@@ -51,16 +50,13 @@ public:
 
     bool solve();
     bool solve(const QList<Component *> &components) override;
-    bool solve(const QList<ComponentAlias *> &aliases);
 
     QString resolutionText(const Component *component) const override;
 
 private:
     bool solveComponent(Component *component, const QString &version = QString()) override;
-    bool solveAlias(ComponentAlias *alias);
 
     void addComponentForInstall(Component *component, const QString &version = QString());
-    bool addComponentsFromAlias(ComponentAlias *alias);
     QSet<Component *> autodependencyComponents();
     QString recursionError(Component *component) const;
 

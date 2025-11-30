@@ -54,11 +54,8 @@ using namespace KDUpdater;
 namespace QInstaller {
 
 struct BinaryLayout;
-struct AliasSource;
-class AliasFinder;
 class PluginEngine;
 class ComponentModel;
-class ComponentAlias;
 class InstallerCalculator;
 class UninstallerCalculator;
 class RemoteFileEngineHandler;
@@ -112,7 +109,6 @@ public:
     QString configurationFileName() const;
 
     bool buildComponentTree(QHash<QString, Component*> &components, bool loadScript);
-    bool buildComponentAliases();
 
     template <typename T>
     bool loadComponentScripts(const T &components, const bool postScript = false);
@@ -194,10 +190,8 @@ signals:
 
 public:
     UpdateFinder *m_updateFinder;
-    AliasFinder *m_aliasFinder;
     QSet<PackageSource> m_packageSources;
     QSet<PackageSource> m_compressedPackageSources;
-    QSet<AliasSource> m_aliasSources;
     std::shared_ptr<LocalPackageHub> m_localPackageHub;
     QStringList m_filesForDelayedDeletion;
 
@@ -223,8 +217,6 @@ public:
     QList<QInstaller::Component*> m_updaterComponents;
     QList<QInstaller::Component*> m_updaterComponentsDeps;
     QList<QInstaller::Component*> m_updaterDependencyReplacements;
-
-    QHash<QString, QInstaller::ComponentAlias *> m_componentAliases;
 
     OperationList m_ownedOperations;
     OperationList m_performedOperationsOld;
@@ -269,7 +261,6 @@ private:
 
     PackagesList remotePackages();
     LocalPackagesMap localInstalledPackages();
-    QList<ComponentAlias *> componentAliases();
 
     bool fetchMetaInformationFromRepositories(DownloadType type = DownloadType::All);
     bool addUpdateResourcesFromRepositories(bool compressedRepository = false);

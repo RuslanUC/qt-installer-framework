@@ -38,7 +38,6 @@ add_library(installer ${IFW_LINK_TYPE}
         archivefactory.cpp
         aspectratiolabel.cpp
         calculatorbase.cpp
-        componentalias.cpp
         concurrentoperationrunner.cpp
         directoryguard.cpp
         fileguard.cpp
@@ -77,7 +76,6 @@ add_library(installer ${IFW_LINK_TYPE}
         downloadarchivesjob.cpp
         init.cpp
         elevatedexecuteoperation.cpp
-        fakestopprocessforupdateoperation.cpp
         progresscoordinator.cpp
         minimumprogressoperation.cpp
         performinstallationform.cpp
@@ -193,7 +191,6 @@ set(IFW_LIBINSTALLER_PUBLIC_HEADERS
         "${CMAKE_CURRENT_SOURCE_DIR}/binarycontent.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/directoryguard.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/genericdatacache.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/fakestopprocessforupdateoperation.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/runextensions.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/categorycombobox.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/operationtracer.h"
@@ -206,7 +203,6 @@ set(IFW_LIBINSTALLER_PUBLIC_HEADERS
         "${CMAKE_CURRENT_SOURCE_DIR}/permissionsettings.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/graph.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/abstracttask.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/componentalias.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/remoteclient.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/installiconsoperation.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/registerfiletypeoperation.h"

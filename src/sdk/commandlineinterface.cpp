@@ -139,12 +139,9 @@ int CommandLineInterface::searchAvailablePackages()
         // If type is specified, only list relevant contents
         if (m_parser.value(CommandLineOptions::scTypeLong) == QLatin1String("package"))
             m_core->listAvailablePackages(regexp, parsePackageFilters());
-        else if (m_parser.value(CommandLineOptions::scTypeLong) == QLatin1String("alias"))
-            m_core->listAvailableAliases(regexp);
     } else {
          // No type - we can try again with packages search if there were no matching aliases
-        if (!m_core->listAvailableAliases(regexp))
-            m_core->listAvailablePackages(regexp, parsePackageFilters());
+        m_core->listAvailablePackages(regexp, parsePackageFilters());
     }
 
     return EXIT_SUCCESS;
