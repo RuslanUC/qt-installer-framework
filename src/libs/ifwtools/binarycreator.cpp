@@ -576,8 +576,7 @@ QList<QSharedPointer<QInstaller::Resource> > createBinaryResourceFiles(const QSt
             if (status != EXIT_SUCCESS)
                 continue;
 
-            result.append(QSharedPointer<QInstaller::Resource> (new QInstaller::Resource(binaryName,
-                binaryName.toUtf8())));
+            result.append(QSharedPointer<Resource> (new Resource(binaryName, binaryName.toUtf8())));
         }
     }
     return result;
@@ -604,91 +603,82 @@ void QInstallerTools::copyConfigData(const BinaryCreatorArgs &args, const QStrin
     QFile configXml(targetConfigFile);
     QInstaller::openForRead(&configXml);
 
-    QBuffer writerBuf;
-    QXmlStreamReader reader(&configXml);
-    QXmlStreamWriter writer(&writerBuf);
+    QDomDocument dom;
+    dom.setContent(&configXml);
+    configXml.close();
 
-    writer.setAutoFormatting(true);
-    writer.writeStartDocument();
+    // iterate over all child elements, searching for relative file names
+    const QDomNodeList children = dom.documentElement().childNodes();
+    for (int i = 0; i < children.count(); ++i) {
+        QDomElement domElement = children.at(i).toElement();
+        if (domElement.isNull())
+            continue;
 
-    bool enterProductImages = false;
-    bool enterProductImage = false;
-    QStringView currentElement;
+        const QString tagName = domElement.tagName();
+        const QString elementText = domElement.text();
+        qDebug().noquote() << QString::fromLatin1("Read dom element: <%1>%2</%1>.").arg(tagName, elementText);
 
-    while(!reader.atEnd()) {
-        reader.readNext();
-
-        if(reader.isStartElement()) {
-            currentElement = reader.name();
-            if(currentElement == scProductImages)
-                enterProductImages = true;
-            if(enterProductImages && currentElement == scProductImage)
-                enterProductImage = true;
-
-            writer.writeStartElement(currentElement);
-        } else if(reader.isEndElement()) {
-            const auto tag = reader.name();
-
-            if(enterProductImages && tag == scProductImage)
-                enterProductImage = false;
-            if(tag == scProductImages)
-                enterProductImages = false;
-
-            writer.writeEndElement();
-        } else if(reader.isCharacters() && !reader.isWhitespace()) {
-            const auto textView = reader.text();
-            auto text = textView.toString();
-
-            if(reader.tokenType() == QXmlStreamReader::Characters && reader.name().isEmpty()) {
-                if(enterProductImages && enterProductImage && currentElement == scImage) {
-                    const QString targetFile = targetDir + QLatin1Char('/') + textView;
-                    const auto childFileInfo = QFileInfo(sourceConfigFilePath, text);
-                    if (!QFileInfo::exists(targetFile))
-                        copyWithException(childFileInfo.absoluteFilePath(), targetFile, scImage);
-                    copyHighDPIImage(childFileInfo, scImage, targetFile);
-                    writer.writeCharacters(textView);
+        if (tagName == QLatin1String("ProductImages")) {
+            const QDomNodeList productImageNode = domElement.childNodes();
+            for (int j = 0; j < productImageNode.count(); ++j) {
+                QDomElement productImagesElement = productImageNode.at(j).toElement();
+                if (productImagesElement.isNull())
                     continue;
+                const QString childName = productImagesElement.tagName();
+                if (childName != QLatin1String("ProductImage"))
+                    continue;
+                const QDomNodeList imageNode = productImagesElement.childNodes();
+                for (int k = 0; k < imageNode.count(); ++k) {
+                    QDomElement productImageElement = imageNode.at(k).toElement();
+                    if (productImageElement.isNull())
+                        continue;
+                    const QString imageChildName = productImageElement.tagName();
+                    if (imageChildName != QLatin1String("Image"))
+                        continue;
+                    const QString targetFile = targetDir + QLatin1Char('/') + productImageElement.text();
+                    const QFileInfo childFileInfo = QFileInfo(sourceConfigFilePath, productImageElement.text());
+                    if (!QFileInfo::exists(targetFile))
+                        QInstallerTools::copyWithException(childFileInfo.absoluteFilePath(), targetFile, imageChildName);
+                    copyHighDPIImage(childFileInfo, imageChildName, targetFile);
                 }
+
             }
-
-            QString newName = text.replace(regex, QLatin1String("_"));
-            QString targetFile;
-            QFileInfo elementFileInfo;
-            if (currentElement == scInstallerApplicationIcon) {
-#if defined(Q_OS_MACOS)
-                const QString suffix = QLatin1String(".icns");
-#elif defined(Q_OS_WIN)
-                const QString suffix = QLatin1String(".ico");
-#else
-                const QString suffix = QLatin1String(".png");
-#endif
-                elementFileInfo = QFileInfo(sourceConfigFilePath, text + suffix);
-                targetFile = targetDir + QLatin1Char('/') + newName + suffix;
-            } else {
-                elementFileInfo = QFileInfo(sourceConfigFilePath, text);
-                const QString suffix = elementFileInfo.completeSuffix();
-                if (!suffix.isEmpty())
-                    newName.append(QLatin1Char('.') + suffix);
-                targetFile = targetDir + QLatin1Char('/') + newName;
-            }
-            if (!elementFileInfo.exists() || elementFileInfo.isDir())
-                continue;
-
-            text = newName;
-            if (!QFileInfo::exists(targetFile))
-                copyWithException(elementFileInfo.absoluteFilePath(), targetFile, currentElement.toString());
-            copyHighDPIImage(elementFileInfo, currentElement.toString(), targetFile);
-
-            writer.writeCharacters(text);
+            continue;
         }
+
+        QString newName = domElement.text().replace(regex, QLatin1String("_"));
+
+        QString targetFile;
+        QFileInfo elementFileInfo;
+        if (tagName == QLatin1String("InstallerApplicationIcon")) {
+#if defined(Q_OS_MACOS)
+            const QString suffix = QLatin1String(".icns");
+#elif defined(Q_OS_WIN)
+            const QString suffix = QLatin1String(".ico");
+#else
+            const QString suffix = QLatin1String(".png");
+#endif
+            elementFileInfo = QFileInfo(sourceConfigFilePath, elementText + suffix);
+            targetFile = targetDir + QLatin1Char('/') + newName + suffix;
+        } else {
+            elementFileInfo = QFileInfo(sourceConfigFilePath, elementText);
+            const QString suffix = elementFileInfo.completeSuffix();
+            if (!suffix.isEmpty())
+                newName.append(QLatin1Char('.') + suffix);
+            targetFile = targetDir + QLatin1Char('/') + newName;
+        }
+        if (!elementFileInfo.exists() || elementFileInfo.isDir())
+            continue;
+
+        domElement.replaceChild(dom.createTextNode(newName), domElement.firstChild());
+        if (!QFileInfo::exists(targetFile))
+            QInstallerTools::copyWithException(elementFileInfo.absoluteFilePath(), targetFile, tagName);
+        copyHighDPIImage(elementFileInfo, tagName, targetFile);
     }
 
-    configXml.close();
-
-    writerBuf.seek(0);
-    openForWrite(&configXml);
-    configXml.write(writerBuf.buffer());
-    configXml.close();
+    QInstaller::openForWrite(&configXml);
+    QTextStream stream(&configXml);
+    dom.save(stream, 4);
 
     qDebug() << "done.\n";
 }

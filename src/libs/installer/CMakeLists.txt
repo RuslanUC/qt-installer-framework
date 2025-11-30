@@ -76,6 +76,7 @@ add_library(installer ${IFW_LINK_TYPE}
         downloadarchivesjob.cpp
         init.cpp
         elevatedexecuteoperation.cpp
+        fakestopprocessforupdateoperation.cpp
         progresscoordinator.cpp
         minimumprogressoperation.cpp
         performinstallationform.cpp
