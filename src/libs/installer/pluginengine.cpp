@@ -56,6 +56,7 @@ namespace QInstaller {
             tempFile->flush();
             tempFile->setPermissions(QFile::ExeOwner | QFile::ReadOwner | QFile::WriteOwner | QFile::ExeGroup | QFile::ReadGroup | QFile::ExeOther | QFile::ReadOther);
             tempFile->setAutoRemove(true);
+            tempFile->close();
 
             library.setFileName(tempFile->fileName());
             if(!library.load()) {
