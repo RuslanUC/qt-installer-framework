@@ -90,8 +90,7 @@ Downloader::~Downloader()
     }
 }
 
-void Downloader::download(QFutureInterface<FileTaskResult> &fi, const QList<FileTaskItem> &items,
-    QNetworkProxyFactory *networkProxyFactory, const bool progressValueInBytes)
+void Downloader::download(QFutureInterface<FileTaskResult> &fi, const QList<FileTaskItem> &items, const bool progressValueInBytes)
 {
     m_items = items;
     m_futureInterface = &fi;
@@ -100,11 +99,8 @@ void Downloader::download(QFutureInterface<FileTaskResult> &fi, const QList<File
     fi.reportStarted();
     fi.setExpectedResultCount(items.count());
 
-    m_nam.setProxyFactory(networkProxyFactory);
     connect(&m_nam, &QNetworkAccessManager::authenticationRequired, this,
         &Downloader::onAuthenticationRequired);
-    connect(&m_nam, &QNetworkAccessManager::proxyAuthenticationRequired, this,
-            &Downloader::onProxyAuthenticationRequired);
 
     auto netInfo = QNetworkInformation::instance();
     if (netInfo) {
@@ -387,17 +383,6 @@ void Downloader::onAuthenticationRequired(QNetworkReply *reply, QAuthenticator *
     }
 }
 
-void Downloader::onProxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *)
-{
-    // Report to GUI thread.
-    // (Job will ask for username/password, and restart the download ...)
-    AuthenticationRequiredException e(AuthenticationRequiredException::Type::Proxy,
-        QCoreApplication::translate("AuthenticationRequiredException",
-        "Proxy requires authentication."));
-    e.setProxy(proxy);
-    m_futureInterface->reportException(e);
-}
-
 /*!
     \internal
 
@@ -627,11 +612,6 @@ void DownloadFileTask::setAuthenticator(const QAuthenticator &authenticator)
     m_authenticator = authenticator;
 }
 
-void DownloadFileTask::setProxyFactory(KDUpdater::FileDownloaderProxyFactory *factory)
-{
-    m_proxyFactory.reset(factory);
-}
-
 void DownloadFileTask::setProgressValueInBytes(bool progressInBytes)
 {
     m_progressInBytes = progressInBytes;
@@ -658,7 +638,7 @@ void DownloadFileTask::doTask(QFutureInterface<FileTaskResult> &fi)
                 items[i].insert(TaskRole::Authenticator, QVariant::fromValue(m_authenticator));
         }
     }
-    downloader.download(fi, items, (m_proxyFactory.isNull() ? 0 : m_proxyFactory->clone()), progressValueInBytes());
+    downloader.download(fi, items, progressValueInBytes());
     el.exec();  // That's tricky here, we need to run our own event loop to keep QNAM working.
 }
 

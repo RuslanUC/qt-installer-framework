@@ -74,15 +74,6 @@ FileDownloaderFactory::FileDownloaderFactory()
 }
 
 /*!
-    Sets \a factory as the file downloader proxy factory.
-*/
-void FileDownloaderFactory::setProxyFactory(FileDownloaderProxyFactory *factory)
-{
-    delete FileDownloaderFactory::instance().d->m_factory;
-    FileDownloaderFactory::instance().d->m_factory = factory;
-}
-
-/*!
     Destroys the file downloader factory.
 */
 FileDownloaderFactory::~FileDownloaderFactory()
@@ -116,12 +107,7 @@ bool FileDownloaderFactory::isSupportedScheme(const QString &scheme)
 */
 FileDownloader *FileDownloaderFactory::create(const QString &scheme, QObject *parent) const
 {
-    FileDownloader *downloader = GenericFactory<FileDownloader, QString, QObject*>::create(scheme, parent);
-    if (downloader && d->m_factory) {
-        downloader->setScheme(scheme);
-        downloader->setProxyFactory(d->m_factory->clone());
-    }
-    return downloader;
+    return GenericFactory<FileDownloader, QString, QObject*>::create(scheme, parent);
 }
 
 /*!

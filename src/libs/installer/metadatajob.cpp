@@ -29,8 +29,6 @@
 
 #include "metadatajob_p.h"
 #include "packagemanagercore.h"
-#include "packagemanagerproxyfactory.h"
-#include "proxycredentialsdialog.h"
 #include "serverauthenticationdialog.h"
 #include "settings.h"
 #include "testrepository.h"
@@ -347,7 +345,6 @@ bool MetadataJob::startXMLTask()
     m_updatesXmlItems = m_updatesXmlItems.mid(chunkSize, m_updatesXmlItems.length());
     if (!tempPackages.empty()) {
         DownloadFileTask *const xmlTask = new DownloadFileTask(tempPackages);
-        xmlTask->setProxyFactory(m_core->proxyFactory());
         connect(&m_xmlTask, &QFutureWatcher<FileTaskResult>::progressValueChanged, this,
                 &MetadataJob::progressChanged);
         m_xmlTask.setFuture(QtConcurrent::run(&DownloadFileTask::doTask, xmlTask));
@@ -496,14 +493,8 @@ void MetadataJob::xmlTaskFinished()
     } catch (const AuthenticationRequiredException &e) {
         if (e.type() == AuthenticationRequiredException::Type::Proxy) {
             qCWarning(QInstaller::lcInstallerInstallLog) << e.message();
-            PackageManagerProxyFactory *factory = m_core->proxyFactory();
-            if (factory->askProxyCredentials(e.proxy())) {
-                m_core->setProxyFactory(factory);
-                status = XmlDownloadRetry;
-            } else {
-                reset();
-                emitFinishedWithError(QInstaller::DownloadError, QLatin1String("Missing proxy credentials."));
-            }
+            reset();
+            emitFinishedWithError(QInstaller::DownloadError, QLatin1String("Missing proxy credentials."));
         } else if (e.type() == AuthenticationRequiredException::Type::Server) {
             qCWarning(QInstaller::lcInstallerInstallLog) << e.message();
             QString username;
@@ -715,7 +706,6 @@ bool MetadataJob::fetchMetaDataPackages()
     if (tempPackages.length() > 0) {
         setProcessedAmount(0);
         DownloadFileTask *const metadataTask = new DownloadFileTask(tempPackages);
-        metadataTask->setProxyFactory(m_core->proxyFactory());
         m_metadataTask.setFuture(QtConcurrent::run(&DownloadFileTask::doTask, metadataTask));
         setInfoMessage(QLatin1String("Retrieving meta information from remote repository..."));
         return true;

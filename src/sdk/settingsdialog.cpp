@@ -198,28 +198,6 @@ SettingsDialog::SettingsDialog(PackageManagerCore *core, QWidget *parent)
     setupRepositoriesTreeWidget();
 
     const Settings &settings = m_core->settings();
-    switch (settings.proxyType()) {
-        case Settings::NoProxy:
-            m_ui->m_noProxySettings->setChecked(true);
-            break;
-        case Settings::SystemProxy:
-            m_ui->m_systemProxySettings->setChecked(true);
-            break;
-        case Settings::UserDefinedProxy:
-            m_ui->m_manualProxySettings->setChecked(true);
-            break;
-        default:
-            m_ui->m_noProxySettings->setChecked(true);
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Unknown proxy type given!");
-    }
-
-    const QNetworkProxy &ftpProxy = settings.ftpProxy();
-    m_ui->m_ftpProxy->setText(ftpProxy.hostName());
-    m_ui->m_ftpProxyPort->setValue(ftpProxy.port());
-
-    const QNetworkProxy &httpProxy = settings.httpProxy();
-    m_ui->m_httpProxy->setText(httpProxy.hostName());
-    m_ui->m_httpProxyPort->setValue(httpProxy.port());
 
     connect(m_ui->m_addRepository, &QAbstractButton::clicked,
             this, &SettingsDialog::addRepository);
@@ -295,26 +273,6 @@ void SettingsDialog::accept()
     // set possible new user repositories
     newSettings.setUserRepositories((dynamic_cast<RepositoryItem*> (m_rootItems.at(2)))->repositories());
     settingsChanged |= (settings.userRepositories() != newSettings.userRepositories());
-
-    // update proxy type
-    newSettings.setProxyType(Settings::NoProxy);
-    if (m_ui->m_systemProxySettings->isChecked())
-        newSettings.setProxyType(Settings::SystemProxy);
-    else if (m_ui->m_manualProxySettings->isChecked())
-        newSettings.setProxyType(Settings::UserDefinedProxy);
-    settingsChanged |= settings.proxyType() != newSettings.proxyType();
-
-    if (newSettings.proxyType() == Settings::UserDefinedProxy) {
-        // update ftp proxy settings
-        newSettings.setFtpProxy(QNetworkProxy(QNetworkProxy::HttpProxy, m_ui->m_ftpProxy->text(),
-            m_ui->m_ftpProxyPort->value()));
-        settingsChanged |= (settings.ftpProxy() != newSettings.ftpProxy());
-
-        // update http proxy settings
-        newSettings.setHttpProxy(QNetworkProxy(QNetworkProxy::HttpProxy, m_ui->m_httpProxy->text(),
-            m_ui->m_httpProxyPort->value()));
-        settingsChanged |= (settings.httpProxy() != newSettings.httpProxy());
-    }
 
     // need to fetch metadata again
     settingsChanged |= m_cacheCleared;

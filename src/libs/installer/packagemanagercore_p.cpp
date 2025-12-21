@@ -170,7 +170,6 @@ PackageManagerCorePrivate::PackageManagerCorePrivate(PackageManagerCore *core)
     , m_controlScriptEngine(nullptr)
     , m_installerCalculator(nullptr)
     , m_uninstallerCalculator(nullptr)
-    , m_proxyFactory(nullptr)
     , m_defaultModel(nullptr)
     , m_updaterModel(nullptr)
     , m_componentSortFilterProxyModel(nullptr)
@@ -216,7 +215,6 @@ PackageManagerCorePrivate::PackageManagerCorePrivate(PackageManagerCore *core, q
     , m_controlScriptEngine(nullptr)
     , m_installerCalculator(nullptr)
     , m_uninstallerCalculator(nullptr)
-    , m_proxyFactory(nullptr)
     , m_defaultModel(nullptr)
     , m_updaterModel(nullptr)
     , m_componentSortFilterProxyModel(nullptr)
@@ -275,7 +273,6 @@ PackageManagerCorePrivate::~PackageManagerCorePrivate()
     qDeleteAll(m_performedOperationsCurrentSession);
 
     delete m_updateFinder;
-    delete m_proxyFactory;
 
     delete m_defaultModel;
     delete m_updaterModel;
@@ -649,7 +646,6 @@ void PackageManagerCorePrivate::initialize(const QHash<QString, QString> &params
     connect(&m_metadataJob, &Job::infoMessage, this, &PackageManagerCorePrivate::infoMessage);
     connect(&m_metadataJob, &Job::progress, this, &PackageManagerCorePrivate::infoProgress);
     connect(&m_metadataJob, &Job::totalProgress, this, &PackageManagerCorePrivate::totalProgress);
-    KDUpdater::FileDownloaderFactory::instance().setProxyFactory(m_core->proxyFactory());
 }
 
 bool PackageManagerCorePrivate::isOfflineOnly() const
@@ -813,24 +809,6 @@ QString PackageManagerCorePrivate::datFileName()
     return m_datFileName;
 }
 
-static QNetworkProxy readProxy(QXmlStreamReader &reader)
-{
-    QNetworkProxy proxy(QNetworkProxy::HttpProxy);
-    while (reader.readNextStartElement()) {
-        if (reader.name() == QLatin1String("Host"))
-            proxy.setHostName(reader.readElementText());
-        else if (reader.name() == QLatin1String("Port"))
-            proxy.setPort(reader.readElementText().toInt());
-        else if (reader.name() == QLatin1String("Username"))
-            proxy.setUser(reader.readElementText());
-        else if (reader.name() == QLatin1String("Password"))
-            proxy.setPassword(reader.readElementText());
-        else
-            reader.skipCurrentElement();
-    }
-    return proxy;
-}
-
 static QSet<Repository> readRepositories(QXmlStreamReader &reader, bool isDefault)
 {
     QSet<Repository> set;
@@ -901,22 +879,6 @@ void PackageManagerCorePrivate::writeMaintenanceConfigFiles()
         writer.writeStartDocument();
 
         writer.writeStartElement(QLatin1String("Network"));
-            writer.writeTextElement(QLatin1String("ProxyType"), QString::number(m_data.settings().proxyType()));
-            writer.writeStartElement(QLatin1String("Ftp"));
-                const QNetworkProxy &ftpProxy = m_data.settings().ftpProxy();
-                writer.writeTextElement(QLatin1String("Host"), ftpProxy.hostName());
-                writer.writeTextElement(QLatin1String("Port"), QString::number(ftpProxy.port()));
-                writer.writeTextElement(QLatin1String("Username"), ftpProxy.user());
-                writer.writeTextElement(QLatin1String("Password"), ftpProxy.password());
-            writer.writeEndElement();
-            writer.writeStartElement(QLatin1String("Http"));
-                const QNetworkProxy &httpProxy = m_data.settings().httpProxy();
-                writer.writeTextElement(QLatin1String("Host"), httpProxy.hostName());
-                writer.writeTextElement(QLatin1String("Port"), QString::number(httpProxy.port()));
-                writer.writeTextElement(QLatin1String("Username"), httpProxy.user());
-                writer.writeTextElement(QLatin1String("Password"), httpProxy.password());
-            writer.writeEndElement();
-
             writer.writeStartElement(QLatin1String("Repositories"));
             foreach (const Repository &repo, m_data.settings().userRepositories()) {
                 writer.writeStartElement(QLatin1String("Repository"));
@@ -971,14 +933,8 @@ void PackageManagerCorePrivate::readMaintenanceConfigFiles(const QString &target
                 if (reader.name() == QLatin1String("Network")) {
                     while (reader.readNextStartElement()) {
                         const QStringView name = reader.name();
-                        if (name == QLatin1String("Ftp")) {
-                            m_data.settings().setFtpProxy(readProxy(reader));
-                        } else if (name == QLatin1String("Http")) {
-                            m_data.settings().setHttpProxy(readProxy(reader));
-                        } else if (reader.name() == QLatin1String("Repositories")) {
+                        if (reader.name() == QLatin1String("Repositories")) {
                             m_data.settings().addUserRepositories(readRepositories(reader, false));
-                        } else if (name == QLatin1String("ProxyType")) {
-                            m_data.settings().setProxyType(Settings::ProxyType(reader.readElementText().toInt()));
                         } else if (name == QLatin1String("LocalCachePath")) {
                             m_data.settings().setLocalCachePath(reader.readElementText());
                         } else {

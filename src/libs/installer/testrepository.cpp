@@ -28,8 +28,6 @@
 #include "testrepository.h"
 
 #include "packagemanagercore.h"
-#include "packagemanagerproxyfactory.h"
-#include "proxycredentialsdialog.h"
 #include "serverauthenticationdialog.h"
 
 #include <QFile>
@@ -94,8 +92,6 @@ void TestRepository::doStart()
 
     m_timer.start(10000);
     DownloadFileTask *const xmlTask = new DownloadFileTask(item);
-    if (m_core)
-        xmlTask->setProxyFactory(m_core->proxyFactory());
     m_xmlTask.setFuture(QtConcurrent::run(&DownloadFileTask::doTask, xmlTask));
 }
 
@@ -146,14 +142,6 @@ void TestRepository::downloadCompleted()
             }
             return;
         } else if (e.type() == AuthenticationRequiredException::Type::Proxy) {
-            const QNetworkProxy proxy = e.proxy();
-            ProxyCredentialsDialog proxyCredentials(proxy);
-            if (proxyCredentials.exec() == QDialog::Accepted) {
-                PackageManagerProxyFactory *factory = m_core->proxyFactory();
-                factory->setProxyCredentials(proxy, proxyCredentials.userName(),
-                    proxyCredentials.password());
-                m_core->setProxyFactory(factory);
-            }
             QMetaObject::invokeMethod(this, "doStart", Qt::QueuedConnection);
             return;
         } else {

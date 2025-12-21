@@ -145,10 +145,6 @@ void TabController::restartWizard()
     if (d->m_networkSettingsChanged) {
         d->m_networkSettingsChanged = false;
 
-        d->m_core->settings().setFtpProxy(d->m_settings.ftpProxy());
-        d->m_core->settings().setHttpProxy(d->m_settings.httpProxy());
-        d->m_core->settings().setProxyType(d->m_settings.proxyType());
-
         d->m_core->settings().setUserRepositories(d->m_settings.userRepositories());
         d->m_core->settings().setDefaultRepositories(d->m_settings.defaultRepositories());
         d->m_core->settings().setTemporaryRepositories(d->m_settings.temporaryRepositories(),

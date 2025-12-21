@@ -79,9 +79,6 @@ public:
     void setupFileTask(AbstractTask *const task, const DownloadType downloadType);
     void resetTasks();
 
-    FileDownloaderProxyFactory *proxyFactory() const;
-    void setProxyFactory(FileDownloaderProxyFactory *factory);
-
     quint64 bytesReceived() const;
 
     bool dataDownloded() const;

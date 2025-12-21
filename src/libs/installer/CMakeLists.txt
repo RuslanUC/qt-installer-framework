@@ -27,7 +27,6 @@ endif()
 find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Widgets Xml Network)
 
 add_library(installer ${IFW_LINK_TYPE}
-        proxycredentialsdialog.ui
         serverauthenticationdialog.ui
         componentsummary.ui
 
@@ -87,7 +86,6 @@ add_library(installer ${IFW_LINK_TYPE}
         qsettingswrapper.cpp
         settings.cpp
         permissionsettings.cpp
-        packagemanagerproxyfactory.cpp
         createlocalrepositoryoperation.cpp
         link.cpp
         createlinkoperation.cpp
@@ -113,7 +111,6 @@ add_library(installer ${IFW_LINK_TYPE}
         installercalculator.cpp
         uninstallercalculator.cpp
         componentchecker.cpp
-        proxycredentialsdialog.cpp
         serverauthenticationdialog.cpp
         keepaliveobject.cpp
         systeminfo.cpp
@@ -188,7 +185,6 @@ set(IFW_LIBINSTALLER_PUBLIC_HEADERS
         "${CMAKE_CURRENT_SOURCE_DIR}/fileguard.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/consumeoutputoperation.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/remoteserver.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/proxycredentialsdialog.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/binarycontent.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/directoryguard.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/genericdatacache.h"
@@ -218,7 +214,6 @@ set(IFW_LIBINSTALLER_PUBLIC_HEADERS
         "${CMAKE_CURRENT_SOURCE_DIR}/performinstallationform.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/calculatorbase.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/packagemanagerpagefactory.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/packagemanagerproxyfactory.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/environmentvariablesoperation.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/packagemanagergui.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/horizontalruler.h"

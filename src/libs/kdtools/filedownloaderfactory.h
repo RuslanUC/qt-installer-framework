@@ -45,24 +45,13 @@ namespace KDUpdater {
 
 class FileDownloader;
 
-class KDTOOLS_EXPORT FileDownloaderProxyFactory : public QNetworkProxyFactory
-{
-public:
-    virtual ~FileDownloaderProxyFactory() {}
-    virtual FileDownloaderProxyFactory *clone() const = 0;
-};
-
 class KDTOOLS_EXPORT FileDownloaderFactory : public GenericFactory<FileDownloader, QString,
                                                                      QObject*>
 {
     Q_DISABLE_COPY(FileDownloaderFactory)
     struct FileDownloaderFactoryData {
-        FileDownloaderFactoryData() : m_factory(0) {}
-        ~FileDownloaderFactoryData() { delete m_factory; }
-
         bool m_ignoreSslErrors;
         QStringList m_supportedSchemes;
-        FileDownloaderProxyFactory *m_factory;
     };
 
 public:
@@ -76,8 +65,6 @@ public:
         d->m_supportedSchemes.append(scheme);
     }
     FileDownloader *create(const QString &scheme, QObject *parent = 0) const;
-
-    static void setProxyFactory(FileDownloaderProxyFactory *factory);
 
     static QStringList supportedSchemes();
     static bool isSupportedScheme(const QString &scheme);

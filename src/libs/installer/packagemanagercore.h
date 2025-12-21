@@ -145,8 +145,6 @@ public:
     LocalPackagesMap localInstalledPackages();
 
     void networkSettingsChanged();
-    PackageManagerProxyFactory *proxyFactory() const;
-    void setProxyFactory(PackageManagerProxyFactory *factory);
 
     PackagesList remotePackages();
     bool fetchRemotePackagesTree(const QStringList& components = QStringList());

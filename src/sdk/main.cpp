@@ -288,14 +288,6 @@ int main(int argc, char *argv[])
             std::cerr << "Unknown option: " << qPrintable(options) << std::endl;
         }
 
-        if (parser.isSet(CommandLineOptions::scSystemProxyLong)) {
-            // Make sure we honor the system's proxy settings
-            QNetworkProxyFactory::setUseSystemConfiguration(true);
-        }
-
-        if (parser.isSet(CommandLineOptions::scNoProxyLong))
-            QNetworkProxyFactory::setUseSystemConfiguration(false);
-
         const SelfRestarter restarter(argc, argv);
         if (parser.positionalArguments().contains(CommandLineOptions::scCheckUpdatesShort)
                 || parser.positionalArguments().contains(CommandLineOptions::scCheckUpdatesLong)) {

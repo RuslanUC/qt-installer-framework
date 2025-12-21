@@ -74,9 +74,6 @@ public:
 
     Type type() const { return m_type; }
 
-    QNetworkProxy proxy() const { return m_proxy; }
-    void setProxy(const QNetworkProxy &proxy) { m_proxy = proxy; }
-
     FileTaskItem taskItem() const { return m_fileTaskItem; }
     void setFileTaskItem(const FileTaskItem &item) { m_fileTaskItem = item; }
 
@@ -86,7 +83,6 @@ public:
 
 private:
     Type m_type;
-    QNetworkProxy m_proxy;
     FileTaskItem m_fileTaskItem;
 };
 
@@ -113,7 +109,6 @@ public:
     void setTaskItems(const QList<FileTaskItem> &items);
 
     void setAuthenticator(const QAuthenticator &authenticator);
-    void setProxyFactory(KDUpdater::FileDownloaderProxyFactory *factory);
 
     void setProgressValueInBytes(bool progressInBytes);
     bool progressValueInBytes() const;
@@ -128,7 +123,6 @@ Q_SIGNALS:
 private:
     friend class Downloader;
     QAuthenticator m_authenticator;
-    QScopedPointer<KDUpdater::FileDownloaderProxyFactory> m_proxyFactory;
     bool m_progressInBytes;
 };
 

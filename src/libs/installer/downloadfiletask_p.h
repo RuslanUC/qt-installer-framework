@@ -77,8 +77,7 @@ public:
     Downloader();
     ~Downloader();
 
-    void download(QFutureInterface<FileTaskResult> &fi, const QList<FileTaskItem> &items,
-        QNetworkProxyFactory *networkProxyFactory, const bool progressValueInBytes);
+    void download(QFutureInterface<FileTaskResult> &fi, const QList<FileTaskItem> &items, const bool progressValueInBytes);
 
 signals:
     void finished();
@@ -94,7 +93,6 @@ private slots:
     void onSslErrors(const QList<QSslError> &sslErrors);
     void onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal);
     void onAuthenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
-    void onProxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator);
     void onTimeout();
     void onReachabilityChanged(QNetworkInformation::Reachability newReachability);
 

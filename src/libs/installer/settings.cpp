@@ -927,42 +927,6 @@ void Settings::setLocalCachePath(const QString &path)
     d->m_data.replace(scLocalCachePath, path);
 }
 
-Settings::ProxyType Settings::proxyType() const
-{
-    return Settings::ProxyType(d->m_data.value(scProxyType, Settings::NoProxy).toInt());
-}
-
-void Settings::setProxyType(Settings::ProxyType type)
-{
-    d->m_data.replace(scProxyType, type);
-}
-
-QNetworkProxy Settings::ftpProxy() const
-{
-    const QVariant variant = d->m_data.value(scFtpProxy);
-    if (variant.canConvert<QNetworkProxy>())
-        return variant.value<QNetworkProxy>();
-    return QNetworkProxy();
-}
-
-void Settings::setFtpProxy(const QNetworkProxy &proxy)
-{
-    d->m_data.replace(scFtpProxy, QVariant::fromValue(proxy));
-}
-
-QNetworkProxy Settings::httpProxy() const
-{
-    const QVariant variant = d->m_data.value(scHttpProxy);
-    if (variant.canConvert<QNetworkProxy>())
-        return variant.value<QNetworkProxy>();
-    return QNetworkProxy();
-}
-
-void Settings::setHttpProxy(const QNetworkProxy &proxy)
-{
-    d->m_data.replace(scHttpProxy, QVariant::fromValue(proxy));
-}
-
 QString Settings::controlScript() const
 {
     return d->m_data.value(QLatin1String(scControlScript)).toString();

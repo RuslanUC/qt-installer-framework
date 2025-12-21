@@ -33,7 +33,6 @@
 #include "downloadfiletask.h"
 #include "copyfiletask.h"
 #include "qinstallerglobal.h"
-#include "packagemanagerproxyfactory.h"
 
 #include <QDialog>
 #include <QDir>
@@ -71,8 +70,7 @@ static constexpr uint scMaxRetries = 3;
 struct KDUpdater::FileDownloader::Private
 {
     Private()
-        : m_factory(0)
-        , m_bytesReceived(0)
+        : m_bytesReceived(0)
         , m_allBytesReceived(0)
         , m_dataDownloaded(false)
         , m_sha1Downloaded(false)
@@ -81,15 +79,9 @@ struct KDUpdater::FileDownloader::Private
     {
     }
 
-    ~Private()
-    {
-        delete m_factory;
-    }
-
     QString scheme;
 
     PackageManagerCore *m_core;
-    FileDownloaderProxyFactory *m_factory;
     QList<FileTaskItem> m_packages;
     quint64 m_bytesReceived;
     quint64 m_allBytesReceived;
@@ -262,14 +254,8 @@ void KDUpdater::FileDownloader::shaDownloadTaskFinished()
     }  catch (const AuthenticationRequiredException &e) {
         if (e.type() == AuthenticationRequiredException::Type::Proxy) {
             qCWarning(QInstaller::lcInstallerInstallLog) << e.message();
-            PackageManagerProxyFactory *factory = d->m_core->proxyFactory();
-            if (factory->askProxyCredentials(e.proxy())) {
-                d->m_core->setProxyFactory(factory);
-                doDownload(DownloadType::ChecksumFile);
-            } else {
-                reset();
-                setDownloadAborted(QInstaller::DownloadError, QLatin1String("Missing proxy credentials."));
-            }
+            reset();
+            setDownloadAborted(QInstaller::DownloadError, QLatin1String("Missing proxy credentials."));
         }
     } catch (const TaskException &e) {
         setDownloadAborted(QInstaller::DownloadError, e.message());
@@ -331,19 +317,6 @@ void KDUpdater::FileDownloader::archiveDownloadTaskFinished()
     } catch (...) {
         setDownloadAborted(QInstaller::DownloadError, QLatin1String("Unknown exception during download."));
     }
-}
-
-FileDownloaderProxyFactory *KDUpdater::FileDownloader::proxyFactory() const
-{
-    if (d->m_factory)
-        return d->m_factory->clone();
-    return 0;
-}
-
-void KDUpdater::FileDownloader::setProxyFactory(FileDownloaderProxyFactory *factory)
-{
-    delete d->m_factory;
-    d->m_factory = factory;
 }
 
 quint64 FileDownloader::bytesReceived() const

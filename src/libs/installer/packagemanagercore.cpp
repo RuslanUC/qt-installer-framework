@@ -36,7 +36,6 @@
 #include "errors.h"
 #include "globals.h"
 #include "messageboxhandler.h"
-#include "packagemanagerproxyfactory.h"
 #include "progresscoordinator.h"
 #include "qprocesswrapper.h"
 #include "qsettingswrapper.h"
@@ -1646,33 +1645,7 @@ void PackageManagerCore::networkSettingsChanged()
             dropAdminRights();
     }
 
-    KDUpdater::FileDownloaderFactory::setProxyFactory(proxyFactory());
-
     emit coreNetworkSettingsChanged();
-}
-
-/*!
-    Returns a copy of the proxy factory that the package manager uses to determine
-    the proxies to be used for requests.
-*/
-PackageManagerProxyFactory *PackageManagerCore::proxyFactory() const
-{
-    if (d->m_proxyFactory)
-        return d->m_proxyFactory->clone();
-    return new PackageManagerProxyFactory(this);
-}
-
-/*!
-    Sets the proxy factory for the package manager to be \a factory. A proxy factory
-    is used to determine a more specific list of proxies to be used for a given
-    request, instead of trying to use the same proxy value for all requests. This
-    might only be of use for HTTP or FTP requests.
-*/
-void PackageManagerCore::setProxyFactory(PackageManagerProxyFactory *factory)
-{
-    delete d->m_proxyFactory;
-    d->m_proxyFactory = factory;
-    KDUpdater::FileDownloaderFactory::setProxyFactory(proxyFactory());
 }
 
 /*!

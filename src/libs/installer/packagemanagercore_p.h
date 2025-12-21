@@ -32,7 +32,6 @@
 #include "metadatajob.h"
 #include "packagemanagercore.h"
 #include "packagemanagercoredata.h"
-#include "packagemanagerproxyfactory.h"
 #include "packagesource.h"
 #include "qinstallerglobal.h"
 #include "component.h"
@@ -310,8 +309,6 @@ private:
 
     InstallerCalculator *m_installerCalculator;
     UninstallerCalculator *m_uninstallerCalculator;
-
-    PackageManagerProxyFactory *m_proxyFactory;
 
     ComponentModel *m_defaultModel;
     ComponentModel *m_updaterModel;

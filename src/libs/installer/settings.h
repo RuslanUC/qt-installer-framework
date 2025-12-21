@@ -162,15 +162,6 @@ public:
     QString localCachePath() const;
     void setLocalCachePath(const QString &path);
 
-    Settings::ProxyType proxyType() const;
-    void setProxyType(Settings::ProxyType type);
-
-    QNetworkProxy ftpProxy() const;
-    void setFtpProxy(const QNetworkProxy &proxy);
-
-    QNetworkProxy httpProxy() const;
-    void setHttpProxy(const QNetworkProxy &proxy);
-
     QString controlScript() const;
 
     bool supportsModify() const;

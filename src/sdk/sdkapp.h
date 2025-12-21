@@ -40,7 +40,6 @@
 #include <settings.h>
 #include <binaryformatenginehandler.h>
 #include <filedownloaderfactory.h>
-#include <packagemanagerproxyfactory.h>
 #include <utils.h>
 #include <runoncechecker.h>
 #include <globals.h>
@@ -201,16 +200,6 @@ public:
                         "until it finishes, close it, or restart your system.").arg(qAppName());
                 return false;
             }
-        }
-
-        // From Qt5.8 onwards system proxy is used by default. If Qt is built with
-        // QT_USE_SYSTEM_PROXIES false then system proxies are not used by default.
-        if (m_parser.isSet(CommandLineOptions::scNoProxyLong)) {
-            m_core->settings().setProxyType(QInstaller::Settings::NoProxy);
-            KDUpdater::FileDownloaderFactory::setProxyFactory(m_core->proxyFactory());
-        } else if (QNetworkProxyFactory::usesSystemConfiguration()) {
-            m_core->settings().setProxyType(QInstaller::Settings::SystemProxy);
-            KDUpdater::FileDownloaderFactory::setProxyFactory(m_core->proxyFactory());
         }
 
         if (m_parser.isSet(CommandLineOptions::scLocalCachePathLong)) {
