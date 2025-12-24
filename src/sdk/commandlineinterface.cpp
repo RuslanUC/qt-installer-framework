@@ -281,7 +281,7 @@ bool CommandLineInterface::setTargetDir()
     if (m_core->installationAllowedToDirectory(targetDir)) {
         QString targetDirWarning = m_core->targetDirWarning(targetDir);
         if (!targetDirWarning.isEmpty()) {
-            qCWarning(QInstaller::lcInstallerInstallLog) << m_core->targetDirWarning(targetDir);
+            qCWarning(QInstaller::lcInstallerInstallLog) << targetDirWarning;
         } else {
             m_core->setValue(QInstaller::scTargetDir, targetDir);
             return true;

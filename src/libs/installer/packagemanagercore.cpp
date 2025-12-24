@@ -1259,7 +1259,7 @@ QString PackageManagerCore::targetDirWarning(const QString &targetDirectory) con
 }
 
 bool PackageManagerCore::directoryContainsInstallation(const QString& directory) const {
-    const auto mtName = maintenanceToolName();
+    const auto mtName = QFileInfo(maintenanceToolName()).fileName();
     const auto mtName2 = mtName.isEmpty() || mtName.isNull() ? QLatin1String("maintenancetool") : mtName;
 
     const QString checkFiles[] = {
@@ -1271,15 +1271,17 @@ bool PackageManagerCore::directoryContainsInstallation(const QString& directory)
         QLatin1String("maintenancetool"),
         QLatin1String("maintenancetool.exe"),
         mtName2,
-        mtName2 + QString::fromUtf8(".exe"),
+        mtName2 + QLatin1String(".exe"),
     };
 
     const QDir dir(directory);
-    for(const auto& fileName : checkFiles)
+    for(const auto& fileName : checkFiles) {
+        qInfo("Checking file \"%s\" in directory \"%s\"...", fileName.toUtf8().data(), directory.toUtf8().data());
         if (QFile(dir.filePath(fileName)).exists()) {
             qInfo("File %s exists!", dir.filePath(fileName).toUtf8().data());
             return true;
         }
+    }
 
     return false;
 }
