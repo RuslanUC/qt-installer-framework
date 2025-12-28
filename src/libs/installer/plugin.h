@@ -109,13 +109,115 @@ typedef struct GuiProxy {
     std::function<void(std::function<void()> callback)> setSettingsButtonClickedCallback;
 } GuiProxy;
 
+#ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
+typedef struct InstallerProxyCallbacks {
+    using Status = QInstaller::Plugin::Status;
+    using WizardPage = QInstaller::Plugin::WizardPage;
+    using SpaceInfo = QInstaller::Plugin::SpaceInfo;
+
+    std::atomic<bool> alive{true};
+
+    std::function<void()> aboutCalculateComponentsToInstallCallback;
+    std::function<void()> finishedCalculateComponentsToInstallCallback;
+    std::function<void()> aboutCalculateComponentsToUninstallCallback;
+    std::function<void()> finishedCalculateComponentsToUninstallCallback;
+    std::function<void(QInstaller::Component *comp)> componentAddedCallback;
+    std::function<void(const std::string &key, const std::string &value)> valueChangedCallback;
+    std::function<void(Status)> statusChangedCallback;
+    std::function<void(int page)> currentPageChangedCallback;
+    std::function<void()> finishButtonClickedCallback;
+    std::function<void(int progress)> metaJobProgressCallback;
+    std::function<void(int progress)> metaJobTotalProgressCallback;
+    std::function<void(const std::string &message)> metaJobInfoMessageCallback;
+    std::function<void()> startAllComponentsResetCallback;
+    std::function<void(const std::vector<QInstaller::Component*> &rootComponents)> finishAllComponentsResetCallback;
+    std::function<void()> startUpdaterComponentsResetCallback;
+    std::function<void(const std::vector<QInstaller::Component*> &componentsWithUpdates)> finishUpdaterComponentsResetCallback;
+    std::function<void()> installationStartedCallback;
+    std::function<void()> installationInterruptedCallback;
+    std::function<void()> installationFinishedCallback;
+    std::function<void()> updateFinishedCallback;
+    std::function<void()> uninstallationStartedCallback;
+    std::function<void()> uninstallationFinishedCallback;
+    std::function<void()> offlineGenerationStartedCallback;
+    std::function<void()> offlineGenerationFinishedCallback;
+    std::function<void(const std::string &title)> titleMessageChangedCallback;
+    std::function<void()> downloadArchivesFinishedCallback;
+    std::function<void(void* /* QWidget */ widget, WizardPage page)> wizardPageInsertionRequestedCallback;
+    std::function<void(void* /* QWidget */ widget)> wizardPageRemovalRequestedCallback;
+    std::function<void(void* /* QWidget */ widget, WizardPage page, int position)> wizardWidgetInsertionRequestedCallback;
+    std::function<void(void* /* QWidget */ widget)> wizardWidgetRemovalRequestedCallback;
+    std::function<void(const std::string &message, WizardPage page, const std::string &id, int position)> wizardPageWarningInsertionRequestedCallback;
+    std::function<void(const std::string &id)> wizardPageWarningRemovalRequestedCallback;
+    std::function<void(bool visible, int page)> wizardPageVisibilityChangeRequestedCallback;
+    std::function<void(QInstaller::Component *component, const std::string &name, const std::string &callbackName)> setValidatorForCustomPageRequestedCallback;
+    std::function<void(bool request)> setAutomatedPageSwitchEnabledCallback;
+    std::function<void()> coreNetworkSettingsChangedCallback;
+    std::function<void(void* /* QObject */ gui)> guiObjectChangedCallback;
+    std::function<void(const std::string &type, const std::string &errorMessage, const std::string &component)> unstableComponentFoundCallback;
+    std::function<void(int64_t magicMarker)> installerBinaryMarkerChangedCallback;
+    std::function<void()> componentsRecalculatedCallback;
+    std::function<void()> guiElementsReadyCallback;
+    std::function<void(const std::string &newDirectory)> installDirectoryChangedCallback;
+    std::function<void(SpaceInfo spaceInfo)> availableSpaceChangedCallback;
+    std::function<void()> metadataDownloadFailedCallback;
+
+    QMetaObject::Connection aboutCalculateComponentsToInstallConnection;
+    QMetaObject::Connection finishedCalculateComponentsToInstallConnection;
+    QMetaObject::Connection aboutCalculateComponentsToUninstallConnection;
+    QMetaObject::Connection finishedCalculateComponentsToUninstallConnection;
+    QMetaObject::Connection componentAddedConnection;
+    QMetaObject::Connection valueChangedConnection;
+    QMetaObject::Connection statusChangedConnection;
+    QMetaObject::Connection currentPageChangedConnection;
+    QMetaObject::Connection finishButtonClickedConnection;
+    QMetaObject::Connection metaJobProgressConnection;
+    QMetaObject::Connection metaJobTotalProgressConnection;
+    QMetaObject::Connection metaJobInfoMessageConnection;
+    QMetaObject::Connection startAllComponentsResetConnection;
+    QMetaObject::Connection finishAllComponentsResetConnection;
+    QMetaObject::Connection startUpdaterComponentsResetConnection;
+    QMetaObject::Connection finishUpdaterComponentsResetConnection;
+    QMetaObject::Connection installationStartedConnection;
+    QMetaObject::Connection installationInterruptedConnection;
+    QMetaObject::Connection installationFinishedConnection;
+    QMetaObject::Connection updateFinishedConnection;
+    QMetaObject::Connection uninstallationStartedConnection;
+    QMetaObject::Connection uninstallationFinishedConnection;
+    QMetaObject::Connection offlineGenerationStartedConnection;
+    QMetaObject::Connection offlineGenerationFinishedConnection;
+    QMetaObject::Connection titleMessageChangedConnection;
+    QMetaObject::Connection downloadArchivesFinishedConnection;
+    QMetaObject::Connection wizardPageInsertionRequestedConnection;
+    QMetaObject::Connection wizardPageRemovalRequestedConnection;
+    QMetaObject::Connection wizardWidgetInsertionRequestedConnection;
+    QMetaObject::Connection wizardWidgetRemovalRequestedConnection;
+    QMetaObject::Connection wizardPageWarningInsertionRequestedConnection;
+    QMetaObject::Connection wizardPageWarningRemovalRequestedConnection;
+    QMetaObject::Connection wizardPageVisibilityChangeRequestedConnection;
+    QMetaObject::Connection setValidatorForCustomPageRequestedConnection;
+    QMetaObject::Connection setAutomatedPageSwitchEnabledConnection;
+    QMetaObject::Connection coreNetworkSettingsChangedConnection;
+    QMetaObject::Connection guiObjectChangedConnection;
+    QMetaObject::Connection unstableComponentFoundConnection;
+    QMetaObject::Connection installerBinaryMarkerChangedConnection;
+    QMetaObject::Connection componentsRecalculatedConnection;
+    QMetaObject::Connection guiElementsReadyConnection;
+    QMetaObject::Connection installDirectoryChangedConnection;
+    QMetaObject::Connection availableSpaceChangedConnection;
+    QMetaObject::Connection metadataDownloadFailedConnection;
+
+    void disconnect();
+} InstallerProxyCallbacks;
+#endif
+
 typedef struct InstallerProxy {
     using Status = QInstaller::Plugin::Status;
     using WizardPage = QInstaller::Plugin::WizardPage;
     using SpaceInfo = QInstaller::Plugin::SpaceInfo;
 
 #ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
-    explicit InstallerProxy(QInstaller::PackageManagerCore*);
+    explicit InstallerProxy(QInstaller::PackageManagerCore*, InstallerProxyCallbacks*);
 #endif
 
     std::function<bool()> virtualComponentsVisible;

@@ -5,6 +5,7 @@
 #include <QTemporaryFile>
 
 #include "installer_global.h"
+#include "plugin.h"
 
 class PluginContext;
 class ControlPluginContext;
@@ -65,6 +66,9 @@ namespace QInstaller {
         bool initialized = false;
 
         QTemporaryFile* tempFile = nullptr;
+
+        // TODO: also add gui_callbacks and component_callbacks
+        InstallerProxyCallbacks* installer_callbacks = nullptr;
 
         ControlPluginContext* controlPluginContext();
         ComponentPluginContext* componentPluginContext();
