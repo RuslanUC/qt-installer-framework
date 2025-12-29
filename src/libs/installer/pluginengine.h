@@ -5,11 +5,12 @@
 #include <QTemporaryFile>
 
 #include "installer_global.h"
-#include "plugin.h"
 
 class PluginContext;
 class ControlPluginContext;
 class ComponentPluginContext;
+class InstallerProxyCallbacks;
+class ComponentProxyCallbacks;
 
 typedef bool(*IfwPluginControlInit)(ControlPluginContext*); // ifw_control_init
 typedef bool(*IfwPluginComponentInit)(ComponentPluginContext*); // ifw_component_init
@@ -67,8 +68,9 @@ namespace QInstaller {
 
         QTemporaryFile* tempFile = nullptr;
 
-        // TODO: also add gui_callbacks and component_callbacks
+        // TODO: also add gui_callbacks
         InstallerProxyCallbacks* installer_callbacks = nullptr;
+        ComponentProxyCallbacks* component_callbacks = nullptr;
 
         ControlPluginContext* controlPluginContext();
         ComponentPluginContext* componentPluginContext();

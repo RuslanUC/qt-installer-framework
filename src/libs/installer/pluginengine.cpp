@@ -24,11 +24,14 @@ namespace QInstaller {
 
         if(installer_callbacks)
             installer_callbacks->disconnect();
+        if(component_callbacks)
+            component_callbacks->disconnect();
 
         if(library.isLoaded())
             library.unload();
 
         delete installer_callbacks;
+        delete component_callbacks;
 
         delete context_control;
         delete context_component;
@@ -134,12 +137,13 @@ namespace QInstaller {
             return context_component;
 
         installer_callbacks = new InstallerProxyCallbacks();
+        component_callbacks = new ComponentProxyCallbacks();
 
         auto* guiObject = reinterpret_cast<PackageManagerGui*>(core->guiObject());
         context_component = new ComponentPluginContext(
             guiObject ? new GuiProxy(guiObject) : nullptr,
             new InstallerProxy(core, installer_callbacks),
-            component ? new ComponentProxy(component) : nullptr,
+            component ? new ComponentProxy(component, component_callbacks) : nullptr,
             new SystemInfoProxy());
 
         return context_component;

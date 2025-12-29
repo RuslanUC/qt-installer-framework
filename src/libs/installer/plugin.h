@@ -121,18 +121,18 @@ typedef struct InstallerProxyCallbacks {
     std::function<void()> finishedCalculateComponentsToInstallCallback;
     std::function<void()> aboutCalculateComponentsToUninstallCallback;
     std::function<void()> finishedCalculateComponentsToUninstallCallback;
-    std::function<void(QInstaller::Component *comp)> componentAddedCallback;
-    std::function<void(const std::string &key, const std::string &value)> valueChangedCallback;
+    std::function<void(QInstaller::Component*)> componentAddedCallback;
+    std::function<void(const std::string&, const std::string&)> valueChangedCallback;
     std::function<void(Status)> statusChangedCallback;
-    std::function<void(int page)> currentPageChangedCallback;
+    std::function<void(int)> currentPageChangedCallback;
     std::function<void()> finishButtonClickedCallback;
-    std::function<void(int progress)> metaJobProgressCallback;
-    std::function<void(int progress)> metaJobTotalProgressCallback;
-    std::function<void(const std::string &message)> metaJobInfoMessageCallback;
+    std::function<void(int)> metaJobProgressCallback;
+    std::function<void(int)> metaJobTotalProgressCallback;
+    std::function<void(const std::string &)> metaJobInfoMessageCallback;
     std::function<void()> startAllComponentsResetCallback;
-    std::function<void(const std::vector<QInstaller::Component*> &rootComponents)> finishAllComponentsResetCallback;
+    std::function<void(const std::vector<QInstaller::Component*>&)> finishAllComponentsResetCallback;
     std::function<void()> startUpdaterComponentsResetCallback;
-    std::function<void(const std::vector<QInstaller::Component*> &componentsWithUpdates)> finishUpdaterComponentsResetCallback;
+    std::function<void(const std::vector<QInstaller::Component*>&)> finishUpdaterComponentsResetCallback;
     std::function<void()> installationStartedCallback;
     std::function<void()> installationInterruptedCallback;
     std::function<void()> installationFinishedCallback;
@@ -141,25 +141,25 @@ typedef struct InstallerProxyCallbacks {
     std::function<void()> uninstallationFinishedCallback;
     std::function<void()> offlineGenerationStartedCallback;
     std::function<void()> offlineGenerationFinishedCallback;
-    std::function<void(const std::string &title)> titleMessageChangedCallback;
+    std::function<void(const std::string&)> titleMessageChangedCallback;
     std::function<void()> downloadArchivesFinishedCallback;
-    std::function<void(void* /* QWidget */ widget, WizardPage page)> wizardPageInsertionRequestedCallback;
-    std::function<void(void* /* QWidget */ widget)> wizardPageRemovalRequestedCallback;
-    std::function<void(void* /* QWidget */ widget, WizardPage page, int position)> wizardWidgetInsertionRequestedCallback;
-    std::function<void(void* /* QWidget */ widget)> wizardWidgetRemovalRequestedCallback;
-    std::function<void(const std::string &message, WizardPage page, const std::string &id, int position)> wizardPageWarningInsertionRequestedCallback;
-    std::function<void(const std::string &id)> wizardPageWarningRemovalRequestedCallback;
-    std::function<void(bool visible, int page)> wizardPageVisibilityChangeRequestedCallback;
-    std::function<void(QInstaller::Component *component, const std::string &name, const std::string &callbackName)> setValidatorForCustomPageRequestedCallback;
+    std::function<void(void* /* QWidget */, WizardPage)> wizardPageInsertionRequestedCallback;
+    std::function<void(void* /* QWidget */)> wizardPageRemovalRequestedCallback;
+    std::function<void(void* /* QWidget */, WizardPage, int)> wizardWidgetInsertionRequestedCallback;
+    std::function<void(void* /* QWidget */)> wizardWidgetRemovalRequestedCallback;
+    std::function<void(const std::string&, WizardPage, const std::string&, int)> wizardPageWarningInsertionRequestedCallback;
+    std::function<void(const std::string&)> wizardPageWarningRemovalRequestedCallback;
+    std::function<void(bool, int)> wizardPageVisibilityChangeRequestedCallback;
+    std::function<void(QInstaller::Component*, const std::string&, const std::string&)> setValidatorForCustomPageRequestedCallback;
     std::function<void(bool request)> setAutomatedPageSwitchEnabledCallback;
     std::function<void()> coreNetworkSettingsChangedCallback;
-    std::function<void(void* /* QObject */ gui)> guiObjectChangedCallback;
-    std::function<void(const std::string &type, const std::string &errorMessage, const std::string &component)> unstableComponentFoundCallback;
-    std::function<void(int64_t magicMarker)> installerBinaryMarkerChangedCallback;
+    std::function<void(void* /* QObject */)> guiObjectChangedCallback;
+    std::function<void(const std::string&, const std::string&, const std::string&)> unstableComponentFoundCallback;
+    std::function<void(int64_t)> installerBinaryMarkerChangedCallback;
     std::function<void()> componentsRecalculatedCallback;
     std::function<void()> guiElementsReadyCallback;
-    std::function<void(const std::string &newDirectory)> installDirectoryChangedCallback;
-    std::function<void(SpaceInfo spaceInfo)> availableSpaceChangedCallback;
+    std::function<void(const std::string&)> installDirectoryChangedCallback;
+    std::function<void(SpaceInfo)> availableSpaceChangedCallback;
     std::function<void()> metadataDownloadFailedCallback;
 
     QMetaObject::Connection aboutCalculateComponentsToInstallConnection;
@@ -384,9 +384,25 @@ typedef struct InstallerProxy {
     std::function<void(std::function<void()> callback)> setMetadataDownloadFailedCallback;
 } InstallerProxy;
 
+#ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
+typedef struct ComponentProxyCallbacks {
+    std::atomic<bool> alive{true};
+
+    std::function<void()> loadedCallback;
+    std::function<void()> virtualStateChangedCallback;
+    std::function<void(const std::string&, const std::string&)> valueChangedCallback;
+
+    QMetaObject::Connection loadedConnection;
+    QMetaObject::Connection virtualStateChangedConnection;
+    QMetaObject::Connection valueChangedConnection;
+
+    void disconnect();
+} ComponentProxyCallbacks;
+#endif
+
 typedef struct ComponentProxy {
 #ifdef IFW_BUILDING_INSTALLER_FRAMEWORK
-    explicit ComponentProxy(QInstaller::Component*);
+    explicit ComponentProxy(QInstaller::Component*, ComponentProxyCallbacks*);
 #endif
 
     std::function<void(const std::string &key, const std::string &value)> setValue;

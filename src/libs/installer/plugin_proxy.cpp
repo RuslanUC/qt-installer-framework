@@ -89,22 +89,22 @@ GuiProxy::GuiProxy(QInstaller::PackageManagerGui* gui) {
 }
 
 InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerProxyCallbacks* callbacks) {
-    virtualComponentsVisible = [core]() {
-        return core->virtualComponentsVisible();
+    virtualComponentsVisible = [core] {
+        return QInstaller::PackageManagerCore::virtualComponentsVisible();
     };
 
-    noForceInstallation = [core]() {
-        return core->noForceInstallation();
+    noForceInstallation = [core] {
+        return QInstaller::PackageManagerCore::noForceInstallation();
     };
 
-    noDefaultInstallation = [core]() {
-        return core->noDefaultInstallation();
+    noDefaultInstallation = [core] {
+        return QInstaller::PackageManagerCore::noDefaultInstallation();
     };
 
-    setDependsOnLocalInstallerBinary = [core]() {
+    setDependsOnLocalInstallerBinary = [core] {
         return core->setDependsOnLocalInstallerBinary();
     };
-    localInstallerBinaryUsed = [core]() {
+    localInstallerBinaryUsed = [core] {
         return core->localInstallerBinaryUsed();
     };
 
@@ -116,7 +116,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
 
         const auto result = core->execute(QString::fromStdString(program), args, QString::fromStdString(stdIn),
                                           QString::fromStdString(stdInCodec), QString::fromStdString(stdOutCodec));
-        std::tuple<std::string, int> resultTup = {
+        std::tuple resultTup = {
             !result.empty() ? result[0].toString().toStdString() : "",
             result.size() > 1 ? result[1].toInt() : 0,
         };
@@ -145,20 +145,20 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
     };
 
     versionMatches = [core](const std::string& version, const std::string& requirement) {
-        return core->versionMatches(QString::fromStdString(version), QString::fromStdString(requirement));
+        return QInstaller::PackageManagerCore::versionMatches(QString::fromStdString(version), QString::fromStdString(requirement));
     };
 
     findLibrary = [core](const std::string& name, const std::vector<std::string>& paths) {
         QStringList pathsQt;
         for (const auto& path : paths)
             pathsQt.append(QString::fromStdString(path));
-        return core->findLibrary(QString::fromStdString(name), pathsQt).toStdString();
+        return QInstaller::PackageManagerCore::findLibrary(QString::fromStdString(name), pathsQt).toStdString();
     };
     findPath = [core](const std::string& name, const std::vector<std::string>& paths) {
         QStringList pathsQt;
         for (const auto& path : paths)
             pathsQt.append(QString::fromStdString(path));
-        return core->findPath(QString::fromStdString(name), pathsQt).toStdString();
+        return QInstaller::PackageManagerCore::findPath(QString::fromStdString(name), pathsQt).toStdString();
     };
 
     setInstallerBaseBinary = [core](const std::string& path) {
@@ -208,20 +208,20 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         return core->setAllowCompressedRepositoryInstall(allow);
     };
 
-    autoAcceptMessageBoxes = [core]() {
+    autoAcceptMessageBoxes = [core] {
         return core->autoAcceptMessageBoxes();
     };
-    autoRejectMessageBoxes = [core]() {
+    autoRejectMessageBoxes = [core] {
         return core->autoRejectMessageBoxes();
     };
     setMessageBoxAutomaticAnswer = [core](const std::string& identifier, int button) {
         return core->setMessageBoxAutomaticAnswer(QString::fromStdString(identifier), button);
     };
-    acceptMessageBoxDefaultButton = [core]() {
+    acceptMessageBoxDefaultButton = [core] {
         return core->acceptMessageBoxDefaultButton();
     };
 
-    setAutoAcceptLicenses = [core]() {
+    setAutoAcceptLicenses = [core] {
         return core->setAutoAcceptLicenses();
     };
     setFileDialogAutomaticAnswer = [core](const std::string& identifier, const std::string& value) {
@@ -266,82 +266,82 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         return componentsVec;
     };
 
-    calculateComponentsToInstall = [core]() {
+    calculateComponentsToInstall = [core] {
         return core->calculateComponentsToInstall();
     };
 
-    recalculateAllComponents = [core]() {
+    recalculateAllComponents = [core] {
         return core->recalculateAllComponents();
     };
 
-    calculateComponentsToUninstall = [core]() {
+    calculateComponentsToUninstall = [core] {
         return core->calculateComponentsToUninstall();
     };
 
-    setInstaller = [core]() {
+    setInstaller = [core] {
         return core->setInstaller();
     };
-    isInstaller = [core]() {
+    isInstaller = [core] {
         return core->isInstaller();
     };
-    isOfflineOnly = [core]() {
+    isOfflineOnly = [core] {
         return core->isOfflineOnly();
     };
 
-    setUninstaller = [core]() {
+    setUninstaller = [core] {
         return core->setUninstaller();
     };
-    isUninstaller = [core]() {
+    isUninstaller = [core] {
         return core->isUninstaller();
     };
 
-    setUpdater = [core]() {
+    setUpdater = [core] {
         return core->setUpdater();
     };
-    isUpdater = [core]() {
+    isUpdater = [core] {
         return core->isUpdater();
     };
 
-    setPackageManager = [core]() {
+    setPackageManager = [core] {
         return core->setPackageManager();
     };
-    isPackageManager = [core]() {
+    isPackageManager = [core] {
         return core->isPackageManager();
     };
 
-    isOfflineGenerator = [core]() {
+    isOfflineGenerator = [core] {
         return core->isOfflineGenerator();
     };
 
-    isPackageViewer = [core]() {
+    isPackageViewer = [core] {
         return core->isPackageViewer();
     };
 
-    isUserSetBinaryMarker = [core]() {
+    isUserSetBinaryMarker = [core] {
         return core->isUserSetBinaryMarker();
     };
 
-    isCommandLineInstance = [core]() {
+    isCommandLineInstance = [core] {
         return core->isCommandLineInstance();
     };
-    isCommandLineDefaultInstall = [core]() {
+    isCommandLineDefaultInstall = [core] {
         return core->isCommandLineDefaultInstall();
     };
 
-    gainAdminRights = [core]() {
+    gainAdminRights = [core] {
         return core->gainAdminRights();
     };
-    dropAdminRights = [core]() {
+    dropAdminRights = [core] {
         return core->dropAdminRights();
     };
-    hasAdminRights = [core]() {
+    hasAdminRights = [core] {
         return core->hasAdminRights();
     };
 
-    requiredDiskSpace = [core]() {
+    requiredDiskSpace = [core] {
         return core->requiredDiskSpace();
     };
-    requiredTemporaryDiskSpace = [core]() {
+    requiredTemporaryDiskSpace = [core] {
         return core->requiredTemporaryDiskSpace();
     };
 
@@ -363,10 +363,8 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
     setDefaultPageVisible = [core](int page, bool visible) {
         return core->setDefaultPageVisible(page, visible);
     };
-    setValidatorForCustomPage = [core](QInstaller::Component* component, const std::string& name,
-                                       const std::string& callbackName) {
-        return core->setValidatorForCustomPage(component, QString::fromStdString(name),
-                                               QString::fromStdString(callbackName));
+    setValidatorForCustomPage = [core](QInstaller::Component* component, const std::string& name, const std::string& callbackName) {
+        return core->setValidatorForCustomPage(component, QString::fromStdString(name), QString::fromStdString(callbackName));
     };
     selectComponent = [core](const std::string& id) {
         return core->selectComponent(QString::fromStdString(id));
@@ -375,31 +373,31 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         return core->deselectComponent(QString::fromStdString(id));
     };
 
-    runInstaller = [core]() {
+    runInstaller = [core] {
         return core->runInstaller();
     };
-    runUninstaller = [core]() {
+    runUninstaller = [core] {
         return core->runUninstaller();
     };
-    runPackageUpdater = [core]() {
+    runPackageUpdater = [core] {
         return core->runPackageUpdater();
     };
-    runOfflineGenerator = [core]() {
+    runOfflineGenerator = [core] {
         return core->runOfflineGenerator();
     };
-    interrupt = [core]() {
+    interrupt = [core] {
         return core->interrupt();
     };
-    setCanceled = [core]() {
+    setCanceled = [core] {
         return core->setCanceled();
     };
-    languageChanged = [core]() {
+    languageChanged = [core] {
         return core->languageChanged();
     };
     setCompleteUninstallation = [core](bool complete) {
         return core->setCompleteUninstallation(complete);
     };
-    cancelMetaInfoJob = [core]() {
+    cancelMetaInfoJob = [core] {
         return core->cancelMetaInfoJob();
     };
 
@@ -434,7 +432,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->finishedCalculateComponentsToUninstallCallback = callback;
         callbacks->finishedCalculateComponentsToUninstallConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::finishedCalculateComponentsToUninstall, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->finishedCalculateComponentsToUninstallCallback();
             });
@@ -448,8 +446,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
                     callbacks->componentAddedCallback(comp);
             });
     };
-    setValueChangedCallback = [core, callbacks](
-        std::function<void(const std::string& key, const std::string& value)> callback) {
+    setValueChangedCallback = [core, callbacks](std::function<void(const std::string& key, const std::string& value)> callback) {
             callbacks->valueChangedCallback = callback;
             callbacks->valueChangedConnection = QObject::connect(
                 core, &QInstaller::PackageManagerCore::valueChanged, core,
@@ -480,7 +477,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->finishButtonClickedCallback = callback;
         callbacks->finishButtonClickedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::finishButtonClicked, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->finishButtonClickedCallback();
             });
@@ -518,43 +515,45 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->startAllComponentsResetCallback = callback;
         callbacks->startAllComponentsResetConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::startAllComponentsReset, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->startAllComponentsResetCallback();
             });
     };
 
-    // TODO: rewrite using `callbacks`
-    setFinishAllComponentsResetCallback = [core](
-        std::function<void(const std::vector<QInstaller::Component*>& rootComponents)> callback) {
-            QObject::connect(core, &QInstaller::PackageManagerCore::finishAllComponentsReset, core,
-                             [callback](const QList<QInstaller::Component*>& rootComponents) {
-                                 std::vector<QInstaller::Component*> componentsVec;
-                                 for (const auto& comp : rootComponents)
-                                     componentsVec.push_back(comp);
-                                 callback(componentsVec);
-                             });
+    setFinishAllComponentsResetCallback = [core, callbacks](std::function<void(const std::vector<QInstaller::Component*>&)> callback) {
+            callbacks->finishAllComponentsResetCallback = callback;
+            callbacks->finishAllComponentsResetConnection = QObject::connect(
+                core, &QInstaller::PackageManagerCore::finishAllComponentsReset, core,
+                [callbacks](const QList<QInstaller::Component*>& rootComponents) {
+                    std::vector<QInstaller::Component*> componentsVec;
+                    for (const auto& comp : rootComponents)
+                        componentsVec.push_back(comp);
+                    if (callbacks->alive.load(std::memory_order_acquire))
+                        callbacks->finishAllComponentsResetCallback(componentsVec);
+                });
         };
 
     setStartUpdaterComponentsResetCallback = [core, callbacks](std::function<void()> callback) {
         callbacks->startUpdaterComponentsResetCallback = callback;
         callbacks->startUpdaterComponentsResetConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::startUpdaterComponentsReset, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->startUpdaterComponentsResetCallback();
             });
     };
-    // TODO: rewrite using `callbacks`
-    setFinishUpdaterComponentsResetCallback = [core](
-        std::function<void(const std::vector<QInstaller::Component*>& componentsWithUpdates)> callback) {
-            QObject::connect(core, &QInstaller::PackageManagerCore::finishUpdaterComponentsReset, core,
-                             [callback](const QList<QInstaller::Component*>& componentsWithUpdates) {
-                                 std::vector<QInstaller::Component*> componentsVec;
-                                 for (const auto& comp : componentsWithUpdates)
-                                     componentsVec.push_back(comp);
-                                 callback(componentsVec);
-                             });
+    setFinishUpdaterComponentsResetCallback = [core, callbacks](std::function<void(const std::vector<QInstaller::Component*>&)> callback) {
+        callbacks->finishUpdaterComponentsResetCallback = callback;
+        callbacks->finishUpdaterComponentsResetConnection = QObject::connect(
+                core, &QInstaller::PackageManagerCore::finishUpdaterComponentsReset, core,
+                [callbacks](const QList<QInstaller::Component*>& componentsWithUpdates) {
+                    std::vector<QInstaller::Component*> componentsVec;
+                    for (const auto& comp : componentsWithUpdates)
+                        componentsVec.push_back(comp);
+                    if (callbacks->alive.load(std::memory_order_acquire))
+                        callbacks->finishUpdaterComponentsResetCallback(componentsVec);
+                });
         };
 
     setInstallationStartedCallback = [core, callbacks](std::function<void()> callback) {
@@ -570,7 +569,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->installationInterruptedCallback = callback;
         callbacks->installationInterruptedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::installationInterrupted, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->installationInterruptedCallback();
             });
@@ -579,7 +578,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->installationFinishedCallback = callback;
         callbacks->installationFinishedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::installationFinished, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->installationFinishedCallback();
             });
@@ -588,7 +587,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->updateFinishedCallback = callback;
         callbacks->updateFinishedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::updateFinished, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->updateFinishedCallback();
             });
@@ -597,7 +596,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->uninstallationStartedCallback = callback;
         callbacks->uninstallationStartedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::uninstallationStarted, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->uninstallationStartedCallback();
             });
@@ -606,7 +605,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->uninstallationFinishedCallback = callback;
         callbacks->uninstallationFinishedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::uninstallationFinished, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->uninstallationFinishedCallback();
             });
@@ -615,7 +614,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->offlineGenerationStartedCallback = callback;
         callbacks->offlineGenerationStartedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::offlineGenerationStarted, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->offlineGenerationStartedCallback();
             });
@@ -624,7 +623,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->offlineGenerationFinishedCallback = callback;
         callbacks->offlineGenerationFinishedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::offlineGenerationFinished, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->offlineGenerationFinishedCallback();
             });
@@ -642,23 +641,22 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->downloadArchivesFinishedCallback = callback;
         callbacks->downloadArchivesFinishedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::downloadArchivesFinished, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->downloadArchivesFinishedCallback();
             });
     };
 
-    // TODO: rewrite using `callbacks`
-    setWizardPageInsertionRequestedCallback = [core](
-        std::function<void(void* /* QWidget */ widget, WizardPage page)> callback) {
-            QObject::connect(core, &QInstaller::PackageManagerCore::wizardPageInsertionRequested, core,
-                             [callback](void* /* QWidget */ widget, QInstaller::PackageManagerCore::WizardPage page) {
-                                 callback(widget, (WizardPage)page);
-                             });
+    setWizardPageInsertionRequestedCallback = [core, callbacks](std::function<void(void* /* QWidget */, WizardPage)> callback) {
+            callbacks->wizardPageInsertionRequestedCallback = callback;
+            callbacks->wizardPageInsertionRequestedConnection = QObject::connect(
+                core, &QInstaller::PackageManagerCore::wizardPageInsertionRequested, core,
+                [callbacks](void* /* QWidget */ widget, QInstaller::PackageManagerCore::WizardPage page) {
+                    if (callbacks->alive.load(std::memory_order_acquire))
+                        callbacks->wizardPageInsertionRequestedCallback(widget, (WizardPage)page);
+                });
         };
-    // TODO: rewrite using `callbacks`
-    setWizardPageRemovalRequestedCallback = [core, callbacks
-        ](std::function<void(void* /* QWidget */ widget)> callback) {
+    setWizardPageRemovalRequestedCallback = [core, callbacks](std::function<void(void* /* QWidget */)> callback) {
             callbacks->wizardPageRemovalRequestedCallback = callback;
             callbacks->wizardPageRemovalRequestedConnection = QObject::connect(
                 core, &QInstaller::PackageManagerCore::wizardPageRemovalRequested, core,
@@ -666,41 +664,36 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
                     if (callbacks->alive.load(std::memory_order_acquire))
                         callbacks->wizardPageRemovalRequestedCallback(widget);
                 });
-        };
-    // TODO: rewrite using `callbacks`
-    setWizardWidgetInsertionRequestedCallback = [core](
-        std::function<void(void* /* QWidget */ widget, WizardPage page, int position)> callback) {
-            QObject::connect(core, &QInstaller::PackageManagerCore::wizardWidgetInsertionRequested, core,
-                             [callback](void* /* QWidget */ widget, QInstaller::PackageManagerCore::WizardPage page,
-                                        int position) {
-                                 callback(widget, (WizardPage)page, position);
-                             });
-        };
-    // TODO: rewrite using `callbacks`
-    setWizardWidgetRemovalRequestedCallback = [core, callbacks
-        ](std::function<void(void* /* QWidget */ widget)> callback) {
-            callbacks->wizardWidgetRemovalRequestedCallback = callback;
-            callbacks->wizardWidgetRemovalRequestedConnection = QObject::connect(
-                core, &QInstaller::PackageManagerCore::wizardWidgetRemovalRequested, core,
-                [callbacks](void* /* QWidget */ widget) {
+    };
+    setWizardWidgetInsertionRequestedCallback = [core, callbacks](std::function<void(void* /* QWidget */, WizardPage, int)> callback) {
+            callbacks->wizardWidgetInsertionRequestedCallback = callback;
+            callbacks->wizardWidgetInsertionRequestedConnection = QObject::connect(
+                core, &QInstaller::PackageManagerCore::wizardWidgetInsertionRequested, core,
+                [callbacks](void* /* QWidget */ widget, QInstaller::PackageManagerCore::WizardPage page, int position) {
                     if (callbacks->alive.load(std::memory_order_acquire))
-                        callbacks->wizardWidgetRemovalRequestedCallback(widget);
+                        callbacks->wizardWidgetInsertionRequestedCallback(widget, (WizardPage)page, position);
                 });
         };
-    // TODO: rewrite using `callbacks`
-    setWizardPageWarningInsertionRequestedCallback = [core](
-        std::function<void(const std::string& message, WizardPage page, const std::string& id,
-                           int position)> callback) {
-            QObject::connect(core, &QInstaller::PackageManagerCore::wizardPageWarningInsertionRequested, core,
-                             [callback](const QString& message, QInstaller::PackageManagerCore::WizardPage page,
-                                        const QString& id,
-                                        int position) {
-                                 callback(message.toStdString(), (WizardPage)page, id.toStdString(), position);
-                             });
+    setWizardWidgetRemovalRequestedCallback = [core, callbacks](std::function<void(void* /* QWidget */)> callback) {
+        callbacks->wizardWidgetRemovalRequestedCallback = callback;
+        callbacks->wizardWidgetRemovalRequestedConnection = QObject::connect(
+            core, &QInstaller::PackageManagerCore::wizardWidgetRemovalRequested, core,
+            [callbacks](void* /* QWidget */ widget) {
+                if (callbacks->alive.load(std::memory_order_acquire))
+                    callbacks->wizardWidgetRemovalRequestedCallback(widget);
+            });
+    };
+    setWizardPageWarningInsertionRequestedCallback = [core, callbacks](std::function<void(const std::string&, WizardPage, const std::string&, int)> callback) {
+            callbacks->wizardPageWarningInsertionRequestedCallback = callback;
+            callbacks->wizardPageWarningInsertionRequestedConnection = QObject::connect(
+                core, &QInstaller::PackageManagerCore::wizardPageWarningInsertionRequested, core,
+                [callbacks](const QString& message, QInstaller::PackageManagerCore::WizardPage page, const QString& id, int position) {
+                    if (callbacks->alive.load(std::memory_order_acquire))
+                        callbacks->wizardPageWarningInsertionRequestedCallback(
+                            message.toStdString(), (WizardPage)page, id.toStdString(), position);
+                });
         };
-    // TODO: rewrite using `callbacks`
-    setWizardPageWarningRemovalRequestedCallback = [core, callbacks
-        ](std::function<void(const std::string& id)> callback) {
+    setWizardPageWarningRemovalRequestedCallback = [core, callbacks](std::function<void(const std::string&)> callback) {
             callbacks->wizardPageWarningRemovalRequestedCallback = callback;
             callbacks->wizardPageWarningRemovalRequestedConnection = QObject::connect(
                 core, &QInstaller::PackageManagerCore::wizardPageWarningRemovalRequested, core,
@@ -709,9 +702,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
                         callbacks->wizardPageWarningRemovalRequestedCallback(id.toStdString());
                 });
         };
-    // TODO: rewrite using `callbacks`
-    setWizardPageVisibilityChangeRequestedCallback = [core, callbacks
-        ](std::function<void(bool visible, int page)> callback) {
+    setWizardPageVisibilityChangeRequestedCallback = [core, callbacks](std::function<void(bool visible, int page)> callback) {
             callbacks->wizardPageVisibilityChangeRequestedCallback = callback;
             callbacks->wizardPageVisibilityChangeRequestedConnection = QObject::connect(
                 core, &QInstaller::PackageManagerCore::wizardPageVisibilityChangeRequested, core,
@@ -720,18 +711,18 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
                         callbacks->wizardPageVisibilityChangeRequestedCallback(visible, page);
                 });
         };
-    // TODO: rewrite using `callbacks`
-    setSetValidatorForCustomPageRequestedCallback = [core](
-        std::function<void(QInstaller::Component* component, const std::string& name,
-                           const std::string& callbackName)> callback) {
-            QObject::connect(core, &QInstaller::PackageManagerCore::setValidatorForCustomPageRequested, core,
-                             [callback](QInstaller::Component* component, const QString& name,
-                                        const QString& callbackName) {
-                                 callback(component, name.toStdString(), callbackName.toStdString());
-                             });
+    setSetValidatorForCustomPageRequestedCallback = [core, callbacks](std::function<void(QInstaller::Component*, const std::string&, const std::string&)> callback) {
+            callbacks->setValidatorForCustomPageRequestedCallback = callback;
+            callbacks->setValidatorForCustomPageRequestedConnection = QObject::connect(
+                core, &QInstaller::PackageManagerCore::setValidatorForCustomPageRequested, core,
+                [callbacks](QInstaller::Component* component, const QString& name, const QString& callbackName) {
+                    if (callbacks->alive.load(std::memory_order_acquire))
+                        callbacks->setValidatorForCustomPageRequestedCallback(
+                            component, name.toStdString(), callbackName.toStdString());
+                });
         };
 
-    setSetAutomatedPageSwitchEnabledCallback = [core, callbacks](std::function<void(bool request)> callback) {
+    setSetAutomatedPageSwitchEnabledCallback = [core, callbacks](std::function<void(bool)> callback) {
         callbacks->setAutomatedPageSwitchEnabledCallback = callback;
         callbacks->setAutomatedPageSwitchEnabledConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::setAutomatedPageSwitchEnabled, core,
@@ -744,13 +735,13 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->coreNetworkSettingsChangedCallback = callback;
         callbacks->coreNetworkSettingsChangedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::coreNetworkSettingsChanged, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->coreNetworkSettingsChangedCallback();
             });
     };
 
-    setGuiObjectChangedCallback = [core, callbacks](std::function<void(void* /* QObject */ gui)> callback) {
+    setGuiObjectChangedCallback = [core, callbacks](std::function<void(void* /* QObject */)> callback) {
         callbacks->guiObjectChangedCallback = callback;
         callbacks->guiObjectChangedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::guiObjectChanged, core,
@@ -759,15 +750,14 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
                     callbacks->guiObjectChangedCallback(gui);
             });
     };
-    // TODO: rewrite using `callbacks`
-    setUnstableComponentFoundCallback = [core](
-        std::function<void(const std::string& type, const std::string& errorMessage, const std::string& component)>
-        callback) {
-            QObject::connect(core, &QInstaller::PackageManagerCore::unstableComponentFound, core,
-                             [callback](const QString& type, const QString& errorMessage,
-                                        const QString& component) {
-                                 callback(type.toStdString(), errorMessage.toStdString(), component.toStdString());
-                             });
+    setUnstableComponentFoundCallback = [core, callbacks](std::function<void(const std::string&, const std::string&, const std::string&)> callback) {
+            callbacks->unstableComponentFoundCallback = callback;
+            callbacks->unstableComponentFoundConnection = QObject::connect(
+                core, &QInstaller::PackageManagerCore::unstableComponentFound, core,
+                [callbacks](const QString& type, const QString& errorMessage, const QString& component) {
+                    if (callbacks->alive.load(std::memory_order_acquire))
+                        callbacks->unstableComponentFoundCallback(type.toStdString(), errorMessage.toStdString(), component.toStdString());
+                });
         };
     setInstallerBinaryMarkerChangedCallback = [core, callbacks](std::function<void(int64_t magicMarker)> callback) {
         callbacks->installerBinaryMarkerChangedCallback = callback;
@@ -782,7 +772,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->componentsRecalculatedCallback = callback;
         callbacks->componentsRecalculatedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::componentsRecalculated, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->componentsRecalculatedCallback();
             });
@@ -791,13 +781,12 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->guiElementsReadyCallback = callback;
         callbacks->guiElementsReadyConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::guiElementsReady, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->guiElementsReadyCallback();
             });
     };
-    setInstallDirectoryChangedCallback = [core, callbacks](
-        std::function<void(const std::string& newDirectory)> callback) {
+    setInstallDirectoryChangedCallback = [core, callbacks](std::function<void(const std::string&)> callback) {
             callbacks->installDirectoryChangedCallback = callback;
             callbacks->installDirectoryChangedConnection = QObject::connect(
                 core, &QInstaller::PackageManagerCore::installDirectoryChanged, core,
@@ -806,7 +795,7 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
                         callbacks->installDirectoryChangedCallback(newDirectory.toStdString());
                 });
         };
-    setAvailableSpaceChangedCallback = [core, callbacks](std::function<void(SpaceInfo spaceInfo)> callback) {
+    setAvailableSpaceChangedCallback = [core, callbacks](std::function<void(SpaceInfo)> callback) {
         callbacks->availableSpaceChangedCallback = callback;
         callbacks->availableSpaceChangedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::availableSpaceChanged, core,
@@ -819,14 +808,14 @@ InstallerProxy::InstallerProxy(QInstaller::PackageManagerCore* core, InstallerPr
         callbacks->metadataDownloadFailedCallback = callback;
         callbacks->metadataDownloadFailedConnection = QObject::connect(
             core, &QInstaller::PackageManagerCore::metadataDownloadFailed, core,
-            [callbacks]() {
+            [callbacks] {
                 if (callbacks->alive.load(std::memory_order_acquire))
                     callbacks->metadataDownloadFailedCallback();
             });
     };
 }
 
-ComponentProxy::ComponentProxy(QInstaller::Component* component) {
+ComponentProxy::ComponentProxy(QInstaller::Component* component, ComponentProxyCallbacks* callbacks) {
     setValue = [component](const std::string& key, const std::string& value) {
         return component->setValue(QString::fromStdString(key), QString::fromStdString(value));
     };
@@ -924,22 +913,32 @@ ComponentProxy::ComponentProxy(QInstaller::Component* component) {
         return component->setAutoCreateOperations(autoCreateOperations);
     };
 
-    setLoadedCallback = [component](std::function<void()> callback) {
-        QObject::connect(component, &QInstaller::Component::loaded, component, [callback]() {
-            callback();
-        });
+    setLoadedCallback = [component, callbacks](std::function<void()> callback) {
+        callbacks->loadedCallback = callback;
+        callbacks->loadedConnection = QObject::connect(
+            component, &QInstaller::Component::loaded, component,
+            [callbacks] {
+                if (callbacks->alive.load(std::memory_order_acquire))
+                    callbacks->loadedCallback();
+            });
     };
-    setVirtualStateChangedCallback = [component](std::function<void()> callback) {
-        QObject::connect(component, &QInstaller::Component::virtualStateChanged, component, [callback]() {
-            callback();
-        });
+    setVirtualStateChangedCallback = [component, callbacks](std::function<void()> callback) {
+        callbacks->virtualStateChangedCallback = callback;
+        callbacks->virtualStateChangedConnection = QObject::connect(
+            component, &QInstaller::Component::virtualStateChanged, component,
+            [callbacks] {
+                if (callbacks->alive.load(std::memory_order_acquire))
+                    callbacks->virtualStateChangedCallback();
+            });
     };
-    setValueChangedCallback = [component](
-        std::function<void(const std::string& key, const std::string& value)> callback) {
-            QObject::connect(component, &QInstaller::Component::valueChanged, component,
-                             [callback](const QString& key, const QString& value) {
-                                 callback(key.toStdString(), value.toStdString());
-                             });
+    setValueChangedCallback = [component, callbacks](std::function<void(const std::string&, const std::string&)> callback) {
+            callbacks->valueChangedCallback = callback;
+            callbacks->valueChangedConnection = QObject::connect(
+                component, &QInstaller::Component::valueChanged, component,
+                [callbacks](const QString& key, const QString& value) {
+                    if (callbacks->alive.load(std::memory_order_acquire))
+                        callbacks->valueChangedCallback(key.toStdString(), value.toStdString());
+                });
         };
 }
 
@@ -1035,4 +1034,16 @@ void InstallerProxyCallbacks::disconnect() {
     installDirectoryChangedCallback = {};
     availableSpaceChangedCallback = {};
     metadataDownloadFailedCallback = {};
+}
+
+void ComponentProxyCallbacks::disconnect() {
+    alive.store(false, std::memory_order_release);
+
+    QObject::disconnect(loadedConnection);
+    QObject::disconnect(virtualStateChangedConnection);
+    QObject::disconnect(valueChangedConnection);
+
+    loadedCallback = {};
+    virtualStateChangedCallback = {};
+    valueChangedCallback = {};
 }
