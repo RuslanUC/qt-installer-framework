@@ -64,10 +64,25 @@ namespace QInstaller {
             tempFile->write(resFile.readAll());
             tempFile->flush();
             tempFile->setPermissions(QFile::ExeOwner | QFile::ReadOwner | QFile::WriteOwner | QFile::ExeGroup | QFile::ReadGroup | QFile::ExeOther | QFile::ReadOther);
+
+#if defined(Q_OS_WINDOWS)
+            tempFile->setAutoRemove(false);
+            tempFile->close();
+            const auto tempPath = tempFile->fileName();
+            QObject::connect(qApp, &QCoreApplication::aboutToQuit, [tempPath] {
+                QFile::remove(tempPath);
+            });
+
+            delete tempFile;
+            tempFile = nullptr;
+
+            library.setFileName(tempPath);
+#else
             tempFile->setAutoRemove(true);
             tempFile->close();
-
             library.setFileName(tempFile->fileName());
+#endif
+
             if(!library.load()) {
                 qCCritical(QInstaller::lcInstallerPluginLog) << "Failed to load library: " << library.errorString();
                 return false;
